@@ -59,6 +59,21 @@ fu! cmdline#fix_typo(label) abort "{{{1
     "       So, we'll reexecute a new fixed command with the timer.
 endfu
 
+fu! cmdline#remember(list) abort "{{{1
+    augroup remember_overlooked_commands
+        au!
+        for cmd in a:list
+            exe printf('
+                      \  au CmdLineLeave :
+                      \  if getcmdline() %s %s
+                      \|     call timer_start(0, {-> execute("echohl WarningMsg | echo %s | echohl NONE", "")})
+                      \| endif
+                      \',     cmd.regex ? '=~#': '==#' , string(cmd.old), string('['.cmd.new .'] was equivalent')
+                      \  )
+        endfor
+    augroup END
+endfu
+
 fu! cmdline#toggle_editing_commands(enable) abort "{{{1
     if a:enable
         call tmp_mappings#restore(get(s:, 'my_editing_commands', []))

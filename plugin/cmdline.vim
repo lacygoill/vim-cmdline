@@ -3,7 +3,24 @@ if exists('g:loaded_cmdline')
 endif
 let g:loaded_cmdline = 1
 
+" Variable {{{1
+
+let s:overlooked_commands = [
+                          \   { 'old': 'vs\%[plit]', 'new': 'C-w v', 'regex': 1 },
+                          \   { 'old': 'sp\%[lit]' , 'new': 'C-w s', 'regex': 1 },
+                          \   { 'old': 'q!'        , 'new': 'ZQ'   , 'regex': 0 },
+                          \   { 'old': 'x'         , 'new': 'ZZ'   , 'regex': 0 },
+                          \ ]
+
 " Autocmds {{{1
+
+augroup lazy_load_reminders
+    au!
+    au CmdLineEnter * call cmdline#remember(s:overlooked_commands)
+                   \| unlet! s:overlooked_commands
+                   \| exe 'au! lazy_load_reminders'
+                   \| exe 'aug! lazy_load_reminders'
+augroup END
 
 augroup my_cmdline
     au!
