@@ -3,6 +3,8 @@ if exists('g:loaded_cmdline')
 endif
 let g:loaded_cmdline = 1
 
+" Autocmds {{{1
+
 augroup my_cmdline
     au!
     " Automatically execute  command B when A  has just been executed  (chain of
@@ -34,3 +36,18 @@ augroup my_cmdline
                    \|     call cmdline#fix_typo('cr')
                    \| endif
 augroup END
+
+" Command {{{1
+
+" Purpose:{{{
+" We have several custom mappings in command-line mode.
+" Some of them are bound to custom functions.
+" They interfere / add noise / bug (cr) when we're in debug or Ex mode.
+" We install this command so that it can be used to toggle them when needed,
+" in other plugins/vimrc/….
+"}}}
+" Usage:{{{
+"         ToggleEditingCommands 0  →  disable
+"         ToggleEditingCommands 1  →  enable
+"}}}
+com! -bar -nargs=1 ToggleEditingCommands call cmdline#toggle_editing_commands(<args>)
