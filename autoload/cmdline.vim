@@ -87,6 +87,7 @@ fu! cmdline#chain() abort "{{{1
         call feedkeys(':sil '.repeat(cmdline[0], 2).' ', 'in')
     endif
 endfu
+
 fu! cmdline#fix_typo(label) abort "{{{1
     let cmdline = getcmdline()
     let keys = {
