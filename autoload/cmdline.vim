@@ -3,6 +3,56 @@ if exists('g:autoloaded_cmdline')
 endif
 let g:autoloaded_cmdline = 1
 
+fu! cmdline#auto_uppercase() abort "{{{1
+
+" We define abbreviations in command-line mode to automatically replace
+" a custom command name written in lowercase with uppercase characters.
+
+    let commands = getcompletion('[A-Z]?*', 'command')
+                 \ +
+                 \ [
+                 \ 'Gblame',
+                 \ 'Gbrowse',
+                 \ 'Gcd',
+                 \ 'Gcommit',
+                 \ 'Gdiff',
+                 \ 'Ge',
+                 \ 'Gedit',
+                 \ 'Gfetch',
+                 \ 'Ggrep',
+                 \ 'Git',
+                 \ 'Glcd',
+                 \ 'Glgrep',
+                 \ 'Gllog',
+                 \ 'Glog',
+                 \ 'Gmerge',
+                 \ 'Gmove',
+                 \ 'Gpedit',
+                 \ 'Gpull',
+                 \ 'Gpush',
+                 \ 'Gread',
+                 \ 'Gremove',
+                 \ 'Gsdiff',
+                 \ 'Gsplit',
+                 \ 'Gstatus',
+                 \ 'Gtabedit',
+                 \ 'Gvdiff',
+                 \ 'Gvsplit',
+                 \ 'Gw',
+                 \ 'Gwq',
+                 \ 'Gwrite',
+                 \ ]
+
+    for lhs in commands
+
+        exe 'cnorea <expr> '.tolower(lhs)
+                          \ .' getcmdtype() ==# ":" && getcmdline() =~# ''\v^%(%(tab<Bar>vert%[ical])\s+)?'
+                          \ .tolower(lhs).'$'''
+                          \ .' ? '.string(lhs)
+                          \ .' : '.string(tolower(lhs))
+    endfor
+endfu
+
 fu! cmdline#chain() abort "{{{1
     " Do NOT write empty lines in this function (gQ → E501, E749).
     let cmdline = getcmdline()
