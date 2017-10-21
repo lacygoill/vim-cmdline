@@ -22,7 +22,7 @@ let g:loaded_cmdline = 1
 
 " When I want to search for tab characters, I often type \` by accident fix this
 " automatically.
-cnorea <expr>  \`    getcmdtype() =~# '[/?]'  ? '\`' : '\`'
+cnorea <expr>  \`    getcmdtype() =~# '[/?]'  ? '\t' : '\`'
 
 cnorea <expr>  sl    getcmdtype() ==# ':' && getcmdpos() == 3  ? 'ls'             : 'sl'
 cnorea <expr>  hg    getcmdtype() ==# ':' && getcmdpos() == 3  ? 'helpgrep'       : 'hg'
