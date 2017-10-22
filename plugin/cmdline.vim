@@ -50,11 +50,11 @@ cnorea <expr>  pc    getcmdtype() ==# ':'  && getcmdpos() == 3  ? 'sil! PlugClea
 
 augroup my_lazy_loaded_cmdline
     au!
-    au CmdLineEnter * call cmdline#auto_uppercase()
+    au CmdLineEnter : call cmdline#auto_uppercase()
                    \| call cmdline#remember(s:overlooked_commands)
                    \| unlet! s:overlooked_commands
                    \| exe 'au! my_lazy_loaded_cmdline'
-                   \| exe 'aug! my_lazy_loaded_cmdline'
+                   \| aug! my_lazy_loaded_cmdline
 augroup END
 
 augroup my_cmdline
