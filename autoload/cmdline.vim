@@ -119,7 +119,9 @@ fu! cmdline#remember(list) abort "{{{1
                       \  if getcmdline() %s %s
                       \|     call timer_start(0, {-> execute("echohl WarningMsg | echo %s | echohl NONE", "")})
                       \| endif
-                      \',     cmd.regex ? '=~#': '==#' , string(cmd.old), string('['.cmd.new .'] was equivalent')
+                      \',     cmd.regex ? '=~#': '==#' ,
+                      \       string(cmd.regex ? '^'.cmd.old.'$' : cmd.old),
+                      \       string('['.cmd.new .'] was equivalent')
                       \  )
         endfor
     augroup END
