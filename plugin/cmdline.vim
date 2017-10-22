@@ -43,29 +43,8 @@ cnorea <expr>  fs    getcmdtype() ==# ':'  && getcmdpos() == 3  ?  'FzLocate'   
 
 cnorea <expr>  ucs   getcmdtype() ==# ':' && getcmdpos() == 4  ? 'UnicodeSearch'  : 'ucs'
 
-cnorea <expr>  pc    getcmdtype() ==# ':'  && getcmdpos() == 3  ? 'sil! PlugClean' : 'pc'
-
 "         :pc    →    :sil! PlugClean
-"
-" NOTE:
-"
-" if we try to clean the plugins with `PlugClean`, while having a modified plugin,
-" the modifications not being committed, we have this error:
-"
-"     /home/user/Dropbox/conf/vim/autoload/plug.vim|2082| <SNR>4_clean[13]
-"     /home/user/Dropbox/conf/vim/autoload/plug.vim|2039| <SNR>4_git_validate[36]
-"     || E688: More targets than List items
-"
-" Solution:
-" When you want to modify a plugin, do it on a cloned version.
-" This way, you can commit your changes, and `Vim-Plug` won't complain.
-" Besides, it's better because your modifications are backed up on github.
-"
-" The only downside is that, if you use a clone of a plugin, when you do an
-" update, you're not being informed when the author of a plugin adds a new
-" feature, or fixes a bug.
-" So, only clone if the plugin is old, or inactive since a long time, or it's
-" a really simple one. Otherwise, try to submit a PR.
+cnorea <expr>  pc    getcmdtype() ==# ':'  && getcmdpos() == 3  ? 'sil! PlugClean' : 'pc'
 
 " Autocmds {{{1
 
