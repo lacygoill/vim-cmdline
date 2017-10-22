@@ -43,14 +43,14 @@ fu! cmdline#auto_uppercase() abort "{{{1
                  \ 'Gwrite',
                  \ ]
 
-    for lhs in commands
-        let llhs  = tolower(lhs)
+    for cmd in commands
+        let lcmd  = tolower(cmd)
         exe printf('cnorea <expr> %s
         \           getcmdtype() == '':'' && getcmdline() =~# ''\v^%(%(tab<Bar>vert%[ical])\s+)?%s$''
         \?                               %s
         \:                               %s
-        \',          llhs, llhs, string(lhs), string(tolower(lhs))
-        \)
+        \',          lcmd, lcmd, string(cmd), string(tolower(cmd))
+        \         )
     endfor
 endfu
 
