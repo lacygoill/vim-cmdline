@@ -116,7 +116,7 @@ fu! cmdline#remember(list) abort "{{{1
         au!
         for cmd in a:list
             exe printf('
-                      \  au CmdLineLeave :
+                      \  au CmdlineLeave :
                       \  if getcmdline() %s %s
                       \|     call timer_start(0, {-> execute("echohl WarningMsg | echo %s | echohl NONE", "")})
                       \| endif
