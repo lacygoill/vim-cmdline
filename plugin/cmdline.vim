@@ -57,12 +57,22 @@ augroup my_lazy_loaded_cmdline
                    \| aug! my_lazy_loaded_cmdline
 augroup END
 
-augroup my_cmdline
+augroup my_cmdline_chain
     au!
     " Automatically execute  command B when A  has just been executed  (chain of
     " commands). Inspiration:
     "         https://gist.github.com/romainl/047aca21e338df7ccf771f96858edb86
     au CmdlineLeave : call cmdline#chain()
+
+    " TODO:
+    " The following autocmds are not  handled by `cmdline#chain()`, because they
+    " don't  execute simple  Ex commands. Still,  it's a  bit weird  to have  an
+    " autocmd handling simple  commands (+ 2 less simple), and  a bunch of other
+    " related autocmds handling more complex commands.
+    "
+    " Try to find a way to consolidate all cases in `cmdline#chain()`.
+    " Refactor it, so that when it handles complex commands, the code is readable.
+    " No long    if … | then … | elseif … | … | elseif … | …
 
     " We use a timer to avoid reenabling the editing commands before having left
     " the command-line completely. Otherwise E501.
