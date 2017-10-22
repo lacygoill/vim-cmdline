@@ -58,7 +58,7 @@ fu! cmdline#chain() abort "{{{1
     " Do NOT write empty lines in this function (gQ → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
-                \  '(g|v).*(#|nu%[mber])' : [ '# '       , 0 ],
+                \  '(g|v).*(#|nu%[mber])' : [ ''         , 0 ],
                 \  '(ls|files|buffers)!?' : [ 'b '       , 0 ],
                 \  'chi%[story]'          : [ 'sil col ' , 1 ],
                 \  'lhi%[story]'          : [ 'sil lol ' , 1 ],
