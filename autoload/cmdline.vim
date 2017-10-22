@@ -44,12 +44,13 @@ fu! cmdline#auto_uppercase() abort "{{{1
                  \ ]
 
     for lhs in commands
-
-        exe 'cnorea <expr> '.tolower(lhs)
-                          \ .' getcmdtype() ==# ":" && getcmdline() =~# ''\v^%(%(tab<Bar>vert%[ical])\s+)?'
-                          \ .tolower(lhs).'$'''
-                          \ .' ? '.string(lhs)
-                          \ .' : '.string(tolower(lhs))
+        let llhs  = tolower(lhs)
+        exe printf('cnorea <expr> %s
+        \           getcmdtype() == '':'' && getcmdline() =~# ''\v^%(%(tab<Bar>vert%[ical])\s+)?%s$''
+        \?                               %s
+        \:                               %s
+        \',          llhs, llhs, string(lhs), string(tolower(lhs))
+        \)
     endfor
 endfu
 
