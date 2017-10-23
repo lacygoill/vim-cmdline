@@ -46,10 +46,10 @@ fu! cmdline#auto_uppercase() abort "{{{1
     for cmd in commands
         let lcmd  = tolower(cmd)
         exe printf('cnorea <expr> %s
-        \           getcmdtype() == '':'' && getcmdline() =~# ''\v^%(%(tab<Bar>vert%[ical])\s+)?%s$''
-        \?                               %s
-        \:                               %s
-        \',          lcmd, lcmd, string(cmd), string(tolower(cmd))
+        \               getcmdtype() == '':'' && getcmdline() =~# ''\v^%(%(tab<Bar>vert%[ical])\s+)?%s$''
+        \               ?     %s
+        \               :     %s
+        \          ', lcmd, lcmd, string(cmd), string(tolower(cmd))
         \         )
     endfor
 endfu
@@ -116,14 +116,14 @@ fu! cmdline#remember(list) abort "{{{1
         au!
         for cmd in a:list
             exe printf('
-                      \  au CmdlineLeave :
-                      \  if getcmdline() %s %s
-                      \|     call timer_start(0, {-> execute("echohl WarningMsg | echo %s | echohl NONE", "")})
-                      \| endif
-                      \',     cmd.regex ? '=~#': '==#' ,
-                      \       string(cmd.regex ? '^'.cmd.old.'$' : cmd.old),
-                      \       string('['.cmd.new .'] was equivalent')
-                      \  )
+            \            au CmdlineLeave :
+            \            if getcmdline() %s %s
+            \|               call timer_start(0, {-> execute("echohl WarningMsg | echo %s | echohl NONE", "")})
+            \|           endif
+            \          ',     cmd.regex ? '=~#' : '==#',
+            \                 string(cmd.regex ? '^'.cmd.old.'$' : cmd.old),
+            \                 string('['.cmd.new .'] was equivalent')
+            \         )
         endfor
     augroup END
 endfu
