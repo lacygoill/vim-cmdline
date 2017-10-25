@@ -129,14 +129,20 @@ fu! cmdline#remember(list) abort "{{{1
 endfu
 
 fu! cmdline#toggle_editing_commands(enable) abort "{{{1
-    if a:enable
-        call tmp_mappings#restore(get(s:, 'my_editing_commands', []))
-    else
-        let lhs_list = map(split(execute('cno'), '\n'), 'matchstr(v:val, ''\vc\s+\zs\S+'')')
-        let s:my_editing_commands = tmp_mappings#save(lhs_list, 'c', 1)
+    try
+        if a:enable
+            call tmp_mappings#restore(get(s:, 'my_editing_commands', []))
+        else
+            let lhs_list = map(split(execute('cno'), '\n'), 'matchstr(v:val, ''\vc\s+\zs\S+'')')
+            call filter(lhs_list, '!empty(v:val)')
+            let s:my_editing_commands = tmp_mappings#save(lhs_list, 'c', 1)
 
-        for lhs in lhs_list
-            exe 'cunmap '.lhs
-        endfor
-    endif
+            for lhs in lhs_list
+                exe 'cunmap '.lhs
+            endfor
+        endif
+
+    catch
+        return 'echoerr '.string(v:exception)
+    endtry
 endfu
