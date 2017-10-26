@@ -20,9 +20,10 @@ let g:loaded_cmdline = 1
 "         com! -nargs=+ Sab call s:strict_abbr(<q-args>, 0)
 "}}}
 
-" When I want to search for tab characters, I often type \` by accident fix this
-" automatically.
+" fix some typos
 cnorea <expr>  \`    getcmdtype() =~# '[/?]'  ? '\t' : '\`'
+cnorea <expr>  soù   getcmdtype() =~# ':' && getcmdline() ==# 'soù' ? 'so%' : 'soù'
+
 
 cnorea <expr>  sl    getcmdtype() ==# ':' && getcmdpos() == 3  ? 'ls'             : 'sl'
 cnorea <expr>  hg    getcmdtype() ==# ':' && getcmdpos() == 3  ? 'helpgrep'       : 'hg'
