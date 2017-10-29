@@ -131,11 +131,11 @@ endfu
 fu! cmdline#toggle_editing_commands(enable) abort "{{{1
     try
         if a:enable
-            call tmp_mappings#restore(get(s:, 'my_editing_commands', []))
+            call my_lib#map_restore(get(s:, 'my_editing_commands', []))
         else
             let lhs_list = map(split(execute('cno'), '\n'), 'matchstr(v:val, ''\vc\s+\zs\S+'')')
             call filter(lhs_list, '!empty(v:val)')
-            let s:my_editing_commands = tmp_mappings#save(lhs_list, 'c', 1)
+            let s:my_editing_commands = my_lib#map_save(lhs_list, 'c', 1)
 
             for lhs in lhs_list
                 exe 'cunmap '.lhs
