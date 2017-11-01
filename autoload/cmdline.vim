@@ -15,6 +15,7 @@ fu! cmdline#auto_uppercase() abort "{{{1
                  \ 'Gbrowse',
                  \ 'Gcd',
                  \ 'Gcommit',
+                 \ 'Gdelete',
                  \ 'Gdiff',
                  \ 'Ge',
                  \ 'Gedit',
