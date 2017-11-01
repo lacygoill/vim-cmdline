@@ -52,6 +52,7 @@ cnorea <expr>  pc    getcmdtype() ==# ':'  && getcmdpos() == 3  ? 'sil! PlugClea
 augroup my_lazy_loaded_cmdline
     au!
     au CmdlineEnter : call cmdline#auto_uppercase()
+                   \| call cmdline#install_fugitive_commands()
                    \| call cmdline#remember(s:overlooked_commands)
                    \| unlet! s:overlooked_commands
                    \| exe 'au! my_lazy_loaded_cmdline'

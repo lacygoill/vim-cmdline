@@ -3,46 +3,13 @@ if exists('g:autoloaded_cmdline')
 endif
 let g:autoloaded_cmdline = 1
 
-fu! cmdline#auto_uppercase() abort "{{{1
+" Functions {{{1
+fu! cmdline#auto_uppercase() abort "{{{2
 
 " We define abbreviations in command-line mode to automatically replace
 " a custom command name written in lowercase with uppercase characters.
 
-    let commands = getcompletion('[A-Z]?*', 'command')
-                 \ +
-                 \ [
-                 \ 'Gblame',
-                 \ 'Gbrowse',
-                 \ 'Gcd',
-                 \ 'Gcommit',
-                 \ 'Gdelete',
-                 \ 'Gdiff',
-                 \ 'Ge',
-                 \ 'Gedit',
-                 \ 'Gfetch',
-                 \ 'Ggrep',
-                 \ 'Git',
-                 \ 'Glcd',
-                 \ 'Glgrep',
-                 \ 'Gllog',
-                 \ 'Glog',
-                 \ 'Gmerge',
-                 \ 'Gmove',
-                 \ 'Gpedit',
-                 \ 'Gpull',
-                 \ 'Gpush',
-                 \ 'Gread',
-                 \ 'Gremove',
-                 \ 'Gsdiff',
-                 \ 'Gsplit',
-                 \ 'Gstatus',
-                 \ 'Gtabedit',
-                 \ 'Gvdiff',
-                 \ 'Gvsplit',
-                 \ 'Gw',
-                 \ 'Gwq',
-                 \ 'Gwrite',
-                 \ ]
+    let commands = getcompletion('[A-Z]?*', 'command') + s:fugitive_commands
 
     for cmd in commands
         let lcmd  = tolower(cmd)
@@ -55,7 +22,7 @@ fu! cmdline#auto_uppercase() abort "{{{1
     endfor
 endfu
 
-fu! cmdline#chain() abort "{{{1
+fu! cmdline#chain() abort "{{{2
     " Do NOT write empty lines in this function (gQ → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
@@ -90,7 +57,7 @@ fu! cmdline#chain() abort "{{{1
     endif
 endfu
 
-fu! cmdline#fix_typo(label) abort "{{{1
+fu! cmdline#fix_typo(label) abort "{{{2
     let cmdline = getcmdline()
     let keys = {
              \   'cr': "\<bs>\<cr>",
@@ -112,7 +79,39 @@ fu! cmdline#fix_typo(label) abort "{{{1
     "       So, we'll reexecute a new fixed command with the timer.
 endfu
 
-fu! cmdline#remember(list) abort "{{{1
+fu! cmdline#install_fugitive_commands() abort "{{{2
+    " In vimrc, we  postpone the loading of `fugitive` until  CursorHold happens for
+    " the first time.
+
+    " It could be an issue in the future,  if we install a custom mapping to execute
+    " a fugitive command, and we hit it before CursorHold happened.
+    "
+    " Also, when we:
+    "
+    "         • start Vim  with a file to open as an argument
+    "         • the file is in a git repo
+    "         • type `:Glog`
+    "
+    " … it fails.
+    "
+    " This  is because  fugitive listens  to  certain events  like `BufReadPost`  to
+    " detect  whether the  current file  is inside  a  git repo,  and if  it is,  it
+    " installs its buffer-local commands.
+    " Even if `fugitive` is correctly lazy-loaded  AFTER Vim has started reading the
+    " file, it wasn't loaded at the time the  file was read.  So, we need to re-emit
+    " `BufReadPost` so that fugitive properly installs its commands.
+    augroup my_install_fugitive_commands
+        au!
+        " Do NOT make this autocmd a fire-once autocmd.
+        " There may be more than 1 file which were opened when Vim started.
+        " The autocmd needs to be there for all of them.
+        au CmdUndefined * if index(s:fugitive_commands, expand('<afile>')) != -1
+                       \|     sil! doautocmd fugitive BufReadPost
+                       \| endif
+    augroup END
+endfu
+
+fu! cmdline#remember(list) abort "{{{2
     augroup remember_overlooked_commands
         au!
         for cmd in a:list
@@ -129,7 +128,7 @@ fu! cmdline#remember(list) abort "{{{1
     augroup END
 endfu
 
-fu! cmdline#toggle_editing_commands(enable) abort "{{{1
+fu! cmdline#toggle_editing_commands(enable) abort "{{{2
     try
         if a:enable
             call my_lib#map_restore(get(s:, 'my_editing_commands', []))
@@ -147,3 +146,39 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{1
         return 'echoerr '.string(v:exception)
     endtry
 endfu
+" Variable {{{1
+
+let s:fugitive_commands = [
+\                           'Gblame',
+\                           'Gbrowse',
+\                           'Gcd',
+\                           'Gcommit',
+\                           'Gdelete',
+\                           'Gdiff',
+\                           'Ge',
+\                           'Gedit',
+\                           'Gfetch',
+\                           'Ggrep',
+\                           'Git',
+\                           'Glcd',
+\                           'Glgrep',
+\                           'Gllog',
+\                           'Glog',
+\                           'Gmerge',
+\                           'Gmove',
+\                           'Gpedit',
+\                           'Gpull',
+\                           'Gpush',
+\                           'Gread',
+\                           'Gremove',
+\                           'Gsdiff',
+\                           'Gsplit',
+\                           'Gstatus',
+\                           'Gtabedit',
+\                           'Gvdiff',
+\                           'Gvsplit',
+\                           'Gw',
+\                           'Gwq',
+\                           'Gwrite',
+\                         ]
+
