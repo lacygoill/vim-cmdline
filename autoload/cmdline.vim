@@ -105,7 +105,7 @@ fu! cmdline#install_fugitive_commands() abort "{{{2
         " Do NOT make this autocmd a fire-once autocmd.
         " There may be more than 1 file which were opened when Vim started.
         " The autocmd needs to be there for all of them.
-        au CmdUndefined * if index(s:fugitive_commands, expand('<afile>')) != -1
+        au CmdUndefined * if index(s:fugitive_commands, expand('<afile>')) >= 0
                        \|     sil! doautocmd fugitive BufReadPost
                        \| endif
     augroup END
