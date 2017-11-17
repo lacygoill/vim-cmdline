@@ -58,20 +58,20 @@ fu! cmdline#chain() abort "{{{2
 endfu
 
 fu! s:cycle_install(...) abort "{{{2
-    let s:nb_chains = get(s:, 'nb_chains', 0) + 1
+    let s:nb_cycles = get(s:, 'nb_cycles', 0) + 1
     let list = deepcopy(a:000)
 
     " Alternative:{{{
     " (a little slower)
     "
-    "         let s:cycle_{s:nb_chains} = {}
+    "         let s:cycle_{s:nb_cycles} = {}
     "         let i = 0
     "         for cmd in list
     "             let key      = substitute(cmd, '@', '', '')
     "             let next_cmd = a:000[(i+1)%len(a:000)]
     "             let pos      = match(next_cmd, '@')+1
     "             let value    = {'cmd': substitute(next_cmd, '@', '', ''), 'pos': pos}
-    "             call extend(s:cycle_{s:nb_chains}, {key : value})
+    "             call extend(s:cycle_{s:nb_cycles}, {key : value})
     "             let i += 1
     "         endfor
     "}}}
@@ -79,9 +79,9 @@ fu! s:cycle_install(...) abort "{{{2
     \                         { "cmd" :       substitute(a:000[(v:key+1)%len(a:000)], "@", "", ""),
     \                           "pos" : match(a:000[(v:key+1)%len(a:000)], "@")+1},
     \               }')
-    let s:cycle_{s:nb_chains} = {}
+    let s:cycle_{s:nb_cycles} = {}
     for dict in list
-        call extend(s:cycle_{s:nb_chains}, dict)
+        call extend(s:cycle_{s:nb_cycles}, dict)
     endfor
 endfu
 
@@ -89,7 +89,7 @@ fu! cmdline#cycle(fwd) abort "{{{2
     let cmdline = getcmdline()
 
     let i = 1
-    while i <= s:nb_chains
+    while i <= s:nb_cycles
         if has_key(s:cycle_{i}, cmdline)
             break
         endif
@@ -97,10 +97,10 @@ fu! cmdline#cycle(fwd) abort "{{{2
     endwhile
 
     if a:fwd
-        call setcmdpos(i <= s:nb_chains ? s:cycle_{i}[cmdline].pos : s:default_cmd.pos)
-        return i <= s:nb_chains ? s:cycle_{i}[cmdline].cmd : s:default_cmd.cmd
+        call setcmdpos(i <= s:nb_cycles ? s:cycle_{i}[cmdline].pos : s:default_cmd.pos)
+        return i <= s:nb_cycles ? s:cycle_{i}[cmdline].cmd : s:default_cmd.cmd
     else
-        if i <= s:nb_chains
+        if i <= s:nb_cycles
             let cmds = items(s:cycle_{i})
             let prev_cmd = filter(deepcopy(cmds), 'v:val[1].cmd ==# '.string(cmdline))[0][0]
             let prev_pos = filter(cmds, 'v:val[1].cmd ==# '.string(prev_cmd))[0][1].pos
