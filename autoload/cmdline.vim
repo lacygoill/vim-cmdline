@@ -59,8 +59,36 @@ endfu
 
 fu! s:cycle_install(...) abort "{{{2
     let s:nb_cycles = get(s:, 'nb_cycles', 0) + 1
+    " It's important to make a copy of the arguments, otherwise{{{
+    " we   would   get   a   weird    result   in   the   next   invocation   of
+    " `map()`. Specifically, in the  last item of the  transformed list. This is
+    " probably  because the  same list  (a:000) would  be mentioned  in the  1st
+    " argument of `map()`, but also in the 2nd one.
+    "}}}
     let list = deepcopy(a:000)
 
+    " Goal:{{{
+    " Produce a dictionary whose keys are the commands in a cycle (a:000),
+    " and whose values are sub-dictionaries.
+    " Each one of the latter contains 2 keys:
+    "
+    "         • new_cmd: the new command which should replace the current one
+    "         • pos:     the position on the latter
+    "
+    " The final dictionary should be stored in a variable such as `s:cycle_42`,
+    " where 42 is the number of cycles installed so far.
+    "}}}
+    " How do we achieve it?{{{
+    " 2 steps:
+    "
+    "     1. transform the list of commands into a list of sub-dictionaries
+    "        (with the keys `new_cmd` and `pos`) through an invocation of
+    "        `map()`
+    "
+    "     2. progressively build the dictionary `s:cycle_42` with a `for`
+    "        loop, using the previous sub-dictionaries as values, and the
+    "        original commands as keys
+    "}}}
     " Alternative:{{{
     " (a little slower)
     "
@@ -76,8 +104,8 @@ fu! s:cycle_install(...) abort "{{{2
     "         endfor
     "}}}
     call map(list, '{ substitute(v:val, "@", "", "") :
-    \                         { "cmd" :       substitute(a:000[(v:key+1)%len(a:000)], "@", "", ""),
-    \                           "pos" : match(a:000[(v:key+1)%len(a:000)], "@")+1},
+    \                     { "new_cmd" : substitute(a:000[(v:key+1)%len(a:000)], "@", "", ""),
+    \                       "pos"     :      match(a:000[(v:key+1)%len(a:000)], "@")+1},
     \               }')
     let s:cycle_{s:nb_cycles} = {}
     for dict in list
@@ -88,6 +116,7 @@ endfu
 fu! cmdline#cycle(fwd) abort "{{{2
     let cmdline = getcmdline()
 
+    " try to find a cycle in which the current command line is a key
     let i = 1
     while i <= s:nb_cycles
         if has_key(s:cycle_{i}, cmdline)
@@ -95,15 +124,32 @@ fu! cmdline#cycle(fwd) abort "{{{2
         endif
         let i += 1
     endwhile
+    " now `i` stores:
+    "
+    "     • the index of the cycle in which the command line is
+    "
+    "     • a number greater than the number of installed cycles
+    "
+    "       if this  is the case,  since there's no  cycle to use,  we'll simply
+    "       return the default command stored in `s:default_cmd`
 
     if a:fwd
-        call setcmdpos(i <= s:nb_cycles ? s:cycle_{i}[cmdline].pos : s:default_cmd.pos)
-        return i <= s:nb_cycles ? s:cycle_{i}[cmdline].cmd : s:default_cmd.cmd
+        call setcmdpos(
+        \               i <= s:nb_cycles
+        \               ?    s:cycle_{i}[cmdline].pos
+        \               :    s:default_cmd.pos
+        \             )
+        return i <= s:nb_cycles
+        \?         s:cycle_{i}[cmdline].new_cmd
+        \:         s:default_cmd.cmd
     else
         if i <= s:nb_cycles
+            " get all the commands, and their position, in the cycle
             let cmds = items(s:cycle_{i})
-            let prev_cmd = filter(deepcopy(cmds), 'v:val[1].cmd ==# '.string(cmdline))[0][0]
-            let prev_pos = filter(cmds, 'v:val[1].cmd ==# '.string(prev_cmd))[0][1].pos
+            " get the previous command in the cycle,
+            " and the position of the cursor on the latter
+            let prev_cmd = filter(deepcopy(cmds), 'v:val[1].new_cmd ==# '.string(cmdline))[0][0]
+            let prev_pos = filter(cmds, 'v:val[1].new_cmd ==# '.string(prev_cmd))[0][1].pos
             call setcmdpos(prev_pos)
             return prev_cmd
         else
