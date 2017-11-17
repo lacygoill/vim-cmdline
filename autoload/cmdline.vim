@@ -215,6 +215,8 @@ com! -nargs=+ CycleInstall call s:cycle_install(<args>)
 " buffer
 
 CycleInstall  'vim /@/gj ~/.vim/**/*.vim',  'lvim /@/gj %',  'vim /@/gj ##'
+"                   │
+"                   └─ indicates where we want the cursor to be
 
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
