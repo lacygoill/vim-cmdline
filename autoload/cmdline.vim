@@ -57,6 +57,52 @@ fu! cmdline#chain() abort "{{{2
     endif
 endfu
 
+fu! cmdline#cycle(fwd) abort "{{{2
+    let cmdline = getcmdline()
+
+    " try to find the cycle to which the current command line belongs
+    let i = 1
+    while i <= s:nb_cycles
+        if has_key(s:cycle_{i}, cmdline)
+            break
+        endif
+        let i += 1
+    endwhile
+    " now `i` stores, either:
+    "
+    "     • the index of the cycle to which the command line belong
+    " OR
+    "     • a number greater than the number of installed cycles
+    "
+    "       if this  is the case,  since there's no  cycle to use,  we'll simply
+    "       return the default command stored in `s:default_cmd`
+
+    if a:fwd
+        call setcmdpos(
+        \               i <= s:nb_cycles
+        \               ?    s:cycle_{i}[cmdline].pos
+        \               :    s:default_cmd.pos
+        \             )
+        return i <= s:nb_cycles
+        \?         s:cycle_{i}[cmdline].new_cmd
+        \:         s:default_cmd.cmd
+    else
+        if i <= s:nb_cycles
+            " get all the commands, and their position, in the cycle
+            let cmds = items(s:cycle_{i})
+            " get the previous command in the cycle,
+            " and the position of the cursor on the latter
+            let prev_cmd = filter(deepcopy(cmds), 'v:val[1].new_cmd ==# '.string(cmdline))[0][0]
+            let prev_pos = filter(cmds, 'v:val[1].new_cmd ==# '.string(prev_cmd))[0][1].pos
+            call setcmdpos(prev_pos)
+            return prev_cmd
+        else
+            call setcmdpos(s:default_cmd.pos)
+            return s:default_cmd.cmd
+        endif
+    endif
+endfu
+
 fu! s:cycle_install(...) abort "{{{2
     let s:nb_cycles = get(s:, 'nb_cycles', 0) + 1
     " It's important to make a copy of the arguments, otherwise{{{
@@ -65,7 +111,7 @@ fu! s:cycle_install(...) abort "{{{2
     " probably  because the  same list  (a:000) would  be mentioned  in the  1st
     " argument of `map()`, but also in the 2nd one.
     "}}}
-    let list = deepcopy(a:000)
+    let cmds = deepcopy(a:000)
 
     " Goal:{{{
     " Produce a dictionary whose keys are the commands in a cycle (a:000),
@@ -98,7 +144,7 @@ fu! s:cycle_install(...) abort "{{{2
     "
     "         let s:cycle_{s:nb_cycles} = {}
     "         let i = 0
-    "         for cmd in list
+    "         for cmd in cmds
     "             let key      = substitute(cmd, '@', '', '')
     "             let next_cmd = a:000[(i+1)%len(a:000)]
     "             let pos      = match(next_cmd, '@')+1
@@ -107,60 +153,14 @@ fu! s:cycle_install(...) abort "{{{2
     "             let i += 1
     "         endfor
     "}}}
-    call map(list, '{ substitute(v:val, "@", "", "") :
+    call map(cmds, '{ substitute(v:val, "@", "", "") :
     \                     { "new_cmd" : substitute(a:000[(v:key+1)%len(a:000)], "@", "", ""),
     \                       "pos"     :      match(a:000[(v:key+1)%len(a:000)], "@")+1},
     \               }')
     let s:cycle_{s:nb_cycles} = {}
-    for dict in list
+    for dict in cmds
         call extend(s:cycle_{s:nb_cycles}, dict)
     endfor
-endfu
-
-fu! cmdline#cycle(fwd) abort "{{{2
-    let cmdline = getcmdline()
-
-    " try to find a cycle in which the current command line is a key
-    let i = 1
-    while i <= s:nb_cycles
-        if has_key(s:cycle_{i}, cmdline)
-            break
-        endif
-        let i += 1
-    endwhile
-    " now `i` stores:
-    "
-    "     • the index of the cycle in which the command line is
-    "
-    "     • a number greater than the number of installed cycles
-    "
-    "       if this  is the case,  since there's no  cycle to use,  we'll simply
-    "       return the default command stored in `s:default_cmd`
-
-    if a:fwd
-        call setcmdpos(
-        \               i <= s:nb_cycles
-        \               ?    s:cycle_{i}[cmdline].pos
-        \               :    s:default_cmd.pos
-        \             )
-        return i <= s:nb_cycles
-        \?         s:cycle_{i}[cmdline].new_cmd
-        \:         s:default_cmd.cmd
-    else
-        if i <= s:nb_cycles
-            " get all the commands, and their position, in the cycle
-            let cmds = items(s:cycle_{i})
-            " get the previous command in the cycle,
-            " and the position of the cursor on the latter
-            let prev_cmd = filter(deepcopy(cmds), 'v:val[1].new_cmd ==# '.string(cmdline))[0][0]
-            let prev_pos = filter(cmds, 'v:val[1].new_cmd ==# '.string(prev_cmd))[0][1].pos
-            call setcmdpos(prev_pos)
-            return prev_cmd
-        else
-            call setcmdpos(s:default_cmd.pos)
-            return s:default_cmd.cmd
-        endif
-    endif
 endfu
 
 fu! cmdline#fix_typo(label) abort "{{{2
