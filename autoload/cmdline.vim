@@ -267,14 +267,18 @@ endfu
 " Do not move  the execution of a `:CycleInstall` command  before the definition
 " of `s:cycle_install()`.
 
+" For each  “cycle“ (set of  commands) you  install, create a  mapping which
+" populates the command line with a command in it.
+
 com! -nargs=+ CycleInstall call s:cycle_install(<args>)
+
+CycleInstall '%s/\v@//g', '%s/\v@//gc'
+"                  │
+"                  └─ indicates where we want the cursor to be
 
 " alternate  between searching  inside `~/.vim`,  the arglist,  and the  current
 " buffer
-
 CycleInstall  'vim /@/gj ~/.vim/**/*.vim',  'lvim /@/gj %',  'vim /@/gj ##'
-"                   │
-"                   └─ indicates where we want the cursor to be
 
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
