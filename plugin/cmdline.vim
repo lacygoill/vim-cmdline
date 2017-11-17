@@ -130,10 +130,6 @@ com! -bar -nargs=1 ToggleEditingCommands exe cmdline#toggle_editing_commands(<ar
 "}}}
 cno <c-s>  <c-\>ecmdline#tweak_search_or_substitution()<cr>
 
-" Populate command-line with a default arbitrary command.
-" Atm, it uses `:vim`, but we could change it in the future.
-nno <c-z><c-z>  :<c-\>ecmdline#cycle(1)<cr>
-
 " Cycle through a set of arbitrary commands.
 " Each cycle is installed with `:CycleInstall` in:
 "
