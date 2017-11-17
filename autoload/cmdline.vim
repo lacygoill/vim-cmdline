@@ -80,11 +80,12 @@ fu! cmdline#fix_typo(label) abort "{{{2
 endfu
 
 fu! cmdline#install_fugitive_commands() abort "{{{2
-    " In vimrc, we  postpone the loading of `fugitive` until  CursorHold happens for
-    " the first time.
+    " In vimrc,  we postpone  the loading  of `fugitive`  after Vim  has started
+    " (through a timer).
 
-    " It could be an issue in the future,  if we install a custom mapping to execute
-    " a fugitive command, and we hit it before CursorHold happened.
+    " It could  be an issue  in the  future, if we  install a custom  mapping to
+    " execute a  fugitive command, and  we press it  before the plugin  has been
+    " loaded.
     "
     " Also, when we:
     "
