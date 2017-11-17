@@ -324,7 +324,7 @@ endfu
 " the  next command  in the  cycle. Instead, you  will get  the default  command
 " (`s:default_cmd`).
 
-com! -nargs=+ CycleInstall call s:cycle_install(<args>)
+com! -bar -nargs=+ CycleInstall call s:cycle_install(<args>)
 
 CycleInstall '%s/\v@//g', '%s/\v@//gc'
 "                  │
