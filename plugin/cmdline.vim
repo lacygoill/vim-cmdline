@@ -130,20 +130,22 @@ com! -bar -nargs=1 ToggleEditingCommands exe cmdline#toggle_editing_commands(<ar
 "}}}
 cno <c-s>  <c-\>ecmdline#tweak_search_or_substitution()<cr>
 
-" Populate command-line with a default arbitrary command
+" Populate command-line with a default arbitrary command.
 " Atm, it uses `:vim`, but we could change it in the future.
 nno <c-z><c-z>  :<c-\>ecmdline#cycle(1)<cr>
 
-" cycle through a set of arbitrary commands
-" see `:CycleInstall in ~/.vim/plugged/vim-cmdline/autoload/cmdline.vim`
+" Cycle through a set of arbitrary commands.
+" Each cycle is installed with `:CycleInstall` in:
+"
+"         ~/.vim/plugged/vim-cmdline/autoload/cmdline.vim
 cno <c-z>   <c-\>ecmdline#cycle(1)<cr>
 cno <m-z>   <c-\>ecmdline#cycle(0)<cr>
 
-" Populate command-line with a substitution command
+" populate command-line with a substitution command
 nno <c-z>s  :<c-u>%s/\v//g<left><left><left>
 xno <c-z>s  :s/\v//g<left><left><left>
 
-" Populate command-line with a `:vimgrep` command
+" populate command-line with a `:vimgrep` command
 nno <c-z>v  :<c-u>vim //gj ~/.vim/**/*.vim<c-b><right><right><right><right><right>
 
 " Variable {{{1

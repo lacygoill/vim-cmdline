@@ -78,6 +78,10 @@ fu! s:cycle_install(...) abort "{{{2
     " The final dictionary should be stored in a variable such as `s:cycle_42`,
     " where 42 is the number of cycles installed so far.
     "}}}
+    " Why do it?{{{
+    " This dictionary will be used as a FSM to transit from the current command
+    " to a new one.
+    "}}}
     " How do we achieve it?{{{
     " 2 steps:
     "
@@ -313,8 +317,12 @@ endfu
 " Do not move  the execution of a `:CycleInstall` command  before the definition
 " of `s:cycle_install()`.
 
+" Advice:
 " For each  “cycle“ (set of  commands) you  install, create a  mapping which
-" populates the command line with a command in it.
+" populates the command  line with a command  in it. This will give  you an easy
+" entry in the cycle. Otherwise the smallest  typo will prevent you from getting
+" the  next command  in the  cycle. Instead, you  will get  the default  command
+" (`s:default_cmd`).
 
 com! -nargs=+ CycleInstall call s:cycle_install(<args>)
 
@@ -322,8 +330,7 @@ CycleInstall '%s/\v@//g', '%s/\v@//gc'
 "                  │
 "                  └─ indicates where we want the cursor to be
 
-" alternate  between searching  inside `~/.vim`,  the arglist,  and the  current
-" buffer
+" search  inside `~/.vim`,  the arglist,  or the  current buffer
 CycleInstall  'vim /@/gj ~/.vim/**/*.vim',  'lvim /@/gj %',  'vim /@/gj ##'
 
 " TODO: `:[l]vim[grep]` is not asynchronous.
