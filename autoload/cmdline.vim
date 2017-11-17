@@ -91,7 +91,7 @@ fu! cmdline#cycle(fwd) abort "{{{2
             " get the previous command in the cycle,
             " and the position of the cursor on the latter
             let prev_cmd = keys(filter(deepcopy(s:cycle_{i}), 'v:val.new_cmd ==# '.string(cmdline)))[0]
-            let prev_pos = s:cycle_{i}[prev_cmd].pos
+            let prev_pos = values(filter(deepcopy(s:cycle_{i}), 'v:val.new_cmd ==# '.string(prev_cmd)))[0].pos
             call setcmdpos(prev_pos)
             return prev_cmd
         else
