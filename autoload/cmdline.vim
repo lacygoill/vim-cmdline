@@ -26,16 +26,16 @@ fu! cmdline#chain() abort "{{{2
     " Do NOT write empty lines in this function (gQ → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
-                \  '(g|v).*(#@<!#|nu%[mber])' : [ ''         , 0 ],
-                \  '(ls|files|buffers)!?'     : [ 'b '       , 0 ],
-                \  'chi%[story]'              : [ 'sil col ' , 1 ],
-                \  'lhi%[story]'              : [ 'sil lol ' , 1 ],
-                \  'marks'                    : [ 'norm! `'  , 1 ],
-                \  'old%[files]'              : [ 'e #<'     , 1 ],
-                \  'undol%[ist]'              : [ 'u '       , 1 ],
-                \  'changes'                  : [ "norm! g;\<s-left>"     , 1 ],
-                \  'ju%[mps]'                 : [ "norm! \<c-o>\<s-left>" , 1 ],
-                \ }
+    \              '(g|v).*(#@<!#|nu%[mber])' : [ ''         , 0 ],
+    \              '(ls|files|buffers)!?'     : [ 'b '       , 0 ],
+    \              'chi%[story]'              : [ 'sil col ' , 1 ],
+    \              'lhi%[story]'              : [ 'sil lol ' , 1 ],
+    \              'marks'                    : [ 'norm! `'  , 1 ],
+    \              'old%[files]'              : [ 'e #<'     , 1 ],
+    \              'undol%[ist]'              : [ 'u '       , 1 ],
+    \              'changes'                  : [ "norm! g;\<s-left>"     , 1 ],
+    \              'ju%[mps]'                 : [ "norm! \<c-o>\<s-left>" , 1 ],
+    \             }
     for [pat, cmd ] in items(pat2cmd)
         let [ keys, nomore ] = cmd
         if cmdline =~# '\v\C^'.pat.'$'
@@ -54,6 +54,62 @@ fu! cmdline#chain() abort "{{{2
         call feedkeys(':'.cmdline[0].'j  '.split(cmdline, ' ')[1]."\<s-left>\<left>", 'in')
     elseif cmdline =~# '\v\C^(cli|lli)'
         call feedkeys(':sil '.repeat(cmdline[0], 2).' ', 'in')
+    endif
+endfu
+
+fu! s:cycle_install(...) abort "{{{2
+    let s:nb_chains = get(s:, 'nb_chains', 0) + 1
+    let list = deepcopy(a:000)
+
+    " Alternative:{{{
+    " (a little slower)
+    "
+    "         let s:cycle_{s:nb_chains} = {}
+    "         let i = 0
+    "         for cmd in list
+    "             let key      = substitute(cmd, '@', '', '')
+    "             let next_cmd = a:000[(i+1)%len(a:000)]
+    "             let pos      = match(next_cmd, '@')+1
+    "             let value    = {'cmd': substitute(next_cmd, '@', '', ''), 'pos': pos}
+    "             call extend(s:cycle_{s:nb_chains}, {key : value})
+    "             let i += 1
+    "         endfor
+    "}}}
+    call map(list, '{ substitute(v:val, "@", "", "") :
+    \                         { "cmd" :       substitute(a:000[(v:key+1)%len(a:000)], "@", "", ""),
+    \                           "pos" : match(a:000[(v:key+1)%len(a:000)], "@")+1},
+    \               }')
+    let s:cycle_{s:nb_chains} = {}
+    for dict in list
+        call extend(s:cycle_{s:nb_chains}, dict)
+    endfor
+endfu
+
+fu! cmdline#cycle(fwd) abort "{{{2
+    let cmdline = getcmdline()
+
+    let i = 1
+    while i <= s:nb_chains
+        if has_key(s:cycle_{i}, cmdline)
+            break
+        endif
+        let i += 1
+    endwhile
+
+    if a:fwd
+        call setcmdpos(i <= s:nb_chains ? s:cycle_{i}[cmdline].pos : s:default_cmd.pos)
+        return i <= s:nb_chains ? s:cycle_{i}[cmdline].cmd : s:default_cmd.cmd
+    else
+        if i <= s:nb_chains
+            let cmds = items(s:cycle_{i})
+            let prev_cmd = filter(deepcopy(cmds), 'v:val[1].cmd ==# '.string(cmdline))[0][0]
+            let prev_pos = filter(cmds, 'v:val[1].cmd ==# '.string(prev_cmd))[0][1].pos
+            call setcmdpos(prev_pos)
+            return prev_cmd
+        else
+            call setcmdpos(s:default_cmd.pos)
+            return s:default_cmd.cmd
+        endif
     endif
 endfu
 
@@ -147,7 +203,25 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{2
         return 'echoerr '.string(v:exception)
     endtry
 endfu
-" Variable {{{1
+" Commands {{{1
+
+" Warning:
+" Do not move  the execution of a `:CycleInstall` command  before the definition
+" of `s:cycle_install()`.
+
+com! -nargs=+ CycleInstall call s:cycle_install(<args>)
+
+" alternate  between searching  inside `~/.vim`,  the arglist,  and the  current
+" buffer
+
+CycleInstall  'vim /@/gj ~/.vim/**/*.vim',  'lvim /@/gj %',  'vim /@/gj ##'
+
+" TODO: `:[l]vim[grep]` is not asynchronous.
+" Add an async command (using  &grepprg?).
+
+" Variables {{{1
+
+let s:default_cmd = { 'cmd' : 'vim //gj ~/.vim/**/*.vim', 'pos' : 6 }
 
 let s:fugitive_commands = [
 \                           'Gblame',

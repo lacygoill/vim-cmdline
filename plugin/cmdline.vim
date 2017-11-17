@@ -116,6 +116,12 @@ augroup END
 "}}}
 com! -bar -nargs=1 ToggleEditingCommands exe cmdline#toggle_editing_commands(<args>)
 
+" Mappings {{{1
+
+nno <m-z>  :<c-\>ecmdline#cycle(1)<cr>
+cno <m-z>   <c-\>ecmdline#cycle(1)<cr>
+cno <c-z>   <c-\>ecmdline#cycle(0)<cr>
+
 " Variable {{{1
 
 let s:overlooked_commands = [
