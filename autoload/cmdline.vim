@@ -203,6 +203,64 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{2
         return 'echoerr '.string(v:exception)
     endtry
 endfu
+
+fu! cmdline#tweak_search_or_substitution() abort "{{{2
+    if getcmdtype() =~ '[?/]'
+        return substitute(getcmdline(), '\a', '[[=\0=]]', 'g')
+
+    elseif getcmdtype() =~ ':'
+        " If  we're on  the Ex  command-line (:),  we try  and guess  whether it
+        " contains a substitution command.
+        let cmdline   = getcmdline()
+        let range     = matchstr(cmdline, '[%*]\|[^,]*,[^,]*\zes')
+        let cmdline   = substitute(cmdline, '^\V'.escape(range, '\').'\vs.\zs\\v', '', '')
+        let separator = cmdline =~# 's/' ? '/' : 's:' ? ':' : ''
+
+        " If there's no substitution command we don't modify the command-line.
+        if empty(separator)
+            return ''
+        endif
+
+        " If there's one, we extract the pattern.
+        let pat = split(cmdline, separator)[1]
+
+        " If  the pattern  contains  word  boundaries (\<,  \>),  we remove  the
+        " backslash,  because we're  going to  enable the  very magic  mode.  We
+        " could have  word boundaries when  we hit * on  a word in  normal mode,
+        " then insert the search register in the pattern field.
+        if pat =~# '^\\<\|\\>'
+            let pat = substitute(pat, '^\\<', '<', 'g')
+            let pat = substitute(pat, '\\>', '>', 'g')
+        endif
+
+        " Then,  we  extract  from  the pattern  words  between  underscores  or
+        " uppercase letters; e.g.:
+        "
+        "         'OneTwoThree'   → ['One', 'Two', 'Three']
+        "         'one_two_three' → ['one', 'two', 'three']
+        let subpatterns = split(pat, pat =~# '_' ? '_' : '\ze\u')
+
+        " Finally we return the keys to type.
+        "
+        "         join(map(subpatterns, '…'), '…')
+        "
+        " … evaluates to  the original pattern,  with the addition  of parentheses
+        " around the subpatterns:
+        "
+        "            (One)(Two)(Three)
+        "      or    (one)_(two)_(three)
+        let new_cmdline = range.'s/\v'.join(map(subpatterns, '"(" . v:val . ")"'), pat =~# '_' ? '_' : '') . '//g'
+
+        " Before returning the  keys, we position the cursor between  the last 2
+        " slashes.
+        call setcmdpos(strchars(new_cmdline)-1)
+        return new_cmdline
+
+    else
+        return ''
+    endif
+endfu
+
 " Commands {{{1
 
 " Warning:

@@ -118,6 +118,18 @@ com! -bar -nargs=1 ToggleEditingCommands exe cmdline#toggle_editing_commands(<ar
 
 " Mappings {{{1
 
+" The following mapping does 2 different things, depending on where we press it:{{{
+"
+"     • on the search command-line, it replaces all alphabetical characters
+"       with the corresponding equivalence class
+"
+"     • on the Ex command-line, if the latter contains a substitution command,
+"       inside the pattern, it captures the words written in snake case or
+"       camel case inside parentheses, so that we can refer to them easily
+"       with backref in the replacement.
+"}}}
+cno <c-s>  <c-\>ecmdline#tweak_search_or_substitution()<cr>
+
 " Populate command-line with a default arbitrary command
 " Atm, it uses `:vim`, but we could change it in the future.
 nno <c-z><c-z>  :<c-\>ecmdline#cycle(1)<cr>
