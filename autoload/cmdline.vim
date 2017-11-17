@@ -311,9 +311,12 @@ endfu
 
 " Commands {{{1
 
-" Warning:
+" Warnings:
 " Do not move  the execution of a `:CycleInstall` command  before the definition
 " of `s:cycle_install()`.
+"
+" Do not give the `-bar` attribute to `:CycleInstall`, it would prevent us
+" from including a command containing a bar inside a cycle.
 
 " Advice:
 " For each  “cycle“ (set of  commands) you  install, create a  mapping which
@@ -322,7 +325,7 @@ endfu
 " the  next command  in the  cycle. Instead, you  will get  the default  command
 " (`s:default_cmd`).
 
-com! -bar -nargs=+ CycleInstall call s:cycle_install(<args>)
+com! -nargs=+ CycleInstall call s:cycle_install(<args>)
 
 CycleInstall '%s/\v@//g', '%s/\v@//gc'
 "                  │
