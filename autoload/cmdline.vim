@@ -337,6 +337,8 @@ CycleInstall  'vim /@/gj ~/.vim/**/*.vim',  'lvim /@/gj %',  'vim /@/gj ##'
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
 
+delcommand CycleInstall
+
 " Variables {{{1
 
 let s:default_cmd = { 'cmd' : 'vim //gj ~/.vim/**/*.vim', 'pos' : 6 }
