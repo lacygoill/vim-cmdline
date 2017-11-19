@@ -246,10 +246,10 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{2
                 exe 'cunmap '.lhs
             endfor
         endif
-
     catch
         return 'echoerr '.string(v:exception)
     endtry
+    return ''
 endfu
 
 fu! cmdline#tweak_search_or_substitution() abort "{{{2
