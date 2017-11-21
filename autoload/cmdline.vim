@@ -385,7 +385,7 @@ delcommand CycleInstall
 
 " Variables {{{1
 
-let s:default_cmd = { 'cmd' : 'vim //gj ~/.vim/**/*.vim', 'pos' : 6 }
+let s:default_cmd = { 'cmd' : 'vim //gj ~/.vim/**/*.vim ~/.vim/vimrc', 'pos' : 6 }
 
 let s:fugitive_commands = [
 \                           'Gblame',
@@ -420,4 +420,3 @@ let s:fugitive_commands = [
 \                           'Gwq',
 \                           'Gwrite',
 \                         ]
-
