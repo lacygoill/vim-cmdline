@@ -118,17 +118,20 @@ com! -bar -nargs=1 ToggleEditingCommands exe cmdline#toggle_editing_commands(<ar
 
 " Mappings {{{1
 
-" The following mapping does 2 different things, depending on where we press it:{{{
+" The following mapping transforms the command line in 2 ways, depending on where we press it:{{{
 "
-"     • on the search command-line, it replaces all alphabetical characters
-"       with the corresponding equivalence class
+"     • on the search command-line, it translates the pattern so that:
+"
+"           - the pattern is searched outside comments
+"           - all alphabetical characters are replaced with their corresponding
+"             equivalence class
 "
 "     • on the Ex command-line, if the latter contains a substitution command,
 "       inside the pattern, it captures the words written in snake case or
 "       camel case inside parentheses, so that we can refer to them easily
 "       with backref in the replacement.
 "}}}
-cno <c-s>  <c-\>ecmdline#tweak_search_or_substitution()<cr>
+cno <expr> <c-s>  cmdline#transform()
 
 " Cycle through a set of arbitrary commands.
 " Each cycle is installed with `:CycleInstall` in:
