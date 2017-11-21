@@ -376,7 +376,7 @@ CycleInstall '%s/\v@//g', '%s/\v@//gc'
 "                  └─ indicates where we want the cursor to be
 
 " search  inside `~/.vim`,  the arglist,  or the  current buffer
-CycleInstall  'vim /@/gj ~/.vim/**/*.vim',  'lvim /@/gj %',  'vim /@/gj ##'
+CycleInstall  'vim /@/gj ~/.vim/**/*.vim ~/.vim/vimrc',  'lvim /@/gj %',  'vim /@/gj ##'
 
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).

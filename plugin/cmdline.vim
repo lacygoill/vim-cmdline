@@ -145,7 +145,7 @@ nno <c-z>s  :<c-u>%s/\v//g<left><left><left>
 xno <c-z>s  :s/\v//g<left><left><left>
 
 " populate command-line with a `:vimgrep` command
-nno <c-z>v  :<c-u>vim //gj ~/.vim/**/*.vim<c-b><right><right><right><right><right>
+nno <c-z>v  :<c-u>vim //gj ~/.vim/**/*.vim ~/.vim/vimrc<c-b><right><right><right><right><right>
 
 " Variable {{{1
 
