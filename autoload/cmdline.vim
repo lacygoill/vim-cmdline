@@ -326,7 +326,7 @@ fu! cmdline#transform() abort "{{{2
         " reset.  So,  once we've invoked this  function once, it can't  be used
         " anymore until we  leave the command line. Maybe we  should inspect the
         " command line instead.
-        au CmdlineLeave  /,\?,:  unlet! s:did_transform
+        au CmdlineLeave  /,\?,:  unlet! s:did_transform s:orig_cmdline
         \|                       exe 'au! reset_did_tweak' | aug! reset_did_tweak
     augroup END
 
