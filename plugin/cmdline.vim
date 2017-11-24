@@ -58,7 +58,7 @@ augroup my_lazy_loaded_cmdline
     \|                call cmdline#remember(s:overlooked_commands)
     \|                unlet! s:overlooked_commands
     \|
-    \|                call cmdline#pass_and_install(s:cycles)
+    \|                call cmdline#pass_and_install_cycles(s:cycles)
     \|                unlet! s:cycles
     \|
     \|                exe 'au! my_lazy_loaded_cmdline'

@@ -265,7 +265,7 @@ fu! cmdline#install_fugitive_commands() abort "{{{2
     augroup END
 endfu
 
-fu! cmdline#pass_and_install(cycles) abort "{{{2
+fu! cmdline#pass_and_install_cycles(cycles) abort "{{{2
     for cycle in a:cycles
         call cmdline#cycle_install(cycle)
     endfor
