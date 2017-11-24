@@ -148,7 +148,7 @@ cno <m-z>   <c-\>ecmdline#cycle(0)<cr>
 
 xno <c-z>s  :s/\v//g<left><left><left>
 
-"   ┌─ we need this variable to pass the commands, in each cycle we're going to configure,
+"   ┌─ need this variable to pass the commands that are in each cycle we're going to configure,
 "   │  to the autoload/ script, where the bulk of the code installing cycles reside
 "   │
 let s:cycles = []
@@ -162,9 +162,9 @@ endfu
 " populate command-line with a substitution command
 call s:cycle_configure('s', '%s/\v@//g', '%s/\v@//gc')
 "                       │         │
-"                       │         └ indicates where we want the cursor to be
+"                       │         └ where we want the cursor to be
 "                       │
-"                       └ the key to press in normal mode, after `C-z`, to populate the command line
+"                       └ key to press in normal mode, after `C-z`, to populate the command line
 "                         with the 1st command in the cycle
 
 " populate command-line with a `:vimgrep` command
