@@ -150,7 +150,11 @@ fu! cmdline#cycle(fwd) abort "{{{2
     endif
 endfu
 
-fu! s:cycle_install(...) abort "{{{2
+fu! cmdline#cycle_install(key, ...) abort "{{{2
+    exe 'nno <c-z>'.a:key
+    \              .' :<c-u>'.substitute(a:1, '@', '', '')
+    \              .'<c-b>'.repeat('<right>', match(a:1, '@'))
+
     let s:nb_cycles = get(s:, 'nb_cycles', 0) + 1
     " It's important to make a copy of the arguments, otherwise{{{
     " we   would   get   a   weird    result   in   the   next   invocation   of
@@ -352,36 +356,6 @@ fu! cmdline#transform() abort "{{{2
         return ''
     endif
 endfu
-
-" Commands {{{1
-
-" Warnings:
-" Do not move  the execution of a `:CycleInstall` command  before the definition
-" of `s:cycle_install()`.
-"
-" Do not give the `-bar` attribute to `:CycleInstall`, it would prevent us
-" from including a command containing a bar inside a cycle.
-
-" Advice:
-" For each  “cycle“ (set of  commands) you  install, create a  mapping which
-" populates the command  line with a command  in it. This will give  you an easy
-" entry in the cycle. Otherwise the smallest  typo will prevent you from getting
-" the  next command  in the  cycle. Instead, you  will get  the default  command
-" (`s:default_cmd`).
-
-com! -nargs=+ CycleInstall call s:cycle_install(<args>)
-
-CycleInstall '%s/\v@//g', '%s/\v@//gc'
-"                  │
-"                  └─ indicates where we want the cursor to be
-
-" search  inside `~/.vim`,  the arglist,  or the  current buffer
-CycleInstall  'vim /@/gj ~/.vim/**/*.vim ~/.vim/vimrc',  'lvim /@/gj %',  'vim /@/gj ##'
-
-" TODO: `:[l]vim[grep]` is not asynchronous.
-" Add an async command (using  &grepprg?).
-
-delcommand CycleInstall
 
 " Variables {{{1
 

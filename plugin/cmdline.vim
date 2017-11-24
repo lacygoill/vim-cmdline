@@ -140,12 +140,37 @@ cno <expr> <c-s>  cmdline#transform()
 cno <c-z>   <c-\>ecmdline#cycle(1)<cr>
 cno <m-z>   <c-\>ecmdline#cycle(0)<cr>
 
-" populate command-line with a substitution command
-nno <c-z>s  :<c-u>%s/\v//g<left><left><left>
 xno <c-z>s  :s/\v//g<left><left><left>
 
-" populate command-line with a `:vimgrep` command
-nno <c-z>v  :<c-u>vim //gj ~/.vim/**/*.vim ~/.vim/vimrc<c-b><right><right><right><right><right>
+nno <expr> <c-z> <sid>c_z()
+fu! s:c_z() abort
+    nunmap <c-z>
+    " populate command-line with a substitution command
+    call cmdline#cycle_install('s', '%s/\v@//g', '%s/\v@//gc')
+    "                           │         │
+    "                           │         └ indicates where we want the cursor to be
+    "                           │
+    "                           └ the key to press in normal mode, after `C-z`, to populate the command line
+    "                             with the 1st command in the cycle
+
+    " populate command-line with a `:vimgrep` command
+    call cmdline#cycle_install('v', 'vim /@/gj ~/.vim/**/*.vim ~/.vim/vimrc',  'lvim /@/gj %',  'vim /@/gj ##')
+    " TODO: `:[l]vim[grep]` is not asynchronous.
+    " Add an async command (using  &grepprg?).
+
+    " Do NOT add the `n` flag. It would type the default `C-z` which suspends Vim.
+    " If  that  happens,  you  would  probably  have  to  remove  the  files  in
+    " `~/.vim/tmp/swap/`, and kill the Vim process.
+    "
+    " Also, do NOT define this recursive mapping:
+    "
+    "         nmap <expr> <c-z> <sid>c_z()
+    "
+    " … thinking that  you could return "\<c-z>". It won't  work. I tried, and
+    " the default C-z (suspension) was invoked.
+    call timer_start(0, {-> feedkeys("\<c-z>".nr2char(getchar()), 'it')})
+    return ''
+endfu
 
 " Variable {{{1
 
