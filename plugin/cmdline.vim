@@ -142,6 +142,8 @@ cno <m-z>   <c-\>ecmdline#cycle(0)<cr>
 
 xno <c-z>s  :s/\v//g<left><left><left>
 
+" The  purpose of  this  temporary  mapping, is  to  delay  the installation  of
+" “cycles“ until we press `C-z` for the 1st time.
 nno <expr> <c-z> <sid>c_z()
 fu! s:c_z() abort
     nunmap <c-z>
