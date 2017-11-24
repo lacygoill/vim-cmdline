@@ -287,7 +287,7 @@ fu! s:replace_with_equiv_class() abort "{{{2
 endfu
 
 fu! s:search_outside_comments() abort "{{{2
-    " we should probably save `cmdline` in  a scripeut-local variable if we want
+    " we should probably save `cmdline` in  a script-local variable if we want
     " to cycle between several transformations
     if empty(&l:cms)
         return get(s:, 'orig_cmdline', '')
