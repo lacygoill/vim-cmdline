@@ -150,22 +150,18 @@ fu! cmdline#cycle(fwd) abort "{{{2
     endif
 endfu
 
-fu! cmdline#cycle_install(key, ...) abort "{{{2
-    exe 'nno <c-z>'.a:key
-    \              .' :<c-u>'.substitute(a:1, '@', '', '')
-    \              .'<c-b>'.repeat('<right>', match(a:1, '@'))
-
+fu! cmdline#cycle_install(cmds) abort "{{{2
     let s:nb_cycles = get(s:, 'nb_cycles', 0) + 1
     " It's important to make a copy of the arguments, otherwise{{{
     " we   would   get   a   weird    result   in   the   next   invocation   of
     " `map()`. Specifically, in the  last item of the  transformed list. This is
-    " probably  because the  same list  (a:000) would  be mentioned  in the  1st
+    " probably  because the  same list  (a:cmds) would  be mentioned  in the  1st
     " argument of `map()`, but also in the 2nd one.
     "}}}
-    let cmds = deepcopy(a:000)
+    let cmds = deepcopy(a:cmds)
 
     " Goal:{{{
-    " Produce a dictionary whose keys are the commands in a cycle (a:000),
+    " Produce a dictionary whose keys are the commands in a cycle (a:cmds),
     " and whose values are sub-dictionaries.
     " Each one of the latter contains 2 keys:
     "
@@ -197,7 +193,7 @@ fu! cmdline#cycle_install(key, ...) abort "{{{2
     "         let i = 0
     "         for cmd in cmds
     "             let key      = substitute(cmd, '@', '', '')
-    "             let next_cmd = a:000[(i+1)%len(a:000)]
+    "             let next_cmd = a:cmds[(i+1)%len(a:cmds)]
     "             let pos      = match(next_cmd, '@')+1
     "             let value    = {'cmd': substitute(next_cmd, '@', '', ''), 'pos': pos}
     "             call extend(s:cycle_{s:nb_cycles}, {key : value})
@@ -205,8 +201,8 @@ fu! cmdline#cycle_install(key, ...) abort "{{{2
     "         endfor
     "}}}
     call map(cmds, '{ substitute(v:val, "@", "", "") :
-    \                     { "new_cmd" : substitute(a:000[(v:key+1)%len(a:000)], "@", "", ""),
-    \                       "pos"     :      match(a:000[(v:key+1)%len(a:000)], "@")+1},
+    \                     { "new_cmd" : substitute(a:cmds[(v:key+1)%len(a:cmds)], "@", "", ""),
+    \                       "pos"     :      match(a:cmds[(v:key+1)%len(a:cmds)], "@")+1},
     \               }')
     let s:cycle_{s:nb_cycles} = {}
     for dict in cmds
@@ -267,6 +263,12 @@ fu! cmdline#install_fugitive_commands() abort "{{{2
                        \|     sil! doautocmd fugitive BufReadPost
                        \| endif
     augroup END
+endfu
+
+fu! cmdline#pass_and_install(cycles) abort "{{{2
+    for cycle in a:cycles
+        call cmdline#cycle_install(cycle)
+    endfor
 endfu
 
 fu! cmdline#remember(list) abort "{{{2

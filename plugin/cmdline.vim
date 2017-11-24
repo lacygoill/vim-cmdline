@@ -52,11 +52,17 @@ cnorea <expr>  pc    getcmdtype() ==# ':'  && getcmdpos() == 3  ? 'sil! PlugClea
 augroup my_lazy_loaded_cmdline
     au!
     au CmdlineEnter : call cmdline#auto_uppercase()
-                   \| call cmdline#install_fugitive_commands()
-                   \| call cmdline#remember(s:overlooked_commands)
-                   \| unlet! s:overlooked_commands
-                   \| exe 'au! my_lazy_loaded_cmdline'
-                   \| aug! my_lazy_loaded_cmdline
+    \|
+    \|                call cmdline#install_fugitive_commands()
+    \|
+    \|                call cmdline#remember(s:overlooked_commands)
+    \|                unlet! s:overlooked_commands
+    \|
+    \|                call cmdline#pass_and_install(s:cycles)
+    \|                unlet! s:cycles
+    \|
+    \|                exe 'au! my_lazy_loaded_cmdline'
+    \|                exe 'aug! my_lazy_loaded_cmdline'
 augroup END
 
 augroup my_cmdline_chain
@@ -142,37 +148,29 @@ cno <m-z>   <c-\>ecmdline#cycle(0)<cr>
 
 xno <c-z>s  :s/\v//g<left><left><left>
 
-" The  purpose of  this  temporary  mapping, is  to  delay  the installation  of
-" “cycles“ until we press `C-z` for the 1st time.
-nno <expr> <c-z> <sid>c_z()
-fu! s:c_z() abort
-    nunmap <c-z>
-    " populate command-line with a substitution command
-    call cmdline#cycle_install('s', '%s/\v@//g', '%s/\v@//gc')
-    "                           │         │
-    "                           │         └ indicates where we want the cursor to be
-    "                           │
-    "                           └ the key to press in normal mode, after `C-z`, to populate the command line
-    "                             with the 1st command in the cycle
-
-    " populate command-line with a `:vimgrep` command
-    call cmdline#cycle_install('v', 'vim /@/gj ~/.vim/**/*.vim ~/.vim/vimrc',  'lvim /@/gj %',  'vim /@/gj ##')
-    " TODO: `:[l]vim[grep]` is not asynchronous.
-    " Add an async command (using  &grepprg?).
-
-    " Do NOT add the `n` flag. It would type the default `C-z` which suspends Vim.
-    " If  that  happens,  you  would  probably  have  to  remove  the  files  in
-    " `~/.vim/tmp/swap/`, and kill the Vim process.
-    "
-    " Also, do NOT define this recursive mapping:
-    "
-    "         nmap <expr> <c-z> <sid>c_z()
-    "
-    " … thinking that  you could return "\<c-z>". It won't  work. I tried, and
-    " the default C-z (suspension) was invoked.
-    call timer_start(0, {-> feedkeys("\<c-z>".nr2char(getchar()), 'it')})
-    return ''
+"   ┌─ we need this variable to pass the commands, in each cycle we're going to configure,
+"   │  to the autoload/ script, where the bulk of the code installing cycles reside
+"   │
+let s:cycles = []
+fu! s:cycle_configure(key, ...) abort
+    exe 'nno <c-z>'.a:key
+    \              .' :<c-u>'.substitute(a:1, '@', '', '')
+    \              .'<c-b>'.repeat('<right>', match(a:1, '@'))
+    let s:cycles += [ a:000 ]
 endfu
+
+" populate command-line with a substitution command
+call s:cycle_configure('s', '%s/\v@//g', '%s/\v@//gc')
+"                       │         │
+"                       │         └ indicates where we want the cursor to be
+"                       │
+"                       └ the key to press in normal mode, after `C-z`, to populate the command line
+"                         with the 1st command in the cycle
+
+" populate command-line with a `:vimgrep` command
+call s:cycle_configure('v', 'vim /@/gj ~/.vim/**/*.vim ~/.vim/vimrc',  'lvim /@/gj %',  'vim /@/gj ##')
+" TODO: `:[l]vim[grep]` is not asynchronous.
+" Add an async command (using  &grepprg?).
 
 " Variable {{{1
 
