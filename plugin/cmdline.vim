@@ -128,7 +128,8 @@ com! -bar -nargs=1 ToggleEditingCommands exe cmdline#toggle_editing_commands(<ar
 "
 "     • on the search command-line, it translates the pattern so that:
 "
-"           - the pattern is searched outside comments
+"           - it's searched outside comments
+"
 "           - all alphabetical characters are replaced with their corresponding
 "             equivalence class
 "
