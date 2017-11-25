@@ -51,16 +51,19 @@ cnorea <expr>  pc    getcmdtype() ==# ':'  && getcmdpos() == 3  ? 'sil! PlugClea
 
 augroup my_lazy_loaded_cmdline
     au!
+    " Do NOT write a bar after a backslash  on an empty line: it would result in
+    " 2 consecutive bars (empty command). This would print a line of a buffer on
+    " the command line, when we change the focused window for the first time.
     au CmdlineEnter : call cmdline#auto_uppercase()
-    \|
+    \
     \|                call cmdline#install_fugitive_commands()
-    \|
+    \
     \|                call cmdline#remember(s:overlooked_commands)
     \|                unlet! s:overlooked_commands
-    \|
+    \
     \|                call cmdline#pass_and_install_cycles(s:cycles)
     \|                unlet! s:cycles
-    \|
+    \
     \|                exe 'au! my_lazy_loaded_cmdline'
     \|                exe 'aug! my_lazy_loaded_cmdline'
 augroup END
