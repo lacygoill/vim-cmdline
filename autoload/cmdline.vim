@@ -194,7 +194,7 @@ fu! cmdline#cycle_install(cmds) abort "{{{2
     "         for cmd in cmds
     "             let key      = substitute(cmd, '@', '', '')
     "             let next_cmd = a:cmds[(i+1)%len(a:cmds)]
-    "             let pos      = match(next_cmd, '@')+1
+    "             let pos      = stridx(next_cmd, '@')+1
     "             let value    = {'cmd': substitute(next_cmd, '@', '', ''), 'pos': pos}
     "             call extend(s:cycle_{s:nb_cycles}, {key : value})
     "             let i += 1
@@ -203,7 +203,7 @@ fu! cmdline#cycle_install(cmds) abort "{{{2
 
     call map(cmds, { k,v -> { substitute(v, '@', '', '') :
     \                             { 'new_cmd' : substitute(a:cmds[(k+1)%len(a:cmds)], '@', '', ''),
-    \                               'pos'     :      match(a:cmds[(k+1)%len(a:cmds)], '@')+1},
+    \                               'pos'     :      stridx(a:cmds[(k+1)%len(a:cmds)], '@')+1},
     \                             }
     \              })
 

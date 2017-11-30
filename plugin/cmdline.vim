@@ -159,7 +159,7 @@ let s:cycles = []
 fu! s:cycle_configure(key, ...) abort
     exe 'nno <c-z>'.a:key
     \              .' :<c-u>'.substitute(a:1, '@', '', '')
-    \              .'<c-b>'.repeat('<right>', match(a:1, '@'))
+    \              .'<c-b>'.repeat('<right>', stridx(a:1, '@'))
     let s:cycles += [ a:000 ]
 endfu
 
