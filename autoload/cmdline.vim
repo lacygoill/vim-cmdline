@@ -63,7 +63,7 @@ fu! s:capture_subpatterns() abort "{{{2
     "
     "            (One)(Two)(Three)
     "      or    (one)_(two)_(three)
-    let new_cmdline = range.'s/\v'.join(map(subpatterns, '"(" . v:val . ")"'), pat =~# '_' ? '_' : '') . '//g'
+    let new_cmdline = range.'s/\v'.join(map(subpatterns, { k,v -> '('.v.')' }), pat =~# '_' ? '_' : '') . '//g'
 
     " Before returning the  keys, we position the cursor between  the last 2
     " slashes.
@@ -139,8 +139,8 @@ fu! cmdline#cycle(fwd) abort "{{{2
         if i <= s:nb_cycles
             " get the previous command in the cycle,
             " and the position of the cursor on the latter
-            let prev_cmd =   keys(filter(deepcopy(s:cycle_{i}), 'v:val.new_cmd ==# '.string(cmdline)))[0]
-            let prev_pos = values(filter(deepcopy(s:cycle_{i}), 'v:val.new_cmd ==# '.string(prev_cmd)))[0].pos
+            let prev_cmd =   keys(filter(deepcopy(s:cycle_{i}), { k,v -> v.new_cmd ==# cmdline }))[0]
+            let prev_pos = values(filter(deepcopy(s:cycle_{i}), { k,v -> v.new_cmd ==# prev_cmd }))[0].pos
             call setcmdpos(prev_pos)
             return prev_cmd
         else
@@ -200,10 +200,13 @@ fu! cmdline#cycle_install(cmds) abort "{{{2
     "             let i += 1
     "         endfor
     "}}}
-    call map(cmds, '{ substitute(v:val, "@", "", "") :
-    \                     { "new_cmd" : substitute(a:cmds[(v:key+1)%len(a:cmds)], "@", "", ""),
-    \                       "pos"     :      match(a:cmds[(v:key+1)%len(a:cmds)], "@")+1},
-    \               }')
+
+    call map(cmds, { k,v -> { substitute(v, '@', '', '') :
+    \                             { 'new_cmd' : substitute(a:cmds[(k+1)%len(a:cmds)], '@', '', ''),
+    \                               'pos'     :      match(a:cmds[(k+1)%len(a:cmds)], '@')+1},
+    \                             }
+    \              })
+
     let s:cycle_{s:nb_cycles} = {}
     for dict in cmds
         call extend(s:cycle_{s:nb_cycles}, dict)
@@ -307,8 +310,8 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{2
         if a:enable
             call my_lib#map_restore(get(s:, 'my_editing_commands', []))
         else
-            let lhs_list = map(split(execute('cno'), '\n'), 'matchstr(v:val, ''\vc\s+\zs\S+'')')
-            call filter(lhs_list, '!empty(v:val)')
+            let lhs_list = map(split(execute('cno'), '\n'), { k,v -> matchstr(v, '\vc\s+\zs\S+') })
+            call filter(lhs_list, { k,v -> !empty(v) })
             let s:my_editing_commands = my_lib#map_save(lhs_list, 'c', 1)
 
             for lhs in lhs_list
