@@ -172,7 +172,11 @@ call s:cycle_configure('s', '%s/\v@//g', '%s/\v@//gc')
 "                         with the 1st command in the cycle
 
 " populate command-line with a `:vimgrep` command
-call s:cycle_configure('v', 'vim /@/gj ~/.vim/**/*.vim ~/.vim/vimrc',  'lvim /@/gj %',  'vim /@/gj ##')
+call s:cycle_configure('v',
+\                      'vim /@/gj ~/.vim/**/*.vim ~/.vim/vimrc',
+\                      'vim /@/gj $VIMRUNTIME/**/*.vim',
+\                      'vim /@/gj ##',
+\                      'lvim /@/gj %')
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
 
