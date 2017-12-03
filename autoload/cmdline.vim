@@ -63,7 +63,7 @@ fu! s:capture_subpatterns() abort "{{{2
     "
     "            (One)(Two)(Three)
     "      or    (one)_(two)_(three)
-    let new_cmdline = range.'s/\v'.join(map(subpatterns, { k,v -> '('.v.')' }), pat =~# '_' ? '_' : '') . '//g'
+    let new_cmdline = range.'s/\v'.join(map(subpatterns, { i,v -> '('.v.')' }), pat =~# '_' ? '_' : '') . '//g'
 
     " Before returning the  keys, we position the cursor between  the last 2
     " slashes.
@@ -319,8 +319,8 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{2
         if a:enable
             call my_lib#map_restore(get(s:, 'my_editing_commands', []))
         else
-            let lhs_list = map(split(execute('cno'), '\n'), { k,v -> matchstr(v, '\vc\s+\zs\S+') })
-            call filter(lhs_list, { k,v -> !empty(v) })
+            let lhs_list = map(split(execute('cno'), '\n'), { i,v -> matchstr(v, '\vc\s+\zs\S+') })
+            call filter(lhs_list, { i,v -> !empty(v) })
             let s:my_editing_commands = my_lib#map_save(lhs_list, 'c', 1)
 
             for lhs in lhs_list
