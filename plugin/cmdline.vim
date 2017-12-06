@@ -141,23 +141,23 @@ com! -bar -nargs=1 ToggleEditingCommands exe cmdline#toggle_editing_commands(<ar
 "       camel case inside parentheses, so that we can refer to them easily
 "       with backref in the replacement.
 "}}}
-cno <expr><unique>  <c-s>  cmdline#transform()
+cno  <expr><unique>  <c-s>  cmdline#transform()
 
 " Cycle through a set of arbitrary commands.
 " Each cycle is installed with `:CycleInstall` in:
 "
 "         ~/.vim/plugged/vim-cmdline/autoload/cmdline.vim
-cno <unique>  <c-z>   <c-\>ecmdline#cycle(1)<cr>
-cno <unique>  <m-z>   <c-\>ecmdline#cycle(0)<cr>
+cno  <unique>  <c-z>  <c-\>ecmdline#cycle(1)<cr>
+cno  <unique>  <m-z>  <c-\>ecmdline#cycle(0)<cr>
 
-xno <unique>  <c-z>s  :s/\v//g<left><left><left>
+xno  <unique>  <c-z>s  :s/\v//g<left><left><left>
 
 "   ┌─ need this variable to pass the commands that are in each cycle we're going to configure,
 "   │  to the autoload/ script, where the bulk of the code installing cycles reside
 "   │
 let s:cycles = []
 fu! s:cycle_configure(key, ...) abort
-    exe 'nno <unique> <c-z>'.a:key
+    exe 'nno  <unique>  <c-z>'.a:key
     \              .' :<c-u>'.substitute(a:1, '@', '', '')
     \              .'<c-b>'.repeat('<right>', stridx(a:1, '@'))
     let s:cycles += [ a:000 ]
