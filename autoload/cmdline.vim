@@ -328,9 +328,8 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{2
             endfor
         endif
     catch
-        return 'echoerr '.string(v:exception)
+        exe my_lib#catch_error()
     endtry
-    return ''
 endfu
 
 fu! cmdline#transform() abort "{{{2

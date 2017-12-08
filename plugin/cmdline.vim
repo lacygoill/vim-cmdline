@@ -123,7 +123,7 @@ augroup END
 "         ToggleEditingCommands 0  →  disable
 "         ToggleEditingCommands 1  →  enable
 "}}}
-com! -bar -nargs=1 ToggleEditingCommands exe cmdline#toggle_editing_commands(<args>)
+com! -bar -nargs=1 ToggleEditingCommands call cmdline#toggle_editing_commands(<args>)
 
 " Mappings {{{1
 
