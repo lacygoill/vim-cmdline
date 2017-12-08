@@ -328,7 +328,7 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{2
             endfor
         endif
     catch
-        call my_lib#catch_error()
+        return my_lib#catch_error()
     endtry
 endfu
 
