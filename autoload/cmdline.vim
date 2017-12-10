@@ -196,9 +196,9 @@ fu! cmdline#cycle_install(cmds) abort "{{{2
     "         endfor
     "}}}
 
-    call map(cmds, { k,v -> { substitute(v, '@', '', '') :
-    \                             { 'new_cmd' : substitute(a:cmds[(k+1)%len(a:cmds)], '@', '', ''),
-    \                               'pos'     :      stridx(a:cmds[(k+1)%len(a:cmds)], '@')+1},
+    call map(cmds, { i,v -> { substitute(v, '@', '', '') :
+    \                             { 'new_cmd' : substitute(a:cmds[(i+1)%len(a:cmds)], '@', '', ''),
+    \                               'pos'     :      stridx(a:cmds[(i+1)%len(a:cmds)], '@')+1},
     \                             }
     \              })
 
