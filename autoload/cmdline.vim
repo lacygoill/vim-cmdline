@@ -259,16 +259,15 @@ fu! cmdline#install_fugitive_commands() abort "{{{2
     " detect  whether the  current file  is inside  a  git repo,  and if  it is,  it
     " installs its buffer-local commands.
     " Even if `fugitive` is correctly lazy-loaded  AFTER Vim has started reading the
-    " file, it wasn't loaded at the time the  file was read.  So, we need to re-emit
+    " file, it was NOT loaded at the time the  file was read.  So, we need to re-emit
     " `BufReadPost` so that fugitive properly installs its commands.
     augroup my_install_fugitive_commands
         au!
-        " Do NOT make this autocmd a fire-once autocmd.
-        " There may be more than 1 file which were opened when Vim started.
-        " The autocmd needs to be there for all of them.
         au CmdUndefined * if index(s:fugitive_commands, expand('<afile>')) >= 0
-                       \|     sil! doautocmd <nomodeline> fugitive BufReadPost
+                       \|     sil! doautoall <nomodeline> fugitive BufReadPost
                        \| endif
+                       \| au! my_install_fugitive_commands
+                       \| aug! my_install_fugitive_commands
     augroup END
 endfu
 
