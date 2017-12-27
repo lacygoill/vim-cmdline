@@ -104,6 +104,10 @@ endfu
 fu! cmdline#cycle(fwd) abort "{{{2
     let cmdline = getcmdline()
 
+    if getcmdtype() != ':'
+        return cmdline
+    endif
+
     " try to find the cycle to which the current command line belongs
     let i = 1
     while i <= s:nb_cycles
