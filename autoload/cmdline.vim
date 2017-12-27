@@ -270,6 +270,13 @@ fu! s:replace_with_equiv_class() abort "{{{2
     return substitute(get(s:, 'orig_cmdline', ''), '\a', '[[=\0=]]', 'g')
 endfu
 
+fu! cmdline#reset_did_transform() abort "{{{2
+    " called by `readline#undo()`
+    " necessary to re-perform a transformation we've undone
+    " by mistake
+    unlet! s:did_transform
+endfu
+
 fu! s:search_outside_comments() abort "{{{2
     " we should probably save `cmdline` in  a script-local variable if we want
     " to cycle between several transformations
