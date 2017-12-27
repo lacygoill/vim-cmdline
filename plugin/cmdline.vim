@@ -145,17 +145,17 @@ cno  <expr><unique>  <c-s>  cmdline#transform()
 " Each cycle is installed with `:CycleInstall` in:
 "
 "         ~/.vim/plugged/vim-cmdline/autoload/cmdline.vim
-cno  <unique>  <c-z>  <c-\>ecmdline#cycle(1)<cr>
-cno  <unique>  <m-z>  <c-\>ecmdline#cycle(0)<cr>
+cno  <unique>  <c-g>  <c-\>ecmdline#cycle(1)<cr>
+cno  <unique>  <m-g>  <c-\>ecmdline#cycle(0)<cr>
 
-xno  <unique>  <c-z>s  :s/\v//g<left><left><left>
+xno  <unique>  <c-g>s  :s/\v//g<left><left><left>
 
 "   ┌─ need this variable to pass the commands that are in each cycle we're going to configure,
 "   │  to the autoload/ script, where the bulk of the code installing cycles reside
 "   │
 let s:cycles = []
 fu! s:cycle_configure(key, ...) abort
-    exe 'nno  <unique>  <c-z>'.a:key
+    exe 'nno  <unique>  <c-g>'.a:key
     \              .' :<c-u>'.substitute(a:1, '@', '', '')
     \              .'<c-b>'.repeat('<right>', stridx(a:1, '@'))
     let s:cycles += [ a:000 ]
@@ -166,7 +166,7 @@ call s:cycle_configure('s', '%s/\v@//g', '%s/\v@//gc')
 "                       │         │
 "                       │         └ where we want the cursor to be
 "                       │
-"                       └ key to press in normal mode, after `C-z`, to populate the command line
+"                       └ key to press in normal mode, after `C-g`, to populate the command line
 "                         with the 1st command in the cycle
 
 " populate command-line with a `:vimgrep` command
