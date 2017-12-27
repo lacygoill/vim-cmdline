@@ -4,7 +4,7 @@ fu! cmdline#auto_uppercase() abort "{{{2
 " We define abbreviations in command-line mode to automatically replace
 " a custom command name written in lowercase with uppercase characters.
 
-    let commands = getcompletion('[A-Z]?*', 'command') + s:fugitive_commands
+    let commands = getcompletion('[A-Z]?*', 'command')
 
     for cmd in commands
         let lcmd  = tolower(cmd)
@@ -239,38 +239,6 @@ fu! cmdline#fix_typo(label) abort "{{{2
     "       So, we'll reexecute a new fixed command with the timer.
 endfu
 
-fu! cmdline#install_fugitive_commands() abort "{{{2
-    " In vimrc,  we postpone  the loading  of `fugitive`  after Vim  has started
-    " (through a timer).
-
-    " It could  be an issue  in the  future, if we  install a custom  mapping to
-    " execute a  fugitive command, and  we press it  before the plugin  has been
-    " loaded.
-    "
-    " Also, when we:
-    "
-    "         • start Vim  with a file to open as an argument
-    "         • the file is in a git repo
-    "         • type `:Glog`
-    "
-    " … it fails.
-    "
-    " This  is because  fugitive listens  to  certain events  like `BufReadPost`  to
-    " detect  whether the  current file  is inside  a  git repo,  and if  it is,  it
-    " installs its buffer-local commands.
-    " Even if `fugitive` is correctly lazy-loaded  AFTER Vim has started reading the
-    " file, it was NOT loaded at the time the  file was read.  So, we need to re-emit
-    " `BufReadPost` so that fugitive properly installs its commands.
-    augroup my_install_fugitive_commands
-        au!
-        au CmdUndefined * if index(s:fugitive_commands, expand('<afile>')) >= 0
-                       \|     sil! doautoall <nomodeline> fugitive BufReadPost
-                       \| endif
-                       \| au! my_install_fugitive_commands
-                       \| aug! my_install_fugitive_commands
-    augroup END
-endfu
-
 fu! cmdline#pass_and_install_cycles(cycles) abort "{{{2
     for cycle in a:cycles
         call cmdline#cycle_install(cycle)
@@ -366,40 +334,6 @@ fu! cmdline#transform() abort "{{{2
     endif
 endfu
 
-" Variables {{{1
+" Variable {{{1
 
 let s:default_cmd = { 'cmd' : 'vim //gj ~/.vim/**/*.vim ~/.vim/vimrc', 'pos' : 6 }
-
-let s:fugitive_commands = [
-\                           'Gblame',
-\                           'Gbrowse',
-\                           'Gcd',
-\                           'Gcommit',
-\                           'Gdelete',
-\                           'Gdiff',
-\                           'Ge',
-\                           'Gedit',
-\                           'Gfetch',
-\                           'Ggrep',
-\                           'Git',
-\                           'Glcd',
-\                           'Glgrep',
-\                           'Gllog',
-\                           'Glog',
-\                           'Gmerge',
-\                           'Gmove',
-\                           'Gpedit',
-\                           'Gpull',
-\                           'Gpush',
-\                           'Gread',
-\                           'Gremove',
-\                           'Gsdiff',
-\                           'Gsplit',
-\                           'Gstatus',
-\                           'Gtabedit',
-\                           'Gvdiff',
-\                           'Gvsplit',
-\                           'Gw',
-\                           'Gwq',
-\                           'Gwrite',
-\                         ]

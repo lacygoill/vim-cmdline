@@ -56,8 +56,6 @@ augroup my_lazy_loaded_cmdline
     " the command line, when we change the focused window for the first time.
     au CmdlineEnter : call cmdline#auto_uppercase()
     \
-    \|                call cmdline#install_fugitive_commands()
-    \
     \|                call cmdline#remember(s:overlooked_commands)
     \|                unlet! s:overlooked_commands
     \
