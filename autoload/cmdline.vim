@@ -290,18 +290,18 @@ endfu
 fu! cmdline#toggle_editing_commands(enable) abort "{{{2
     try
         if a:enable
-            call my_lib#map_restore(get(s:, 'my_editing_commands', []))
+            call lg#map_restore(get(s:, 'my_editing_commands', []))
         else
             let lhs_list = map(split(execute('cno'), '\n'), { i,v -> matchstr(v, '\vc\s+\zs\S+') })
             call filter(lhs_list, { i,v -> !empty(v) })
-            let s:my_editing_commands = my_lib#map_save(lhs_list, 'c', 1)
+            let s:my_editing_commands = lg#map_save(lhs_list, 'c', 1)
 
             for lhs in lhs_list
                 exe 'cunmap '.lhs
             endfor
         endif
     catch
-        return my_lib#catch_error()
+        return lg#catch_error()
     endtry
 endfu
 
