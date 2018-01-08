@@ -101,7 +101,7 @@ fu! cmdline#chain() abort "{{{2
     endif
 endfu
 
-fu! cmdline#cycle(fwd) abort "{{{2
+fu! cmdline#cycle(is_fwd) abort "{{{2
     let cmdline = getcmdline()
 
     if getcmdtype() != ':'
@@ -125,7 +125,7 @@ fu! cmdline#cycle(fwd) abort "{{{2
     "       if this  is the case,  since there's no  cycle to use,  we'll simply
     "       return the default command stored in `s:default_cmd`
 
-    if a:fwd
+    if a:is_fwd
         call setcmdpos(
         \               i <= s:nb_cycles
         \               ?    s:cycle_{i}[cmdline].pos
