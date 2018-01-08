@@ -284,7 +284,7 @@ fu! s:search_outside_comments() abort "{{{2
         return get(s:, 'orig_cmdline', '')
     endif
     let cml = '\V'.escape(split(&l:cms, '%')[0], '\').'\v'
-    return '\v%(^%(\s*'.cml.')@!.*)@<='.get(s:, 'orig_cmdline', '')
+    return '\v%(^%(\s*'.cml.')@!.*)@<=\m'.get(s:, 'orig_cmdline', '')
 endfu
 
 fu! cmdline#toggle_editing_commands(enable) abort "{{{2
