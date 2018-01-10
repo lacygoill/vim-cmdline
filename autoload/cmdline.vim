@@ -294,7 +294,7 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{2
         else
             let lhs_list = map(split(execute('cno'), '\n'), { i,v -> matchstr(v, '\vc\s+\zs\S+') })
             call filter(lhs_list, { i,v -> !empty(v) })
-            let s:my_editing_commands = lg#map#save('c', 1, lhs_list)
+            let s:my_editing_commands = lg#map#save('c', 0, lhs_list)
 
             for lhs in lhs_list
                 exe 'cunmap '.lhs
