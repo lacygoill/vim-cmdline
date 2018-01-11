@@ -1,3 +1,8 @@
+if exists('g:autoloaded_cmdline')
+    finish
+endif
+let g:autoloaded_cmdline = 1
+
 " Functions {{{1
 fu! cmdline#auto_uppercase() abort "{{{2
 
