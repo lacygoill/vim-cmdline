@@ -1,10 +1,43 @@
+" Why a guard?{{{
+"
+" We need to assign a value to a variable, for the functions to work.
+"
+" Big deal (/s) … So what?
+"
+" Rule: Any  interface element  (mapping, autocmd,  command), or  anything which
+" initialize the plugin totally or  partially (assignment, call to function like
+" `call s:init()`), should be sourced only once.
+"
+" What's the reasoning behind this rule?
+"
+" Changing the  state of the plugin  during runtime may have  undesired effects,
+" including bugs. Same thing  for the interface.
+"}}}
+" How could this file be sourced twice?{{{
+"
+" Suppose you call a function defined in this file from somewhere.
+" You write the name of the function correctly, except you make a small typo
+" in the last component (i.e. the text after the last #).
+"
+" Now suppose the file has already been sourced because another function from it
+" has been called.
+" Later, when Vim  will have to call  the misspelled function, it  will see it's
+" not defined.   So, it will look  for its definition. The name  before the last
+" component being correct, it will find this file, and source it AGAIN.  Because
+" of the typo, it won't find the function,  but the damage is done: the file has
+" been sourced twice.
+"
+" This is unexpected, and we don't want that.
+"}}}
+
 if exists('g:autoloaded_cmdline')
     finish
 endif
 let g:autoloaded_cmdline = 1
 
-" Functions {{{1
-fu! cmdline#auto_uppercase() abort "{{{2
+let s:default_cmd = { 'cmd' : 'vim //gj ~/.vim/**/*.vim ~/.vim/vimrc', 'pos' : 6 }
+
+fu! cmdline#auto_uppercase() abort "{{{1
 
 " We define abbreviations in command-line mode to automatically replace
 " a custom command name written in lowercase with uppercase characters.
@@ -22,7 +55,7 @@ fu! cmdline#auto_uppercase() abort "{{{2
     endfor
 endfu
 
-fu! s:capture_subpatterns() abort "{{{2
+fu! s:capture_subpatterns() abort "{{{1
     " If  we're on  the Ex  command-line (:),  we try  and guess  whether it
     " contains a substitution command.
     let cmdline   = getcmdline()
@@ -71,7 +104,7 @@ fu! s:capture_subpatterns() abort "{{{2
     \     ."\<c-b>".repeat("\<right>", strchars(new_cmdline, 1)-2)
 endfu
 
-fu! cmdline#chain() abort "{{{2
+fu! cmdline#chain() abort "{{{1
     " Do NOT write empty lines in this function (gQ → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
@@ -106,7 +139,7 @@ fu! cmdline#chain() abort "{{{2
     endif
 endfu
 
-fu! cmdline#cycle(is_fwd) abort "{{{2
+fu! cmdline#cycle(is_fwd) abort "{{{1
     let cmdline = getcmdline()
 
     if getcmdtype() != ':'
@@ -154,7 +187,7 @@ fu! cmdline#cycle(is_fwd) abort "{{{2
     endif
 endfu
 
-fu! cmdline#cycle_install(cmds) abort "{{{2
+fu! cmdline#cycle_install(cmds) abort "{{{1
     let s:nb_cycles = get(s:, 'nb_cycles', 0) + 1
     " It's important to make a copy of the arguments, otherwise{{{
     " we   would   get   a   weird    result   in   the   next   invocation   of
@@ -217,7 +250,7 @@ fu! cmdline#cycle_install(cmds) abort "{{{2
     endfor
 endfu
 
-fu! s:emit_cmdline_transformation_pre() abort "{{{2
+fu! s:emit_cmdline_transformation_pre() abort "{{{1
     " We want to be able to undo the transformation.
     " We emit  a custom event, so  that we can  add the current line  to our
     " undo list in `vim-readline`.
@@ -226,7 +259,7 @@ fu! s:emit_cmdline_transformation_pre() abort "{{{2
     endif
 endfu
 
-fu! cmdline#fix_typo(label) abort "{{{2
+fu! cmdline#fix_typo(label) abort "{{{1
     let cmdline = getcmdline()
     let keys = {
              \   'cr': "\<bs>\<cr>",
@@ -248,13 +281,13 @@ fu! cmdline#fix_typo(label) abort "{{{2
     "       So, we'll reexecute a new fixed command with the timer.
 endfu
 
-fu! cmdline#pass_and_install_cycles(cycles) abort "{{{2
+fu! cmdline#pass_and_install_cycles(cycles) abort "{{{1
     for cycle in a:cycles
         call cmdline#cycle_install(cycle)
     endfor
 endfu
 
-fu! cmdline#remember(list) abort "{{{2
+fu! cmdline#remember(list) abort "{{{1
     augroup remember_overlooked_commands
         au!
         for cmd in a:list
@@ -271,18 +304,18 @@ fu! cmdline#remember(list) abort "{{{2
     augroup END
 endfu
 
-fu! s:replace_with_equiv_class() abort "{{{2
+fu! s:replace_with_equiv_class() abort "{{{1
     return substitute(get(s:, 'orig_cmdline', ''), '\a', '[[=\0=]]', 'g')
 endfu
 
-fu! cmdline#reset_did_transform() abort "{{{2
+fu! cmdline#reset_did_transform() abort "{{{1
     " called by `readline#undo()`
     " necessary to re-perform a transformation we've undone
     " by mistake
     unlet! s:did_transform
 endfu
 
-fu! s:search_outside_comments() abort "{{{2
+fu! s:search_outside_comments() abort "{{{1
     " we should probably save `cmdline` in  a script-local variable if we want
     " to cycle between several transformations
     if empty(&l:cms)
@@ -292,7 +325,7 @@ fu! s:search_outside_comments() abort "{{{2
     return '\v%(^%(\s*'.cml.')@!.*)@<=\m'.get(s:, 'orig_cmdline', '')
 endfu
 
-fu! cmdline#toggle_editing_commands(enable) abort "{{{2
+fu! cmdline#toggle_editing_commands(enable) abort "{{{1
     try
         if a:enable
             call lg#map#restore(get(s:, 'my_editing_commands', []))
@@ -310,7 +343,7 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{2
     endtry
 endfu
 
-fu! cmdline#transform() abort "{{{2
+fu! cmdline#transform() abort "{{{1
     "     ┌─ number of times we've transformed the command line
     "     │
     let s:did_transform = get(s:, 'did_transform', -1) + 1
@@ -349,7 +382,3 @@ fu! cmdline#transform() abort "{{{2
         return ''
     endif
 endfu
-
-" Variable {{{1
-
-let s:default_cmd = { 'cmd' : 'vim //gj ~/.vim/**/*.vim ~/.vim/vimrc', 'pos' : 6 }
