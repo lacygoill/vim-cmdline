@@ -1,35 +1,3 @@
-" Why a guard?{{{
-"
-" We need to assign a value to a variable, for the functions to work.
-"
-" Big deal (/s) … So what?
-"
-" Rule: Any  interface element  (mapping, autocmd,  command), or  anything which
-" initialize the plugin totally or  partially (assignment, call to function like
-" `call s:init()`), should be sourced only once.
-"
-" What's the reasoning behind this rule?
-"
-" Changing the  state of the plugin  during runtime may have  undesired effects,
-" including bugs. Same thing  for the interface.
-"}}}
-" How could this file be sourced twice?{{{
-"
-" Suppose you call a function defined in this file from somewhere.
-" You write the name of the function correctly, except you make a small typo
-" in the last component (i.e. the text after the last #).
-"
-" Now suppose the file has already been sourced because another function from it
-" has been called.
-" Later, when Vim  will have to call  the misspelled function, it  will see it's
-" not defined.   So, it will look  for its definition. The name  before the last
-" component being correct, it will find this file, and source it AGAIN.  Because
-" of the typo, it won't find the function,  but the damage is done: the file has
-" been sourced twice.
-"
-" This is unexpected, and we don't want that.
-"}}}
-
 if exists('g:autoloaded_cmdline')
     finish
 endif
