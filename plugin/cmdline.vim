@@ -40,7 +40,7 @@ cnorea <expr>  fl    getcmdtype() ==# ':'  && getcmdpos() == 3  ?  'FzLines'    
 cnorea <expr>  fs    getcmdtype() ==# ':'  && getcmdpos() == 3  ?  'FzLocate'      : 'fs'
 "              │
 "              └─ `fl` is already taken for `:FzLines`
-"                 besides, we can use this mnemonics: in `fs`, `s` is for ’_s_earch’.
+"                 besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
 
 cnorea <expr>  ucs   getcmdtype() ==# ':' && getcmdpos() == 4  ? 'UnicodeSearch'  : 'ucs'
 
