@@ -335,7 +335,7 @@ fu! cmdline#transform() abort "{{{1
     endif
 
     if getcmdtype() =~# '[/?]'
-        if get(s:, 'did_transform', 0) == 0
+        if get(s:, 'did_transform', 0) ==# 0
             let s:orig_cmdline = getcmdline()
         endif
         call s:emit_cmdline_transformation_pre()
