@@ -110,7 +110,7 @@ endfu
 fu! cmdline#cycle(is_fwd) abort "{{{1
     let cmdline = getcmdline()
 
-    if getcmdtype() != ':'
+    if getcmdtype() isnot# ':'
         return cmdline
     endif
 
