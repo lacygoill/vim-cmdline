@@ -15,7 +15,7 @@ fu! cmdline#auto_uppercase() abort "{{{1
     for cmd in commands
         let lcmd  = tolower(cmd)
         exe printf('cnorea <expr> %s
-        \               getcmdtype() == '':'' && getcmdline() =~# ''\v^%(%(tab<Bar>vert%[ical])\s+)?%s$''
+        \               getcmdtype() is# '':'' && getcmdline() =~# ''\v^%(%(tab<Bar>vert%[ical])\s+)?%s$''
         \               ?     %s
         \               :     %s
         \          ', lcmd, lcmd, string(cmd), string(tolower(cmd))
@@ -144,8 +144,8 @@ fu! cmdline#cycle(is_fwd) abort "{{{1
         if i <= s:nb_cycles
             " get the previous command in the cycle,
             " and the position of the cursor on the latter
-            let prev_cmd =   keys(filter(deepcopy(s:cycle_{i}), { k,v -> v.new_cmd ==# cmdline }))[0]
-            let prev_pos = values(filter(deepcopy(s:cycle_{i}), { k,v -> v.new_cmd ==# prev_cmd }))[0].pos
+            let prev_cmd =   keys(filter(deepcopy(s:cycle_{i}), { k,v -> v.new_cmd is# cmdline }))[0]
+            let prev_pos = values(filter(deepcopy(s:cycle_{i}), { k,v -> v.new_cmd is# prev_cmd }))[0].pos
             call setcmdpos(prev_pos)
             return prev_cmd
         else
@@ -326,7 +326,7 @@ fu! cmdline#transform() abort "{{{1
         \|                       exe 'au! reset_did_tweak' | aug! reset_did_tweak
     augroup END
 
-    if s:did_transform >= 1 && getcmdtype() ==# ':'
+    if s:did_transform >= 1 && getcmdtype() is# ':'
         " If  we  invoke this  function  twice  on  the  same Ex  command  line,
         " it  shouldn't  do  anything  the  2nd  time.   Because  we  only  have
         " one transformation  atm (s:capture_subpatterns()), and  re-applying it

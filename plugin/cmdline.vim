@@ -10,7 +10,7 @@ let g:loaded_cmdline = 1
 "             let l:lhs = matchstr(a:args, '^\s*\zs\S\+')
 "             let l:rhs = matchstr(a:args, '^\s*\S\+\s\+\zs.*')
 "             if a:cmd
-"                 exe printf("cnorea <expr> %s getcmdtype() ==# ':' ? '%s' : '%s'", l:lhs, l:rhs, l:lhs)
+"                 exe printf("cnorea <expr> %s getcmdtype() is# ':' ? '%s' : '%s'", l:lhs, l:rhs, l:lhs)
 "             else
 "                 exe printf("cnorea <expr> %s getcmdtype() =~ '[/?]' ? '%s' : '%s'", l:lhs, l:rhs, l:lhs)
 "             endif
@@ -22,30 +22,30 @@ let g:loaded_cmdline = 1
 
 " fix some typos
 cnorea <expr>  \`    getcmdtype() =~# '[/?]'  ? '\t' : '\`'
-cnorea <expr>  soù   getcmdtype() =~# ':' && getcmdline() ==# 'soù' ? 'so%' : 'soù'
+cnorea <expr>  soù   getcmdtype() =~# ':' && getcmdline() is# 'soù' ? 'so%' : 'soù'
 
 
-cnorea <expr>  sl    getcmdtype() ==# ':' && getcmdpos() == 3  ? 'ls'             : 'sl'
-cnorea <expr>  hg    getcmdtype() ==# ':' && getcmdpos() == 3  ? 'helpgrep'       : 'hg'
-cnorea <expr>  dig   getcmdtype() ==# ':' && getcmdpos() == 4  ? 'verb Digraphs!' : 'dig'
-cnorea <expr>  ecoh  getcmdtype() ==# ':' && getcmdpos() == 5  ? 'echo'           : 'ecoh'
+cnorea <expr>  sl    getcmdtype() is# ':' && getcmdpos() == 3  ? 'ls'             : 'sl'
+cnorea <expr>  hg    getcmdtype() is# ':' && getcmdpos() == 3  ? 'helpgrep'       : 'hg'
+cnorea <expr>  dig   getcmdtype() is# ':' && getcmdpos() == 4  ? 'verb Digraphs!' : 'dig'
+cnorea <expr>  ecoh  getcmdtype() is# ':' && getcmdpos() == 5  ? 'echo'           : 'ecoh'
 
 "         :fbl    →    :FzBLines
 "         :fc     →    :FzCommands
 "         :fl     →    :FzLines
 "         :fs     →    :FzLocate
-cnorea <expr>  fbl   getcmdtype() ==# ':'  && getcmdpos() == 4  ?  'FzBLines'      : 'fbl'
-cnorea <expr>  fc    getcmdtype() ==# ':'  && getcmdpos() == 3  ?  'FzCommands'    : 'fc'
-cnorea <expr>  fl    getcmdtype() ==# ':'  && getcmdpos() == 3  ?  'FzLines'       : 'fl'
-cnorea <expr>  fs    getcmdtype() ==# ':'  && getcmdpos() == 3  ?  'FzLocate'      : 'fs'
+cnorea <expr>  fbl   getcmdtype() is# ':'  && getcmdpos() == 4  ?  'FzBLines'      : 'fbl'
+cnorea <expr>  fc    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzCommands'    : 'fc'
+cnorea <expr>  fl    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzLines'       : 'fl'
+cnorea <expr>  fs    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzLocate'      : 'fs'
 "              │
 "              └─ `fl` is already taken for `:FzLines`
 "                 besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
 
-cnorea <expr>  ucs   getcmdtype() ==# ':' && getcmdpos() == 4  ? 'UnicodeSearch'  : 'ucs'
+cnorea <expr>  ucs   getcmdtype() is# ':' && getcmdpos() == 4  ? 'UnicodeSearch'  : 'ucs'
 
 "         :pc    →    :sil! PlugClean
-cnorea <expr>  pc    getcmdtype() ==# ':'  && getcmdpos() == 3  ? 'sil! PlugClean' : 'pc'
+cnorea <expr>  pc    getcmdtype() is# ':'  && getcmdpos() == 3  ? 'sil! PlugClean' : 'pc'
 
 " Autocmds {{{1
 
