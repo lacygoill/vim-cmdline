@@ -3,7 +3,7 @@ if exists('g:autoloaded_cmdline')
 endif
 let g:autoloaded_cmdline = 1
 
-let s:default_cmd = { 'cmd' : 'vim //gj ~/.vim/**/*.vim ~/.vim/vimrc', 'pos' : 6 }
+let s:DEFAULT_CMD = { 'cmd' : 'vim //gj ~/.vim/**/*.vim ~/.vim/vimrc', 'pos' : 6 }
 
 fu! cmdline#auto_uppercase() abort "{{{1
 
@@ -129,17 +129,17 @@ fu! cmdline#cycle(is_fwd) abort "{{{1
     "     • a number greater than the number of installed cycles
     "
     "       if this  is the case,  since there's no  cycle to use,  we'll simply
-    "       return the default command stored in `s:default_cmd`
+    "       return the default command stored in `s:DEFAULT_CMD`
 
     if a:is_fwd
         call setcmdpos(
         \               i <= s:nb_cycles
         \               ?    s:cycle_{i}[cmdline].pos
-        \               :    s:default_cmd.pos
+        \               :    s:DEFAULT_CMD.pos
         \             )
         return i <= s:nb_cycles
         \?         s:cycle_{i}[cmdline].new_cmd
-        \:         s:default_cmd.cmd
+        \:         s:DEFAULT_CMD.cmd
     else
         if i <= s:nb_cycles
             " get the previous command in the cycle,
@@ -149,8 +149,8 @@ fu! cmdline#cycle(is_fwd) abort "{{{1
             call setcmdpos(prev_pos)
             return prev_cmd
         else
-            call setcmdpos(s:default_cmd.pos)
-            return s:default_cmd.cmd
+            call setcmdpos(s:DEFAULT_CMD.pos)
+            return s:DEFAULT_CMD.cmd
         endif
     endif
 endfu
