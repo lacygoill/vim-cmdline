@@ -289,7 +289,7 @@ fu! s:search_outside_comments() abort "{{{1
     if empty(&l:cms)
         return get(s:, 'orig_cmdline', '')
     endif
-    let cml = '\V'.escape(split(&l:cms, '%')[0], '\').'\v'
+    let cml = '\V'.escape(matchstr(split(&l:cms, '%')[0], '\S*'), '\').'\v'
     return '\v%(^%(\s*'.cml.')@!.*)@<=\m'.get(s:, 'orig_cmdline', '')
 endfu
 
