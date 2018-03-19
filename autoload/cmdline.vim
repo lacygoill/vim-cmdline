@@ -91,6 +91,13 @@ fu! cmdline#chain() abort "{{{1
         if cmdline =~# '\v\C^'.pat.'$'
             if nomore
                 let more_save = &more
+                " when  I execute  `:[cl]chi`, don't  populate the  command-line
+                " with `:sil [cl]ol`  if the qf stack doesn't have  at least two
+                " qf lists
+                if   (pat ==# 'chi%[story]' || pat ==# 'lhi%[story]')
+                \  && get(getqflist({'nr': '$'}), 'nr', 0) <= 1
+                    return
+                endif
                 " allow Vim's pager to display the full contents of any command,
                 " even if it takes more than one screen; don't stop after the first
                 " screen to display the message:    -- More --
