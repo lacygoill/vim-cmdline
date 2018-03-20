@@ -94,7 +94,7 @@ fu! cmdline#chain() abort "{{{1
                 " when  I execute  `:[cl]chi`, don't  populate the  command-line
                 " with `:sil [cl]ol`  if the qf stack doesn't have  at least two
                 " qf lists
-                if   (pat ==# 'chi%[story]' || pat ==# 'lhi%[story]')
+                if   (pat is# 'chi%[story]' || pat is# 'lhi%[story]')
                 \  && get(getqflist({'nr': '$'}), 'nr', 0) <= 1
                     return
                 endif
@@ -271,7 +271,7 @@ fu! cmdline#remember(list) abort "{{{1
             \            if getcmdline() %s %s
             \|               call timer_start(0, {-> execute("echohl WarningMsg | echo %s | echohl NONE", "")})
             \|           endif
-            \          ',     cmd.regex ? '=~#' : '==#',
+            \          ',     cmd.regex ? '=~#' : 'is#',
             \                 string(cmd.regex ? '^'.cmd.old.'$' : cmd.old),
             \                 string('['.cmd.new .'] was equivalent')
             \         )
