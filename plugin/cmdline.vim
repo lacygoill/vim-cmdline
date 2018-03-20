@@ -25,27 +25,27 @@ cnorea <expr>  \`    getcmdtype() =~# '[/?]'  ? '\t' : '\`'
 cnorea <expr>  soù   getcmdtype() =~# ':' && getcmdline() is# 'soù' ? 'so%' : 'soù'
 
 
-cnorea <expr>  sl    getcmdtype() is# ':' && getcmdpos() == 3  ? 'ls'             : 'sl'
-cnorea <expr>  hg    getcmdtype() is# ':' && getcmdpos() == 3  ? 'helpgrep'       : 'hg'
-cnorea <expr>  dig   getcmdtype() is# ':' && getcmdpos() == 4  ? 'verb Digraphs!' : 'dig'
-cnorea <expr>  ecoh  getcmdtype() is# ':' && getcmdpos() == 5  ? 'echo'           : 'ecoh'
+cnorea <expr>  sl    getcmdtype() is# ':' && getcmdpos() ==# 3  ? 'ls'             : 'sl'
+cnorea <expr>  hg    getcmdtype() is# ':' && getcmdpos() ==# 3  ? 'helpgrep'       : 'hg'
+cnorea <expr>  dig   getcmdtype() is# ':' && getcmdpos() ==# 4  ? 'verb Digraphs!' : 'dig'
+cnorea <expr>  ecoh  getcmdtype() is# ':' && getcmdpos() ==# 5  ? 'echo'           : 'ecoh'
 
 "         :fbl    →    :FzBLines
 "         :fc     →    :FzCommands
 "         :fl     →    :FzLines
 "         :fs     →    :FzLocate
-cnorea <expr>  fbl   getcmdtype() is# ':'  && getcmdpos() == 4  ?  'FzBLines'      : 'fbl'
-cnorea <expr>  fc    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzCommands'    : 'fc'
-cnorea <expr>  fl    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzLines'       : 'fl'
-cnorea <expr>  fs    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzLocate'      : 'fs'
+cnorea <expr>  fbl   getcmdtype() is# ':'  && getcmdpos() ==# 4  ?  'FzBLines'      : 'fbl'
+cnorea <expr>  fc    getcmdtype() is# ':'  && getcmdpos() ==# 3  ?  'FzCommands'    : 'fc'
+cnorea <expr>  fl    getcmdtype() is# ':'  && getcmdpos() ==# 3  ?  'FzLines'       : 'fl'
+cnorea <expr>  fs    getcmdtype() is# ':'  && getcmdpos() ==# 3  ?  'FzLocate'      : 'fs'
 "              │
 "              └─ `fl` is already taken for `:FzLines`
 "                 besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
 
-cnorea <expr>  ucs   getcmdtype() is# ':' && getcmdpos() == 4  ? 'UnicodeSearch'  : 'ucs'
+cnorea <expr>  ucs   getcmdtype() is# ':' && getcmdpos() ==# 4  ? 'UnicodeSearch'  : 'ucs'
 
 "         :pc    →    :sil! PlugClean
-cnorea <expr>  pc    getcmdtype() is# ':'  && getcmdpos() == 3  ? 'sil! PlugClean' : 'pc'
+cnorea <expr>  pc    getcmdtype() is# ':'  && getcmdpos() ==# 3  ? 'sil! PlugClean' : 'pc'
 
 " Autocmds {{{1
 
