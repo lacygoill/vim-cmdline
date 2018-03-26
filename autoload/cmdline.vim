@@ -140,13 +140,13 @@ fu! cmdline#cycle(is_fwd) abort "{{{1
 
     if a:is_fwd
         call setcmdpos(
-        \               i <= s:nb_cycles
-        \               ?    s:cycle_{i}[cmdline].pos
-        \               :    s:DEFAULT_CMD.pos
-        \             )
+                    \   i <= s:nb_cycles
+                    \ ?      s:cycle_{i}[cmdline].pos
+                    \ :      s:DEFAULT_CMD.pos
+                    \ )
         return i <= s:nb_cycles
-        \      ?    s:cycle_{i}[cmdline].new_cmd
-        \      :    s:DEFAULT_CMD.cmd
+           \ ?     s:cycle_{i}[cmdline].new_cmd
+           \ :     s:DEFAULT_CMD.cmd
     else
         if i <= s:nb_cycles
             " get the previous command in the cycle,
