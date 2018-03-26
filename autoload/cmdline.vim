@@ -333,7 +333,9 @@ fu! cmdline#transform() abort "{{{1
         \|                       exe 'au! reset_did_tweak' | aug! reset_did_tweak
     augroup END
 
-    if s:did_transform >= 1 && getcmdtype() is# ':'
+    let cmdtype = getcmdtype()
+    let cmdline = getcmdline()
+    if s:did_transform >= 1 && cmdtype is# ':'
         " If  we  invoke this  function  twice  on  the  same Ex  command  line,
         " it  shouldn't  do  anything  the  2nd  time.   Because  we  only  have
         " one transformation  atm (s:capture_subpatterns()), and  re-applying it
@@ -341,19 +343,24 @@ fu! cmdline#transform() abort "{{{1
         return ''
     endif
 
-    if getcmdtype() =~# '[/?]'
+    if cmdtype =~# '[/?]'
         if get(s:, 'did_transform', 0) ==# 0
-            let s:orig_cmdline = getcmdline()
+            let s:orig_cmdline = cmdline
         endif
         call s:emit_cmdline_transformation_pre()
         return "\<c-e>\<c-u>"
         \     .(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments())
 
-    elseif getcmdtype() =~ ':'
-        call s:emit_cmdline_transformation_pre()
-        return s:capture_subpatterns()
+    elseif cmdtype =~# ':'
+        if cmdline =~# '^\%(fin\|\%(vert \)\?sf\|tabf\) \*$'
+            return "\<c-e>\<c-u>".trim(cmdline, '*')."~/.vim/**/*"
+        else
+            call s:emit_cmdline_transformation_pre()
+            return s:capture_subpatterns()
+        endif
 
     else
         return ''
     endif
 endfu
+
