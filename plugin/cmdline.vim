@@ -168,8 +168,8 @@ endfu
 "         • the directory of the current buffer
 "}}}
 call s:cycle_configure('ef',
-\                      'fin *@',
 \                      'fin ~/.vim/**/*@',
+\                      'fin *@',
 \                      'fin %:h/**/*@')
 " Why `fin *@`, and not `fin **/*@`?{{{
 "
@@ -192,18 +192,18 @@ call s:cycle_configure('ef',
 "}}}
 
 call s:cycle_configure('es',
-\                      'sfin *@',
 \                      'sfin ~/.vim/**/*@',
+\                      'sfin *@',
 \                      'sfin %:h/**/*@')
 
 call s:cycle_configure('ev',
-\                      'vert sfin *@',
 \                      'vert sfin ~/.vim/**/*@',
+\                      'vert sfin *@',
 \                      'vert sfin %:h/**/*@')
 
 call s:cycle_configure('et',
-\                      'tabfin *@',
 \                      'tabfin ~/.vim/**/*@',
+\                      'tabfin *@',
 \                      'tabfin %:h/**/*@')
 
 " populate command-line with a substitution command
