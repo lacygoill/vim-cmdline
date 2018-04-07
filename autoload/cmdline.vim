@@ -3,7 +3,25 @@ if exists('g:autoloaded_cmdline')
 endif
 let g:autoloaded_cmdline = 1
 
-let s:DEFAULT_CMD = { 'cmd' : 'vim //gj ~/.vim/**/*.vim ~/.vim/vimrc', 'pos' : 6 }
+" TODO:{{{
+" If we change the first command in the cycle `C-g v`, it should be changed here
+" too. Otherwise:
+"
+"     :
+"
+"     C-g
+"         → vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc
+"         ✔
+"
+"     C-g
+"         → vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc
+"         ✘
+"         we should have the next command in the cycle
+"
+" Find a way to define `s:DEFAULT_CMD` as whatever first command is in the cycle
+" `C-g v`, at any given time.
+"}}}
+let s:DEFAULT_CMD = { 'cmd' : 'vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc', 'pos' : 6 }
 
 fu! cmdline#auto_uppercase() abort "{{{1
 
@@ -352,13 +370,8 @@ fu! cmdline#transform() abort "{{{1
         \     .(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments())
 
     elseif cmdtype =~# ':'
-        if cmdline =~# '^\%(fin\|\%(vert \)\?sf\|tabf\) \*$'
-            return "\<c-e>\<c-u>".trim(cmdline, '*')."~/.vim/**/*"
-        else
-            call s:emit_cmdline_transformation_pre()
-            return s:capture_subpatterns()
-        endif
-
+        call s:emit_cmdline_transformation_pre()
+        return s:capture_subpatterns()
     else
         return ''
     endif

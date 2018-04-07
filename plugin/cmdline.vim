@@ -161,6 +161,51 @@ fu! s:cycle_configure(key, ...) abort
     let s:cycles += [ a:000 ]
 endfu
 
+" search a file in:{{{
+"
+"         • the working directory
+"         • ~/.vim
+"         • the directory of the current buffer
+"}}}
+call s:cycle_configure('ef',
+\                      'fin *@',
+\                      'fin ~/.vim/**/*@',
+\                      'fin %:h/**/*@')
+" Why `fin *@`, and not `fin **/*@`?{{{
+"
+" 1. It's useless to add `**` because we already included it inside 'path'.
+"    And `:find` searches in all paths of 'path'.
+"    So, it will use `**` as a prefix.
+"
+" 2. If we used `fin **/*@`, the path of the candidates would be relative to
+"    the working directory.
+"    It's too verbose. We just need their name.
+"
+"    Btw, you may wonder what happens when  we type `:fin *bar` and press Tab or
+"    C-d,  while  there  are two  files  with  the  same  name `foobar`  in  two
+"    directories in the working directory.
+"
+"    The answer is simple:
+"    for each candidate, Vim prepends the  previous path component to remove the
+"    ambiguity. If it's not enough, it goes on adding path components until it's
+"    not needed anymore.
+"}}}
+
+call s:cycle_configure('es',
+\                      'sfin *@',
+\                      'sfin ~/.vim/**/*@',
+\                      'sfin %:h/**/*@')
+
+call s:cycle_configure('ev',
+\                      'vert sfin *@',
+\                      'vert sfin ~/.vim/**/*@',
+\                      'vert sfin %:h/**/*@')
+
+call s:cycle_configure('et',
+\                      'tabfin *@',
+\                      'tabfin ~/.vim/**/*@',
+\                      'tabfin %:h/**/*@')
+
 " populate command-line with a substitution command
 call s:cycle_configure('s', '%s/\v@//g', '%s/\v@//gc')
 "                       │         │
@@ -172,8 +217,8 @@ call s:cycle_configure('s', '%s/\v@//g', '%s/\v@//gc')
 " populate command-line with a `:vimgrep` command
 call s:cycle_configure('v',
 \                      'vim /@/gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc',
-\                      'vim /@/gj $VIMRUNTIME/**/*.vim',
 \                      'vim /@/gj ./**/*.vim',
+\                      'vim /@/gj $VIMRUNTIME/**/*.vim',
 \                      'vim /@/gj ##',
 \                      'lvim /@/gj %')
 " TODO: `:[l]vim[grep]` is not asynchronous.
