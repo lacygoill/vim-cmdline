@@ -216,10 +216,10 @@ call s:cycle_configure('s', '%s/\v@//g', '%s/\v@//gc')
 
 " populate command-line with a `:vimgrep` command
 call s:cycle_configure('v',
-\                      'noa vim /@/gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc \| lw',
-\                      'noa vim /@/gj ./**/*.vim \| lw',
-\                      'noa vim /@/gj $VIMRUNTIME/**/*.vim \| lw',
-\                      'noa vim /@/gj ## \| lw',
+\                      'noa vim /@/gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc \| cw',
+\                      'noa vim /@/gj ./**/*.vim \| cw',
+\                      'noa vim /@/gj $VIMRUNTIME/**/*.vim \| cw',
+\                      'noa vim /@/gj ## \| cw',
 \                      'noa lvim /@/gj % \| lw')
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
