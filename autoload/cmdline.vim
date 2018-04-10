@@ -21,7 +21,7 @@ let g:autoloaded_cmdline = 1
 " Find a way to define `s:DEFAULT_CMD` as whatever first command is in the cycle
 " `C-g v`, at any given time.
 "}}}
-let s:DEFAULT_CMD = { 'cmd' : 'noa vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc \| cw', 'pos' : 10 }
+let s:DEFAULT_CMD = { 'cmd' : 'noa vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc | cw', 'pos' : 10 }
 
 fu! cmdline#auto_uppercase() abort "{{{1
 

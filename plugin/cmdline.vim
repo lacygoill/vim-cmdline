@@ -158,7 +158,7 @@ fu! s:cycle_configure(key, ...) abort
     exe 'nno  <unique>  <c-g>'.a:key
     \              .' :<c-u>'.substitute(a:1, '@', '', '')
     \              .'<c-b>'.repeat('<right>', stridx(a:1, '@'))
-    let s:cycles += [ a:000 ]
+    let s:cycles += [ map(copy(a:000), {i,v -> substitute(v, '<bar>', '|', 'g')})]
 endfu
 
 " search a file in:{{{
@@ -216,11 +216,11 @@ call s:cycle_configure('s', '%s/\v@//g', '%s/\v@//gc')
 
 " populate command-line with a `:vimgrep` command
 call s:cycle_configure('v',
-\                      'noa vim /@/gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc \| cw',
-\                      'noa vim /@/gj ./**/*.vim \| cw',
-\                      'noa vim /@/gj $VIMRUNTIME/**/*.vim \| cw',
-\                      'noa vim /@/gj ## \| cw',
-\                      'noa lvim /@/gj % \| lw')
+\                      'noa vim /@/gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc <bar> cw',
+\                      'noa vim /@/gj ./**/*.vim <bar> cw',
+\                      'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
+\                      'noa vim /@/gj ## <bar> cw',
+\                      'noa lvim /@/gj % <bar> lw')
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
 
