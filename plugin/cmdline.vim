@@ -148,7 +148,7 @@ cno  <expr><unique>  <c-s>  cmdline#transform()
 cno  <unique>  <c-g>  <c-\>ecmdline#cycle(1)<cr>
 cno  <unique>  <m-g>  <c-\>ecmdline#cycle(0)<cr>
 
-xno  <unique>  <c-g>s  :s/\v//g<left><left><left>
+xno  <unique>  <c-g>s  :s///g<left><left><left>
 
 "   ┌─ need this variable to pass the commands that are in each cycle we're going to configure,
 "   │  to the autoload/ script, where the bulk of the code installing cycles reside
@@ -207,9 +207,9 @@ call s:cycle_configure('et',
 \                      'tabfin %:h/**/*@')
 
 " populate command-line with a substitution command
-call s:cycle_configure('s', '%s/\v@//g', '%s/\v@//gc')
-"                       │         │
-"                       │         └ where we want the cursor to be
+call s:cycle_configure('s', '%s/@//g', '%s/@//gc')
+"                       │       │
+"                       │       └ where we want the cursor to be
 "                       │
 "                       └ key to press in normal mode, after `C-g`, to populate the command line
 "                         with the 1st command in the cycle
