@@ -155,11 +155,20 @@ xno  <unique>  <c-g>s  :s///g<left><left><left>
 "   │
 let s:cycles = []
 fu! s:cycle_configure(key, ...) abort
+    let cycle = map(copy(a:000), {i,v -> substitute(v, '<bar>', '|', 'g')})
+    let s:cycles += [ cycle ]
     exe 'nno  <unique>  <c-g>'.a:key
     \              .' :<c-u>'.substitute(a:1, '@', '', '')
-    \              .'<c-b>'.repeat('<right>', stridx(a:1, '@'))
-    let s:cycles += [ map(copy(a:000), {i,v -> substitute(v, '<bar>', '|', 'g')})]
+    \              .'<c-b>'.repeat('<right>', stridx(cycle[0], '@'))
 endfu
+
+" populate the arglist with:
+"
+"     • all the files in a directory
+"     • all the files in the output of a shell command
+call s:cycle_configure('a',
+\                      'sp <bar> args `=glob(''@/*'')`',
+\                      'sp <bar> args `=systemlist(''@'')`')
 
 " search a file in:{{{
 "
