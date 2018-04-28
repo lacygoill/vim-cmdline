@@ -92,7 +92,7 @@ augroup my_cmdline_chain
     " enable the  item in  the statusline  showing our  position in  the arglist
     " after we execute an `:args` command
     au CmdlineLeave : if getcmdline() =~# '\v\C^%(tab\s+)?ar%[gs]\s+'
-                   \|     call timer_start(0, { -> execute('let g:my_stl_list_position = 1 | redraw!') })
+                   \|     call timer_start(0, { -> execute('let g:my_stl_list_position = 2 | redraw!') })
                    \| endif
 
     " sometimes, we type `:h functionz)` instead of `:h function()`
