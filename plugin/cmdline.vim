@@ -167,7 +167,7 @@ endfu
 "     • all the files in a directory
 "     • all the files in the output of a shell command
 call s:cycle_configure('a',
-\                      'sp <bar> args `=glob(''@/*'')`',
+\                      'sp <bar> args `=filter(glob(''@/*'', 0, 1), {i,v -> filereadable(v)})`',
 \                      'sp <bar> args `=systemlist(''@'')`')
 
 " search a file in:{{{
