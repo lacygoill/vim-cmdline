@@ -243,12 +243,12 @@ fu! cmdline#cycle_install(cmds) abort "{{{1
     endfor
 endfu
 
-fu! s:emit_cmdline_transformation_pre() abort "{{{1
+fu! s:emit_add_to_undolist_c() abort "{{{1
     " We want to be able to undo the transformation.
     " We emit  a custom event, so  that we can  add the current line  to our
     " undo list in `vim-readline`.
-    if exists('#User#CmdlineTransformationPre')
-        doautocmd <nomodeline> User CmdlineTransformationPre
+    if exists('#User#add_to_undolist_c')
+        doautocmd <nomodeline> User add_to_undolist_c
     endif
 endfu
 
@@ -365,12 +365,12 @@ fu! cmdline#transform() abort "{{{1
         if get(s:, 'did_transform', 0) ==# 0
             let s:orig_cmdline = cmdline
         endif
-        call s:emit_cmdline_transformation_pre()
+        call s:emit_add_to_undolist_c()
         return "\<c-e>\<c-u>"
         \     .(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments())
 
     elseif cmdtype =~# ':'
-        call s:emit_cmdline_transformation_pre()
+        call s:emit_add_to_undolist_c()
         return s:capture_subpatterns()
     else
         return ''

@@ -170,6 +170,17 @@ call s:cycle_configure('a',
 \                      'sp <bar> args `=filter(glob(''@/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
 \                      'sp <bar> args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
 
+" populate the qfl with the output of a shell command
+" Why not using `:cexpr`?{{{
+"
+" It suffers from an issue regarding a possible pipe in the shell command.
+" You have to escape it, which is  inconsistent with how a bar is interpreted by
+" Vim in other contexts.
+" I don't want to remember this quirk.
+"}}}
+call s:cycle_configure('c',
+\                      'call system(''@ >/tmp/my_cfile'') <bar> cgetfile /tmp/my_cfile')
+
 " search a file in:{{{
 "
 "         • the working directory
@@ -229,6 +240,7 @@ call s:cycle_configure('v',
 \                      'noa vim /@/gj ./**/*.vim <bar> cw',
 \                      'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
 \                      'noa vim /@/gj ## <bar> cw',
+\                      'noa vim /@/gj `find . -type f -cmin -60` <bar> cw',
 \                      'noa lvim /@/gj % <bar> lw')
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
