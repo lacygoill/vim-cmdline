@@ -287,8 +287,8 @@ fu! cmdline#remember(list) abort "{{{1
             exe printf('
             \            au CmdlineLeave :
             \            if getcmdline() %s %s
-            \|               call timer_start(0, {-> execute("echohl WarningMsg | echo %s | echohl NONE", "")})
-            \|           endif
+            \ |              call timer_start(0, {-> execute("echohl WarningMsg | echo %s | echohl NONE", "")})
+            \ |          endif
             \          ',     cmd.regex ? '=~#' : 'is#',
             \                 string(cmd.regex ? '^'.cmd.old.'$' : cmd.old),
             \                 string('['.cmd.new .'] was equivalent')
@@ -348,7 +348,7 @@ fu! cmdline#transform() abort "{{{1
         " anymore until we  leave the command line. Maybe we  should inspect the
         " command line instead.
         au CmdlineLeave  /,\?,:  unlet! s:did_transform s:orig_cmdline
-        \|                       exe 'au! reset_did_tweak' | aug! reset_did_tweak
+        \ |                      exe 'au! reset_did_tweak' | aug! reset_did_tweak
     augroup END
 
     let cmdtype = getcmdtype()

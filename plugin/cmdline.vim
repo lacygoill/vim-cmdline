@@ -56,14 +56,14 @@ augroup my_lazy_loaded_cmdline
     " the command line, when we change the focused window for the first time.
     au CmdlineEnter : call cmdline#auto_uppercase()
     \
-    \|                call cmdline#remember(s:overlooked_commands)
-    \|                unlet! s:overlooked_commands
+    \ |               call cmdline#remember(s:overlooked_commands)
+    \ |               unlet! s:overlooked_commands
     \
-    \|                call cmdline#pass_and_install_cycles(s:cycles)
-    \|                unlet! s:cycles
+    \ |               call cmdline#pass_and_install_cycles(s:cycles)
+    \ |               unlet! s:cycles
     \
-    \|                exe 'au! my_lazy_loaded_cmdline'
-    \|                exe 'aug! my_lazy_loaded_cmdline'
+    \ |               exe 'au! my_lazy_loaded_cmdline'
+    \ |               exe 'aug! my_lazy_loaded_cmdline'
 augroup END
 
 augroup my_cmdline_chain
@@ -86,26 +86,26 @@ augroup my_cmdline_chain
     " We use a timer to avoid reenabling the editing commands before having left
     " the command-line completely. Otherwise E501.
     au CmdlineLeave : if getcmdline() =~# '\v^\s*vi%[sual]\s*$'
-                   \|     call timer_start(0, {-> execute('ToggleEditingCommands 1')})
-                   \| endif
+                  \ |     call timer_start(0, {-> execute('ToggleEditingCommands 1')})
+                  \ | endif
 
     " enable the  item in  the statusline  showing our  position in  the arglist
     " after we execute an `:args` command
     au CmdlineLeave : if getcmdline() =~# '\v\C^%(tab\s+)?ar%[gs]\s+'
-                   \|     call timer_start(0, { -> execute('let g:my_stl_list_position = 2 | redraw!') })
-                   \| endif
+                  \ |     call timer_start(0, { -> execute('let g:my_stl_list_position = 2 | redraw!') })
+                  \ | endif
 
     " sometimes, we type `:h functionz)` instead of `:h function()`
     au CmdlineLeave : if getcmdline() =~# '\v\C^h%[elp]\s+\S+z\)\s*$'
-                   \|     call cmdline#fix_typo('z')
-                   \| endif
+                  \ |     call cmdline#fix_typo('z')
+                  \ | endif
 
     " when we copy a line of vimscript and paste it on the command line,
     " sometimes the newline gets copied and translated into a literal CR,
     " which raises an error:    remove it
     au CmdlineLeave : if getcmdline() =~# '\r$'
-                   \|     call cmdline#fix_typo('cr')
-                   \| endif
+                  \ |     call cmdline#fix_typo('cr')
+                  \ | endif
 augroup END
 
 " Command {{{1
@@ -167,7 +167,7 @@ endfu
 "     • all the files in a directory
 "     • all the files in the output of a shell command
 call s:cycle_configure('a',
-\                      'sp <bar> args `=filter(glob(''@/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
+\                      'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
 \                      'sp <bar> args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
 
 " populate the qfl with the output of a shell command
@@ -225,6 +225,20 @@ call s:cycle_configure('et',
 \                      'tabfin ~/.vim/**/*@',
 \                      'tabfin *@',
 \                      'tabfin %:h/**/*@')
+
+call s:cycle_configure('f',
+\                      'filter /@/ map',
+\                      'filter /@/ ab',
+\                      'filter /@/ %#',
+\                      'filter /@/ com',
+\                      'filter /@/ old',
+\                      'filter /@/ chi',
+\                      'filter /@/ mess',
+\                      'filter /@/ scr',
+\                      'filter /@/ ls')
+
+call s:cycle_configure('p',
+\                      'put =execute(''@'')')
 
 " populate command-line with a substitution command
 call s:cycle_configure('s', '%s/@//g', '%s/@//gc')
