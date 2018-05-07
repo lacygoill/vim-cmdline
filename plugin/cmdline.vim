@@ -181,6 +181,16 @@ call s:cycle_configure('a',
 call s:cycle_configure('c',
 \                      'call system(''grep -RHIinos @ . >/tmp/my_cfile'') <bar> cgetfile /tmp/my_cfile')
 
+call s:cycle_configure('ee',
+\                      'tabe $MYVIMRC@',
+\                      'e $MYVIMRC@',
+\                      'sp $MYVIMRC@',
+\                      'vs $MYVIMRC@')
+
+call s:cycle_configure('em',
+\                      'tabe /tmp/vimrc@',
+\                      'tabe /tmp/vim.vim@')
+
 " search a file in:{{{
 "
 "         • the working directory
