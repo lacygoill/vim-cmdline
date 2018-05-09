@@ -184,10 +184,10 @@ call s:cycle_configure('c',
 "                       ┌ definition
 "                       │
 call s:cycle_configure('d',
-\                      'verb nno @',
-\                      'verb com @',
-\                      'verb fu @',
-\                      'verb fu {''<lambda>@''}')
+\                      'Verb nno @',
+\                      'Verb com @',
+\                      'Verb fu @',
+\                      'Verb fu {''<lambda>@''}')
 
 call s:cycle_configure('ee',
 \                      'tabe $MYVIMRC@',
