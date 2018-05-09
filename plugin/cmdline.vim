@@ -247,6 +247,9 @@ call s:cycle_configure('f',
 \                      'filter /@/ scr',
 \                      'filter /@/ ls')
 
+call s:cycle_configure('l',
+\                      'verb fu {''<lambda>@''}')
+
 call s:cycle_configure('p',
 \                      'put =execute(''@'')')
 
