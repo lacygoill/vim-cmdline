@@ -245,15 +245,15 @@ call s:cycle_configure('et',
 \                      'tabfin %:h/**/*@')
 
 call s:cycle_configure('f',
-\                      'filter /@/ map',
-\                      'filter /@/ ab',
-\                      'filter /@/ %#',
-\                      'filter /@/ com',
-\                      'filter /@/ old',
-\                      'filter /@/ chi',
-\                      'filter /@/ mess',
-\                      'filter /@/ scr',
-\                      'filter /@/ ls')
+\                      'Verb filter /@/ map',
+\                      'Verb filter /@/ ab',
+\                      'Verb filter /@/ %#',
+\                      'Verb filter /@/ com',
+\                      'Verb filter /@/ old',
+\                      'Verb filter /@/ chi',
+\                      'Verb filter /@/ mess',
+\                      'Verb filter /@/ scr',
+\                      'Verb filter /@/ ls')
 
 call s:cycle_configure('p',
 \                      'put =execute(''@'')')
