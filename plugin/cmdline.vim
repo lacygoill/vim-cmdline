@@ -181,6 +181,14 @@ call s:cycle_configure('a',
 call s:cycle_configure('c',
 \                      'call system(''grep -RHIinos @ . >/tmp/my_cfile'') <bar> cgetfile /tmp/my_cfile')
 
+"                       ┌ definition
+"                       │
+call s:cycle_configure('d',
+\                      'verb nno @',
+\                      'verb com @',
+\                      'verb fu @',
+\                      'verb fu {''<lambda>@''}')
+
 call s:cycle_configure('ee',
 \                      'tabe $MYVIMRC@',
 \                      'e $MYVIMRC@',
@@ -246,9 +254,6 @@ call s:cycle_configure('f',
 \                      'filter /@/ mess',
 \                      'filter /@/ scr',
 \                      'filter /@/ ls')
-
-call s:cycle_configure('l',
-\                      'verb fu {''<lambda>@''}')
 
 call s:cycle_configure('p',
 \                      'put =execute(''@'')')
