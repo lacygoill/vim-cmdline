@@ -280,6 +280,15 @@ fu! cmdline#pass_and_install_cycles(cycles) abort "{{{1
     endfor
 endfu
 
+fu! cmdline#redraw() abort "{{{1
+    augroup cmdline_redraw
+        au!
+        au CmdlineLeave * call timer_start(0, {-> execute('redraw!')})
+        \ |               exe 'au! cmdline_redraw'
+        \ |               aug! cmdline_redraw
+    augroup END
+endfu
+
 fu! cmdline#remember(list) abort "{{{1
     augroup remember_overlooked_commands
         au!

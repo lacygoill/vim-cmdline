@@ -277,6 +277,10 @@ call s:cycle_configure('v',
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
 
+com! -bar Redraw call cmdline#redraw()
+call s:cycle_configure('!',
+\                      'Redraw <bar> sil !sr wref @')
+
 " Variable {{{1
 
 " Commented because the messages are annoying.
