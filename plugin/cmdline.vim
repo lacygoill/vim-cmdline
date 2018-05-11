@@ -186,6 +186,8 @@ call s:cycle_configure('c',
 call s:cycle_configure('d',
 \                      'Verb nno @',
 \                      'Verb com @',
+\                      'Verb au @',
+\                      'Verb au * <buffer=@>',
 \                      'Verb fu @',
 \                      'Verb fu {''<lambda>@''}')
 
