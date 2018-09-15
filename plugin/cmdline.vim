@@ -275,7 +275,12 @@ call s:cycle_configure('v',
 \                      'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
 \                      'noa vim /@/gj ## <bar> cw',
 \                      'noa vim /@/gj `find . -type f -cmin -60` <bar> cw',
-\                      'noa lvim /@/gj % <bar> lw')
+\                      'noa lvim /@/gj % <bar> lw',
+\                      'noa vim /@/gj ~/bin/**/*.sh ~/.shrc ~/.bashrc ~/.zshrc ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets | cw'
+\ )
+" TODO:
+" Remove `~/.shrc` from the last cycle once we've integrated this file into `~/.zshrc`.
+
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
 
