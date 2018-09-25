@@ -294,10 +294,10 @@ call s:cycle_configure('!',
 " I keep it for educational purpose.
 "
 "     let s:overlooked_commands = [
-"                               \   { 'old': 'vs\%[plit]', 'new': 'C-w v', 'regex': 1 },
-"                               \   { 'old': 'sp\%[lit]' , 'new': 'C-w s', 'regex': 1 },
-"                               \   { 'old': 'q!'        , 'new': 'ZQ'   , 'regex': 0 },
-"                               \   { 'old': 'x'         , 'new': 'ZZ'   , 'regex': 0 },
-"                               \ ]
+"         \ {'old': 'vs\%[plit]', 'new': 'C-w v', 'regex': 1},
+"         \ {'old': 'sp\%[lit]' , 'new': 'C-w s', 'regex': 1},
+"         \ {'old': 'q!'        , 'new': 'ZQ'   , 'regex': 0},
+"         \ {'old': 'x'         , 'new': 'ZZ'   , 'regex': 0},
+"         \ ]
 
 let s:overlooked_commands = []

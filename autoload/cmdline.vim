@@ -104,7 +104,7 @@ fu! cmdline#chain() abort "{{{1
     \              'changes'                  : ["norm! g;\<s-left>"     , 1],
     \              'ju%[mps]'                 : ["norm! \<c-o>\<s-left>" , 1],
     \             }
-    for [pat, cmd ] in items(pat2cmd)
+    for [pat, cmd] in items(pat2cmd)
         let [keys, nomore] = cmd
         if cmdline =~# '\v\C^'.pat.'$'
             if nomore
