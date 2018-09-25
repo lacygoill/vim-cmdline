@@ -156,7 +156,7 @@ xno  <unique>  <c-g>s  :s///g<left><left><left>
 let s:cycles = []
 fu! s:cycle_configure(key, ...) abort
     let cycle = map(copy(a:000), {i,v -> substitute(v, '<bar>', '|', 'g')})
-    let s:cycles += [ cycle ]
+    let s:cycles += [cycle]
     exe 'nno  <unique>  <c-g>'.a:key
     \              .' :<c-u>'.substitute(a:1, '@', '', '')
     \              .'<c-b>'.repeat('<right>', stridx(cycle[0], '@'))

@@ -94,18 +94,18 @@ fu! cmdline#chain() abort "{{{1
     " Do NOT write empty lines in this function (gQ → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
-    \              '(g|v).*(#@<!#|nu%[mber])' : [ ''         , 0 ],
-    \              '(ls|files|buffers)!?'     : [ 'b '       , 0 ],
-    \              'chi%[story]'              : [ 'sil col ' , 1 ],
-    \              'lhi%[story]'              : [ 'sil lol ' , 1 ],
-    \              'marks'                    : [ 'norm! `'  , 1 ],
-    \              'old%[files]'              : [ 'e #<'     , 1 ],
-    \              'undol%[ist]'              : [ 'u '       , 1 ],
-    \              'changes'                  : [ "norm! g;\<s-left>"     , 1 ],
-    \              'ju%[mps]'                 : [ "norm! \<c-o>\<s-left>" , 1 ],
+    \              '(g|v).*(#@<!#|nu%[mber])' : [''         , 0],
+    \              '(ls|files|buffers)!?'     : ['b '       , 0],
+    \              'chi%[story]'              : ['sil col ' , 1],
+    \              'lhi%[story]'              : ['sil lol ' , 1],
+    \              'marks'                    : ['norm! `'  , 1],
+    \              'old%[files]'              : ['e #<'     , 1],
+    \              'undol%[ist]'              : ['u '       , 1],
+    \              'changes'                  : ["norm! g;\<s-left>"     , 1],
+    \              'ju%[mps]'                 : ["norm! \<c-o>\<s-left>" , 1],
     \             }
     for [pat, cmd ] in items(pat2cmd)
-        let [ keys, nomore ] = cmd
+        let [keys, nomore] = cmd
         if cmdline =~# '\v\C^'.pat.'$'
             if nomore
                 let more_save = &more
