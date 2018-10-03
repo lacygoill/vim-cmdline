@@ -111,7 +111,6 @@ fu! cmdline#chain() abort "{{{1
         \  && get(getqflist({'nr': '$'}), 'nr', 0) <= 1
             return
         endif
-
         let [keys, nomore] = cmd
         if cmdline =~# '\v\C^'.pat.'$'
             if nomore
