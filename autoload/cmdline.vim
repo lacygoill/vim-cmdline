@@ -94,33 +94,39 @@ fu! cmdline#chain() abort "{{{1
     " Do NOT write empty lines in this function (gQ → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
-    \              '(g|v).*(#@<!#|nu%[mber])' : [''         , 0],
-    \              '(ls|files|buffers)!?'     : ['b '       , 0],
-    \              'chi%[story]'              : ['sil col ' , 1],
-    \              'lhi%[story]'              : ['sil lol ' , 1],
-    \              'marks'                    : ['norm! `'  , 1],
-    \              'old%[files]'              : ['e #<'     , 1],
-    \              'undol%[ist]'              : ['u '       , 1],
-    \              'changes'                  : ["norm! g;\<s-left>"     , 1],
-    \              'ju%[mps]'                 : ["norm! \<c-o>\<s-left>" , 1],
-    \             }
+        \ '(g|v).*(#@<!#|nu%[mber])' : [''         , 0],
+        \ '(ls|files|buffers)!?'     : ['b '       , 0],
+        \ 'chi%[story]'              : ['sil col ' , 1],
+        \ 'lhi%[story]'              : ['sil lol ' , 1],
+        \ 'marks'                    : ['norm! `'  , 1],
+        \ 'old%[files]'              : ['e #<'     , 1],
+        \ 'undol%[ist]'              : ['u '       , 1],
+        \ 'changes'                  : ["norm! g;\<s-left>"     , 1],
+        \ 'ju%[mps]'                 : ["norm! \<c-o>\<s-left>" , 1],
+        \ }
     for [pat, cmd] in items(pat2cmd)
+        " when I execute `:[cl]chi`, don't  populate the command-line with
+        " `:sil [cl]ol` if the qf stack doesn't have at least two qf lists
+        if (pat is# 'chi%[story]' || pat is# 'lhi%[story]')
+        \  && get(getqflist({'nr': '$'}), 'nr', 0) <= 1
+            return
+        endif
+
         let [keys, nomore] = cmd
         if cmdline =~# '\v\C^'.pat.'$'
             if nomore
-                let more_save = &more
-                " when  I execute  `:[cl]chi`, don't  populate the  command-line
-                " with `:sil [cl]ol`  if the qf stack doesn't have  at least two
-                " qf lists
-                if   (pat is# 'chi%[story]' || pat is# 'lhi%[story]')
-                \  && get(getqflist({'nr': '$'}), 'nr', 0) <= 1
-                    return
-                endif
+                let s:more_save = &more
                 " allow Vim's pager to display the full contents of any command,
                 " even if it takes more than one screen; don't stop after the first
                 " screen to display the message:    -- More --
                 set nomore
-                call timer_start(0, {-> execute('set '.(more_save ? '' : 'no').'more')})
+                augroup restore_more
+                    au!
+                    au CmdlineLeave * exe 'set '.(s:more_save ? '' : 'no').'more'
+                    \ | unlet! s:more_save
+                    \ | au! restore_more
+                    \ | aug! restore_more
+                augroup END
             endif
             return feedkeys(':'.keys, 'in')
         endif
