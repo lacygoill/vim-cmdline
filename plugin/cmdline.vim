@@ -283,6 +283,8 @@ call s:cycle_configure('v',
 
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
+" For inspiration:
+"     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
 
 com! -bar Redraw call cmdline#redraw()
 call s:cycle_configure('!',
