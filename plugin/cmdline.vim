@@ -125,6 +125,22 @@ com! -bar -nargs=1 ToggleEditingCommands call cmdline#toggle_editing_commands(<a
 
 " Mappings {{{1
 
+" Purpose:{{{
+"
+" By default,  when you search  for a  pattern, C-g and  C-t allow you  to cycle
+" through all the matches, without leaving the command-line.
+" We remap these commands to Tab and S-Tab on the search command-line.
+
+" Also, on the Ex command-line (:), Tab can expand wildcards.
+" But sometimes there are  too many suggestions, and we want to  get back to the
+" command-line prior to the expansion, and refine the wildcards.
+" We use  our Tab mapping  to save the command-line  prior to an  expansion, and
+" install a C-q mapping to restore it.
+"}}}
+cno  <expr>  <tab>    cmdline#tab#custom(1)
+cno  <expr>  <s-tab>  cmdline#tab#custom(0)
+cno          <c-q>    <c-\>ecmdline#tab#restore_cmdline_after_expansion()<cr>
+
 " The following mapping transforms the command line in 2 ways, depending on where we press it:{{{
 "
 "     • on the search command-line, it translates the pattern so that:
