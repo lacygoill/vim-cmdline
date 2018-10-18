@@ -195,7 +195,7 @@ call s:cycle_configure('a',
 " I don't want to remember this quirk.
 "}}}
 call s:cycle_configure('c',
-\                      'call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
+\                      'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
 
 "                       ┌ definition
 "                       │
