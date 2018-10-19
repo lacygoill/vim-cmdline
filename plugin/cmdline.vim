@@ -184,7 +184,7 @@ endfu
 "     • all the files in the output of a shell command
 call s:cycle_configure('a',
 \                      'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
-\                      'sp <bar> args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
+\                      'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
 
 " populate the qfl with the output of a shell command
 " Why not using `:cexpr`?{{{
