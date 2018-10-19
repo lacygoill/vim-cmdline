@@ -286,7 +286,7 @@ call s:cycle_configure('s', '%s/@//g', '%s/@//gc', '%s/@//gn')
 
 " populate command-line with a `:vimgrep` command
 call s:cycle_configure('v',
-\                      'noa vim /@/gj ~/.vim/**/*.vim ~/.vim/**/*.snippets ~/.vim/vimrc <bar> cw',
+\                      'noa vim /@/gj ~/.vim/**/*.vim ~/.vim/**/*.snippets ~/.vim/template/** ~/.vim/vimrc <bar> cw',
 \                      'noa vim /@/gj ./**/*.vim <bar> cw',
 \                      'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
 \                      'noa vim /@/gj ## <bar> cw',
