@@ -30,14 +30,15 @@ fu! cmdline#auto_uppercase() abort "{{{1
 
     let commands = getcompletion('[A-Z]?*', 'command')
 
+    let pat = '^\%%(\%%(tab\<bar>vert\%%[ical]\)\s\+\)\=%s$\<bar>^\%%(''<,''>\<bar>\*\)%s$'
     for cmd in commands
         let lcmd  = tolower(cmd)
         exe printf('cnorea <expr> %s
-        \               getcmdtype() is# '':'' && getcmdline() =~# ''\v^%(%(tab<Bar>vert%[ical])\s+)?%s$''
-        \               ?     %s
-        \               :     %s
-        \          ', lcmd, lcmd, string(cmd), string(tolower(cmd))
-        \         )
+            \         getcmdtype() is# '':'' && getcmdline() =~# '.string(pat).'
+            \         ?     %s
+            \         :     %s'
+            \ , lcmd, lcmd, lcmd, string(cmd), string(tolower(cmd))
+            \ )
     endfor
 endfu
 
