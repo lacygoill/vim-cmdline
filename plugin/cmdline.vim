@@ -280,7 +280,7 @@ call s:cycle_configure('p',
 \                      'put =execute(''@'')')
 
 " populate command-line with a substitution command
-call s:cycle_configure('s', '%s/@//g', '%s/@//gc', '%s/@//gn')
+call s:cycle_configure('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
 "                       │       │
 "                       │       └ where we want the cursor to be
 "                       │
