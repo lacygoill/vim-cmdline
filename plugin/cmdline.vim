@@ -271,6 +271,9 @@ call s:cycle_configure('f',
 \                      'Verb filter /@/ chi',
 \                      'Verb filter /@/ mess',
 \                      'Verb filter /@/ scr',
+\                      'Verb filter /@/ let',
+\                      'Verb filter /@/ set',
+\                      'Verb filter /@/ hi',
 \                      'Verb filter /@/ ls')
 
 call s:cycle_configure('p',
