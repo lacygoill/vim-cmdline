@@ -124,7 +124,7 @@ fu! cmdline#chain() abort "{{{1
                     au!
                     au CmdlineLeave * exe 'set '.(s:more_save ? '' : 'no').'more'
                     \ | unlet! s:more_save
-                    \ | au! restore_more
+                    \ | exe 'au! restore_more'
                     \ | aug! restore_more
                 augroup END
             endif

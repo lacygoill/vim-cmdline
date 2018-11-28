@@ -63,7 +63,7 @@ augroup my_lazy_loaded_cmdline
     \ |               unlet! s:cycles
     \
     \ |               exe 'au! my_lazy_loaded_cmdline'
-    \ |               exe 'aug! my_lazy_loaded_cmdline'
+    \ |               aug! my_lazy_loaded_cmdline
 augroup END
 
 augroup my_cmdline_chain
