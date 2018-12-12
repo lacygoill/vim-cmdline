@@ -106,14 +106,14 @@ fu! cmdline#chain() abort "{{{1
         \ 'ju%[mps]'                 : ["norm! \<c-o>\<s-left>" , 1],
         \ }
     for [pat, cmd] in items(pat2cmd)
-        " when I execute `:[cl]chi`, don't  populate the command-line with
-        " `:sil [cl]ol` if the qf stack doesn't have at least two qf lists
-        if (pat is# 'chi%[story]' || pat is# 'lhi%[story]')
-        \  && get(getqflist({'nr': '$'}), 'nr', 0) <= 1
-            return
-        endif
         let [keys, nomore] = cmd
         if cmdline =~# '\v\C^'.pat.'$'
+            " when I  execute `:[cl]chi`,  don't populate the  command-line with
+            " `:sil [cl]ol` if the qf stack doesn't have at least two qf lists
+            if pat is# 'lhi%[story]' && get(getloclist(0, {'nr': '$'}), 'nr', 0) <= 1
+            \ || pat is# 'chi%[story]' && get(getqflist({'nr': '$'}), 'nr', 0) <= 1
+                return
+            endif
             if nomore
                 let s:more_save = &more
                 " allow Vim's pager to display the full contents of any command,
