@@ -95,13 +95,13 @@ fu! cmdline#chain() abort "{{{1
     " Do NOT write empty lines in this function (gQ → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
-        \ '(g|v).*(#@<!#|nu%[mber])' : [''         , 0],
-        \ '(ls|files|buffers)!?'     : ['b '       , 0],
-        \ 'chi%[story]'              : ['sil col ' , 1],
-        \ 'lhi%[story]'              : ['sil lol ' , 1],
-        \ 'marks'                    : ['norm! `'  , 1],
-        \ 'old%[files]'              : ['e #<'     , 1],
-        \ 'undol%[ist]'              : ['u '       , 1],
+        \ '(g|v).*(#@<!#|nu%[mber])' : [''        , 0],
+        \ '(ls|files|buffers)!?'     : ['b '      , 0],
+        \ 'chi%[story]'              : ['CC '     , 1],
+        \ 'lhi%[story]'              : ['LL '     , 1],
+        \ 'marks'                    : ['norm! `' , 1],
+        \ 'old%[files]'              : ['e #<'    , 1],
+        \ 'undol%[ist]'              : ['u '      , 1],
         \ 'changes'                  : ["norm! g;\<s-left>"     , 1],
         \ 'ju%[mps]'                 : ["norm! \<c-o>\<s-left>" , 1],
         \ }
@@ -113,6 +113,17 @@ fu! cmdline#chain() abort "{{{1
             if pat is# 'lhi%[story]' && get(getloclist(0, {'nr': '$'}), 'nr', 0) <= 1
             \ || pat is# 'chi%[story]' && get(getqflist({'nr': '$'}), 'nr', 0) <= 1
                 return
+            endif
+            if pat is# 'chi%[story]'
+                let pfx = 'c'
+            elseif pat is# 'lhi%[story]'
+                let pfx = 'l'
+            endif
+            if exists('pfx')
+                if pfx is# 'c' && get(getqflist({'nr': '$'}), 'nr', 0) <= 1
+                \ || pfx is# 'l' && get(getloclist(0, {'nr': '$'}), 'nr', 0) <= 1
+                    return
+                endif
             endif
             if nomore
                 let s:more_save = &more
