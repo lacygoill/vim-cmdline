@@ -28,6 +28,7 @@ fu! cmdline#tab#custom(is_fwd) abort "{{{2
         " Why use `feedkeys()`?{{{
         "
         " If we used this mapping:
+        "
         "         cno <expr>  <s-tab>  getcmdtype() =~ '[?/]' ? '<c-t>' : '<s-tab>'
         "
         " When we would hit <s-tab> on the command-line (:) (outside the wildmenu),
@@ -66,12 +67,17 @@ endfu
 
 " Utility {{{1
 fu! s:save_cmdline_before_expansion() abort "{{{2
+    " The returned  key will  be pressed  from a  mapping while  in command-line
+    " mode.
+    " We want Vim to start a wildcard expansion.
+    " So, we need to return whatever key is stored in 'wcm'.
+    let l:key = nr2char(&wcm ? &wcm : &wc)
     if wildmenumode()
-        return "\<tab>"
+        return l:key
     endif
     let cmdline = getcmdline()
     call timer_start(0, {-> s:save_if_wildmenu_is_active(cmdline)})
-    return "\<tab>"
+    return l:key
 endfu
 
 fu! s:save_if_wildmenu_is_active(cmdline) abort "{{{2
