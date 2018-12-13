@@ -40,7 +40,7 @@ fu! cmdline#tab#custom(is_fwd) abort "{{{2
         " Why not pass the `t` flag unconditionally?{{{
         "
         " It breaks the  replay of a macro during which  we've pressed `Tab`
-        " or `S-Tab` on the command line.
+        " or `S-Tab` on the command-line.
         " MWE:
         "         qqq
         "         qq : Tab Tab CR    (should execute `:#`)

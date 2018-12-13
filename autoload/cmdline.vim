@@ -156,7 +156,7 @@ fu! cmdline#cycle(is_fwd) abort "{{{1
         return cmdline
     endif
 
-    " try to find the cycle to which the current command line belongs
+    " try to find the cycle to which the current command-line belongs
     let i = 1
     while i <= s:nb_cycles
         if has_key(s:cycle_{i}, cmdline)
@@ -166,7 +166,7 @@ fu! cmdline#cycle(is_fwd) abort "{{{1
     endwhile
     " now `i` stores, either:
     "
-    "     • the index of the cycle to which the command line belong
+    "     • the index of the cycle to which the command-line belong
     " OR
     "     • a number greater than the number of installed cycles
     "
@@ -278,14 +278,14 @@ fu! cmdline#fix_typo(label) abort "{{{1
     "                                    ┌─ do NOT replace this with `getcmdline()`:
     "                                    │
     "                                    │      when the callback will be processed,
-    "                                    │      the old command line will be lost
+    "                                    │      the old command-line will be lost
     "                                    │
     call timer_start(0, {-> feedkeys(':'.cmdline.keys, 'in')})
     "    │
     "    └─ we can't send the keys right now, because the command hasn't been
     "       executed yet; from `:h CmdWinLeave`:
     "
-    "               “Before leaving the command line.“
+    "               “Before leaving the command-line.“
     "
     "       But it seems we can't modify the command either. Maybe it's locked.
     "       So, we'll reexecute a new fixed command with the timer.
@@ -363,16 +363,16 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{1
 endfu
 
 fu! cmdline#transform() abort "{{{1
-    "     ┌─ number of times we've transformed the command line
+    "     ┌─ number of times we've transformed the command-line
     "     │
     let s:did_transform = get(s:, 'did_transform', -1) + 1
     augroup reset_did_tweak
         au!
         " TODO:
-        " If we  empty the command line  without leaving it, the  counter is not
+        " If we  empty the command-line  without leaving it, the  counter is not
         " reset.  So,  once we've invoked this  function once, it can't  be used
-        " anymore until we  leave the command line. Maybe we  should inspect the
-        " command line instead.
+        " anymore until we  leave the command-line. Maybe we  should inspect the
+        " command-line instead.
         au CmdlineLeave  /,\?,:  unlet! s:did_transform s:orig_cmdline
         \ |                      exe 'au! reset_did_tweak' | aug! reset_did_tweak
     augroup END
@@ -380,10 +380,10 @@ fu! cmdline#transform() abort "{{{1
     let cmdtype = getcmdtype()
     let cmdline = getcmdline()
     if s:did_transform >= 1 && cmdtype is# ':'
-        " If  we  invoke this  function  twice  on  the  same Ex  command  line,
-        " it  shouldn't  do  anything  the  2nd  time.   Because  we  only  have
-        " one transformation  atm (s:capture_subpatterns()), and  re-applying it
-        " doesn't make sense.
+        " If  we invoke  this function  twice on  the same  Ex command-line,  it
+        " shouldn't do anything the 2nd time.
+        " Because we only have one transformation atm (s:capture_subpatterns()),
+        " and re-applying it doesn't make sense.
         return ''
     endif
 

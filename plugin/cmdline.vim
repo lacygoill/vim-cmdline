@@ -53,7 +53,7 @@ augroup my_lazy_loaded_cmdline
     au!
     " Do NOT write a bar after a backslash  on an empty line: it would result in
     " 2 consecutive bars (empty command). This would print a line of a buffer on
-    " the command line, when we change the focused window for the first time.
+    " the command-line, when we change the focused window for the first time.
     au CmdlineEnter : call cmdline#auto_uppercase()
     \
     \ |               call cmdline#remember(s:overlooked_commands)
@@ -100,7 +100,7 @@ augroup my_cmdline_chain
                   \ |     call cmdline#fix_typo('z')
                   \ | endif
 
-    " when we copy a line of vimscript and paste it on the command line,
+    " when we copy a line of vimscript and paste it on the command-line,
     " sometimes the newline gets copied and translated into a literal CR,
     " which raises an error:    remove it
     au CmdlineLeave : if getcmdline() =~# '\r$'
@@ -141,7 +141,7 @@ cno  <expr>  <tab>    cmdline#tab#custom(1)
 cno  <expr>  <s-tab>  cmdline#tab#custom(0)
 cno          <c-q>    <c-\>ecmdline#tab#restore_cmdline_after_expansion()<cr>
 
-" The following mapping transforms the command line in 2 ways, depending on where we press it:{{{
+" The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
 "
 "     • on the search command-line, it translates the pattern so that:
 "
@@ -284,7 +284,7 @@ call s:cycle_configure('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`
 "                       │       │
 "                       │       └ where we want the cursor to be
 "                       │
-"                       └ key to press in normal mode, after `C-g`, to populate the command line
+"                       └ key to press in normal mode, after `C-g`, to populate the command-line
 "                         with the 1st command in the cycle
 
 " populate command-line with a `:vimgrep` command
