@@ -22,7 +22,7 @@ let g:loaded_cmdline = 1
 
 " fix some typos
 cnorea <expr>  \`    getcmdtype() =~# '[/?]'  ? '\t' : '\`'
-cnorea <expr>  soù   getcmdtype() =~# ':' && getcmdline() is# 'soù' ? 'so%' : 'soù'
+cnorea <expr>  soù   getcmdtype() =~# ':' && getcmdpos() ==# 4 ? 'so%' : 'soù'
 
 
 cnorea <expr>  sl    getcmdtype() is# ':' && getcmdpos() ==# 3  ? 'ls'             : 'sl'
