@@ -248,19 +248,19 @@ call s:cycle_configure('ef',
 "}}}
 
 call s:cycle_configure('es',
-\                      'sfin ~/.vim/**/*@',
-\                      'sfin *@',
-\                      'sfin %:h/**/*@')
+\                      'sf ~/.vim/**/*@',
+\                      'sf *@',
+\                      'sf %:h/**/*@')
 
 call s:cycle_configure('ev',
-\                      'vert sfin ~/.vim/**/*@',
-\                      'vert sfin *@',
-\                      'vert sfin %:h/**/*@')
+\                      'vert sf ~/.vim/**/*@',
+\                      'vert sf *@',
+\                      'vert sf %:h/**/*@')
 
 call s:cycle_configure('et',
-\                      'tabfin ~/.vim/**/*@',
-\                      'tabfin *@',
-\                      'tabfin %:h/**/*@')
+\                      'tabf ~/.vim/**/*@',
+\                      'tabf *@',
+\                      'tabf %:h/**/*@')
 
 call s:cycle_configure('f',
 \                      'Verb filter /@/ map',
