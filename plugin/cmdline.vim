@@ -30,10 +30,14 @@ cnorea <expr>  hg    getcmdtype() is# ':' && getcmdpos() ==# 3  ? 'helpgrep'    
 cnorea <expr>  dig   getcmdtype() is# ':' && getcmdpos() ==# 4  ? 'verb Digraphs!' : 'dig'
 cnorea <expr>  ecoh  getcmdtype() is# ':' && getcmdpos() ==# 5  ? 'echo'           : 'ecoh'
 
-"         :fbl    →    :FzBLines
-"         :fc     →    :FzCommands
-"         :fl     →    :FzLines
-"         :fs     →    :FzLocate
+"         :fbl
+"         :FzBLines~
+"         :fc
+"         :FzCommands~
+"         :fl
+"         :FzLines~
+"         :fs
+"         :FzLocate~
 cnorea <expr>  fbl   getcmdtype() is# ':'  && getcmdpos() ==# 4  ?  'FzBLines'      : 'fbl'
 cnorea <expr>  fc    getcmdtype() is# ':'  && getcmdpos() ==# 3  ?  'FzCommands'    : 'fc'
 cnorea <expr>  fl    getcmdtype() is# ':'  && getcmdpos() ==# 3  ?  'FzLines'       : 'fl'
@@ -44,7 +48,8 @@ cnorea <expr>  fs    getcmdtype() is# ':'  && getcmdpos() ==# 3  ?  'FzLocate'  
 
 cnorea <expr>  ucs   getcmdtype() is# ':' && getcmdpos() ==# 4  ? 'UnicodeSearch'  : 'ucs'
 
-"         :pc    →    :sil! PlugClean
+"     :pc
+"     :sil! PlugClean~
 cnorea <expr>  pc    getcmdtype() is# ':'  && getcmdpos() ==# 3  ? 'sil! PlugClean' : 'pc'
 
 " Autocmds {{{1

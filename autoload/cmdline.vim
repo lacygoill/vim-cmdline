@@ -10,13 +10,12 @@ let g:autoloaded_cmdline = 1
 "     :
 "
 "     C-g
-"         → vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc
-"         ✔
+"     vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc~
+"     ✔
 "
 "     C-g
-"         → vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc
-"         ✘
-"         we should have the next command in the cycle
+"     vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc~
+"     ✘ we should have the next command in the cycle~
 "
 " Find a way to define `s:DEFAULT_CMD` as whatever first command is in the cycle
 " `C-g v`, at any given time.
@@ -92,7 +91,7 @@ fu! s:capture_subpatterns() abort "{{{1
 endfu
 
 fu! cmdline#chain() abort "{{{1
-    " Do NOT write empty lines in this function (gQ → E501, E749).
+    " Do NOT write empty lines in this function (<kbd>gQ</kbd> → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
         \ '(g|v).*(#@<!#|nu%[mber])' : [''        , 0],

@@ -49,7 +49,7 @@ fu! cmdline#tab#custom(is_fwd) abort "{{{2
         "
         "         :nunmap @
         "         @q
-        "             → should print the current line; does not
+        "         should print the current line; does not~
         "}}}
         call feedkeys("\<s-tab>", flags)
         return ''
