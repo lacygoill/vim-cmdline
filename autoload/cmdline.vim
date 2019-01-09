@@ -340,7 +340,13 @@ fu! s:search_outside_comments() abort "{{{1
         return get(s:, 'orig_cmdline', '')
     endif
     let cml = '\V'.escape(matchstr(split(&l:cms, '%')[0], '\S*'), '\').'\v'
-    return '\v%(^%(\s*'.cml.')@!.*)@<=\m'.get(s:, 'orig_cmdline', '')
+    return '\v%(^%(\s*'.cml.')@!.*)@<=\m\%('.get(s:, 'orig_cmdline', '').'\)'
+    "                                   ├─┘
+    "                                   └ Why?{{{
+    " The original pattern may contain several branches.
+    " In that  case, we want the  lookbehind to be  applied to all of  them, not
+    " just the first one.
+    "}}}
 endfu
 
 fu! cmdline#toggle_editing_commands(enable) abort "{{{1
