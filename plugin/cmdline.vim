@@ -302,8 +302,37 @@ call s:cycle_configure('v',
 \                      'noa lvim /@/gj % <bar> lw',
 \                      'noa vim /@/gj ~/bin/**/*.sh ~/.shrc ~/.bashrc ~/.zshrc ~/.zshenv ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets | cw'
 \ )
-" TODO:
-" Remove `~/.shrc` from the last cycle once we've integrated this file into `~/.zshrc`.
+
+" TODO: add support for `<c-r>=expr<cr>`
+" This would require, among other things, to change these lines:
+"
+"     return i <= s:nb_cycles
+"        \ ?     s:cycle_{i}[cmdline].new_cmd
+"        \ :     s:DEFAULT_CMD.cmd
+"
+"     return i <= s:nb_cycles
+"        \ ?     substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>\(.\{-}\)<cr>', 'eval(submatch(1))', '')
+"        \ :     s:DEFAULT_CMD.cmd
+"
+" in `./autoload/cmdline.vim`.
+" But it would break the cycling with `C-g`.
+" Probably because of this:
+"
+"     " try to find the cycle to which the current command-line belongs
+"     let i = 1
+"     while i <= s:nb_cycles
+"         if has_key(s:cycle_{i}, cmdline)
+"             break
+"         endif
+"         let i += 1
+"     endwhile
+"
+" We  wouldn't be  able to  determine to  which cycle  the current  command-line
+" belongs because it has been transformed.
+" So,  we  would  need  to  have  a database  of  cycles,  each  containing  the
+" transformed and UNtransformed command-line.
+
+" TODO: Remove `~/.shrc` from the last cycle once we've integrated this file into `~/.zshrc`.
 
 " TODO: `:[l]vim[grep]` is not asynchronous.
 " Add an async command (using  &grepprg?).
