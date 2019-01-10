@@ -196,7 +196,7 @@ fu! cmdline#cycle(is_fwd) abort "{{{1
     endif
 endfu
 
-fu! cmdline#cycle_install(cmds) abort "{{{1
+fu! s:cycle_install(cmds) abort "{{{1
     let s:nb_cycles = get(s:, 'nb_cycles', 0) + 1
     " It's important to make a copy of the arguments, otherwise{{{
     " we   would   get   a   weird    result   in   the   next   invocation   of
@@ -292,7 +292,7 @@ endfu
 
 fu! cmdline#pass_and_install_cycles(cycles) abort "{{{1
     for cycle in a:cycles
-        call cmdline#cycle_install(cycle)
+        call s:cycle_install(cycle)
     endfor
 endfu
 
