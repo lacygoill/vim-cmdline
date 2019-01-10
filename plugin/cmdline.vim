@@ -171,22 +171,23 @@ cno  <unique>  <m-g>  <c-\>ecmdline#cycle(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
-"   ┌─ need this variable to pass the commands that are in each cycle we're going to configure,
-"   │  to the autoload/ script, where the bulk of the code installing cycles reside
+"   ┌ need  this variable to  pass the commands that  are in each  cycle we're
+"   │ going to configure, to the `autoload/`  script, where the bulk of the code
+"   │ installing cycles reside
 "   │
 let s:cycles = []
 fu! s:cycle_configure(key, ...) abort
     let cycle = map(copy(a:000), {i,v -> substitute(v, '<bar>', '|', 'g')})
-    let s:cycles += [cycle]
     exe 'nno  <unique>  <c-g>'.a:key
-    \              .' :<c-u>'.substitute(a:1, '@', '', '')
-    \              .'<c-b>'.repeat('<right>', stridx(cycle[0], '@'))
+        \ . ' :<c-u>'.substitute(a:1, '@', '', '')
+        \ .   '<c-b>'.repeat('<right>', stridx(cycle[0], '@'))
+    let s:cycles += [cycle]
 endfu
 
 " populate the arglist with:
 "
-"     • all the files in a directory
-"     • all the files in the output of a shell command
+"    • all the files in a directory
+"    • all the files in the output of a shell command
 call s:cycle_configure('a',
 \                      'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
 \                      'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
@@ -242,14 +243,13 @@ call s:cycle_configure('ef',
 "    the working directory.
 "    It's too verbose. We just need their name.
 "
-"    Btw, you may wonder what happens when  we type `:fin *bar` and press Tab or
+"     Btw, you may wonder what happens when we type `:fin *bar` and press Tab or
 "    C-d,  while  there  are two  files  with  the  same  name `foobar`  in  two
 "    directories in the working directory.
 "
-"    The answer is simple:
-"    for each candidate, Vim prepends the  previous path component to remove the
-"    ambiguity. If it's not enough, it goes on adding path components until it's
-"    not needed anymore.
+"     The answer is  simple: for each candidate, Vim prepends  the previous path
+"    component to  remove the ambiguity. If it's  not enough, it goes  on adding
+"    path components until it's not needed anymore.
 "}}}
 
 call s:cycle_configure('es',
@@ -284,15 +284,8 @@ call s:cycle_configure('f',
 call s:cycle_configure('p',
 \                      'put =execute(''@'')')
 
-" populate command-line with a substitution command
 call s:cycle_configure('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
-"                       │       │
-"                       │       └ where we want the cursor to be
-"                       │
-"                       └ key to press in normal mode, after `C-g`, to populate the command-line
-"                         with the 1st command in the cycle
 
-" populate command-line with a `:vimgrep` command
 call s:cycle_configure('v',
 \                      'noa vim /@/gj ~/.vim/**/*.vim ~/.vim/**/*.snippets ~/.vim/template/** ~/.vim/vimrc <bar> cw',
 \                      'noa vim /@/gj ./**/*.vim <bar> cw',

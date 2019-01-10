@@ -20,7 +20,7 @@ let g:autoloaded_cmdline = 1
 " Find a way to define `s:DEFAULT_CMD` as whatever first command is in the cycle
 " `C-g v`, at any given time.
 "}}}
-let s:DEFAULT_CMD = { 'cmd' : 'noa vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc | cw', 'pos' : 10 }
+let s:DEFAULT_CMD = {'cmd' : 'noa vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc | cw', 'pos' : 10}
 
 fu! cmdline#auto_uppercase() abort "{{{1
 
@@ -224,13 +224,12 @@ fu! s:cycle_install(cmds) abort "{{{1
     " How do we achieve it?{{{
     " 2 steps:
     "
-    "     1. transform the list of commands into a list of sub-dictionaries
-    "        (with the keys `new_cmd` and `pos`) through an invocation of
-    "        `map()`
+    " 1. transform  the list of commands  into a list of  sub-dictionaries (with
+    " the keys `new_cmd` and `pos`) through an invocation of `map()`
     "
-    "     2. progressively build the dictionary `s:cycle_42` with a `for`
-    "        loop, using the previous sub-dictionaries as values, and the
-    "        original commands as keys
+    " 2. progressively  build the  dictionary `s:cycle_123`  with a  `for` loop,
+    " using the previous  sub-dictionaries as values, and  the original commands
+    " as keys
     "}}}
     " Alternative:{{{
     " (a little slower)
@@ -247,11 +246,10 @@ fu! s:cycle_install(cmds) abort "{{{1
     "         endfor
     "}}}
 
-    call map(cmds, { i,v -> { substitute(v, '@', '', '') :
-    \                             { 'new_cmd' : substitute(a:cmds[(i+1)%len(a:cmds)], '@', '', ''),
-    \                               'pos'     :      stridx(a:cmds[(i+1)%len(a:cmds)], '@')+1},
-    \                             }
-    \              })
+    call map(cmds, {i,v -> {substitute(v, '@', '', '') : {
+        \ 'new_cmd': substitute(a:cmds[(i+1)%len(a:cmds)], '@', '', ''),
+        \ 'pos'    :     stridx(a:cmds[(i+1)%len(a:cmds)], '@')+1},
+        \ }})
 
     let s:cycle_{s:nb_cycles} = {}
     for dict in cmds
