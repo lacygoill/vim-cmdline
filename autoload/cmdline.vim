@@ -3,25 +3,6 @@ if exists('g:autoloaded_cmdline')
 endif
 let g:autoloaded_cmdline = 1
 
-" TODO:{{{
-" If we change the first command in the cycle `C-g v`, it should be changed here
-" too. Otherwise:
-"
-"     :
-"
-"     C-g
-"     vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc~
-"     ✔
-"
-"     C-g
-"     vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc~
-"     ✘ we should have the next command in the cycle~
-"
-" Find a way to define `s:DEFAULT_CMD` as whatever first command is in the cycle
-" `C-g v`, at any given time.
-"}}}
-let s:DEFAULT_CMD = {'cmd' : 'noa vim //gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc | cw', 'pos' : 10}
-
 fu! cmdline#auto_uppercase() abort "{{{1
 
 " We define abbreviations in command-line mode to automatically replace
@@ -165,34 +146,32 @@ fu! cmdline#cycle(is_fwd) abort "{{{1
     endwhile
     " now `i` stores, either:
     "
-    "     • the index of the cycle to which the command-line belong
-    " OR
-    "     • a number greater than the number of installed cycles
+    "    • the index of the cycle to which the command-line belong
     "
-    "       if this  is the case,  since there's no  cycle to use,  we'll simply
-    "       return the default command stored in `s:DEFAULT_CMD`
+    "    • a number greater than the number of installed cycles;
+    "    in that case, we'll try to return the command of the last used cycle
 
-    if a:is_fwd
-        call setcmdpos(
-                    \   i <= s:nb_cycles
-                    \ ?      s:cycle_{i}[cmdline].pos
-                    \ :      s:DEFAULT_CMD.pos
-                    \ )
-        return i <= s:nb_cycles
-           \ ?     s:cycle_{i}[cmdline].new_cmd
-           \ :     s:DEFAULT_CMD.cmd
+    if i <= s:nb_cycles
+        let s:last_cycle = {
+            \ 'pos': s:cycle_{i}[cmdline].pos,
+            \ 'cmdline': substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>=\(.\{-}\)<cr>', '\=eval(submatch(1))', ''),
+            \ }
+            " \ 'cmdline': s:cycle_{i}[cmdline].new_cmd,
+    endif
+    if i > s:nb_cycles
+        call setcmdpos(get(get(s:, 'last_cycle', {}), 'pos', 1))
+        return get(get(s:, 'last_cycle', {}), 'cmdline', '')
+    elseif a:is_fwd
+        call setcmdpos(s:cycle_{i}[cmdline].pos)
+        return substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>=\(.\{-}\)<cr>', '\=eval(submatch(1))', '')
+        " return s:cycle_{i}[cmdline].new_cmd
     else
-        if i <= s:nb_cycles
-            " get the previous command in the cycle,
-            " and the position of the cursor on the latter
-            let prev_cmd =   keys(filter(deepcopy(s:cycle_{i}), { k,v -> v.new_cmd is# cmdline }))[0]
-            let prev_pos = values(filter(deepcopy(s:cycle_{i}), { k,v -> v.new_cmd is# prev_cmd }))[0].pos
-            call setcmdpos(prev_pos)
-            return prev_cmd
-        else
-            call setcmdpos(s:DEFAULT_CMD.pos)
-            return s:DEFAULT_CMD.cmd
-        endif
+        " get the previous command in the cycle,
+        " and the position of the cursor on the latter
+        let prev_cmd =   keys(filter(deepcopy(s:cycle_{i}), { k,v -> v.new_cmd is# cmdline }))[0]
+        let prev_pos = values(filter(deepcopy(s:cycle_{i}), { k,v -> v.new_cmd is# prev_cmd }))[0].pos
+        call setcmdpos(prev_pos)
+        return prev_cmd
     endif
 endfu
 

@@ -288,7 +288,7 @@ call s:cycle_configure('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`
 
 call s:cycle_configure('v',
 \                      'noa vim /@/gj ~/.vim/**/*.vim ~/.vim/**/*.snippets ~/.vim/template/** ~/.vim/vimrc <bar> cw',
-\                      'noa vim /@/gj ./**/*.vim <bar> cw',
+\                      'noa vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
 \                      'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
 \                      'noa vim /@/gj ## <bar> cw',
 \                      'noa vim /@/gj `find . -type f -cmin -60` <bar> cw',
@@ -299,16 +299,27 @@ call s:cycle_configure('v',
 " TODO: add support for `<c-r>=expr<cr>`
 " This would require, among other things, to change these lines:
 "
-"     return i <= s:nb_cycles
-"        \ ?     s:cycle_{i}[cmdline].new_cmd
-"        \ :     s:DEFAULT_CMD.cmd
+"     let s:last_cycle = {
+"         \ 'pos': s:cycle_{i}[cmdline].pos,
+"         \ 'cmdline': s:cycle_{i}[cmdline].new_cmd,
+"         \ }
 "
-"     return i <= s:nb_cycles
-"        \ ?     substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>\(.\{-}\)<cr>', 'eval(submatch(1))', '')
-"        \ :     s:DEFAULT_CMD.cmd
+"     →
+"
+"     let s:last_cycle = {
+"         \ 'pos': s:cycle_{i}[cmdline].pos,
+"         \ 'cmdline': substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>=\(.\{-}\)<cr>', '\=eval(submatch(1))', ''),
+"         \ }
+"
+"     return s:cycle_{i}[cmdline].new_cmd
+"
+"     →
+"
+"     return substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>=\(.\{-}\)<cr>', '\=eval(submatch(1))', '')
 "
 " in `./autoload/cmdline.vim`.
-" But it would break the cycling with `C-g`.
+" But  it would  cause  the cycling  with  `C-g`  to be  stuck  on each  command
+" containing `<c-r>=...<cr>`.
 " Probably because of this:
 "
 "     " try to find the cycle to which the current command-line belongs
