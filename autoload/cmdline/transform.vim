@@ -11,25 +11,21 @@ fu! cmdline#transform#main() abort "{{{1
     let s:did_transform = get(s:, 'did_transform', -1) + 1
     augroup reset_did_tweak
         au!
-        " TODO:
-        " If we empty the command-line without leaving it, the counter is not reset.
-        " So,  once  we've  invoked  this   function  once,  it  can't  be  used
-        " anymore until we  leave the command-line.
-        " Maybe we should inspect the command-line instead.
         au CmdlineLeave  /,\?,:  unlet! s:did_transform s:orig_cmdline
         \ |                      exe 'au! reset_did_tweak' | aug! reset_did_tweak
     augroup END
 
     let cmdtype = getcmdtype()
     let cmdline = getcmdline()
-    if s:did_transform >= 1 && cmdtype is# ':'
-        " If  we invoke  this function  twice on  the same  Ex command-line,  it
-        " shouldn't do anything the 2nd time.
-        " Because we only have one transformation atm (`s:capture_subpatterns()`),
-        " and re-applying it doesn't make sense.
-        return ''
-    endif
-
+    " Don't write a guard to prevent multiple transformations on the Ex command-line!{{{
+    "
+    "     if s:did_transform >= 1 && cmdtype is# ':'
+    "         return ''
+    "     endif
+    "
+    " It would prevent you from re-applying a transformation, after clearing the
+    " command-line (<kbd>C-u</kbd>) and writing a new command.
+    "}}}
     if cmdtype =~# '[/?]'
         if get(s:, 'did_transform', 0) ==# 0
             let s:orig_cmdline = cmdline
@@ -37,7 +33,6 @@ fu! cmdline#transform#main() abort "{{{1
         call cmdline#util#undo#emit_add_to_undolist_c()
         return "\<c-e>\<c-u>"
         \     .(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments())
-
     elseif cmdtype =~# ':'
         call cmdline#util#undo#emit_add_to_undolist_c()
         return s:capture_subpatterns()
@@ -104,11 +99,5 @@ fu! s:search_outside_comments() abort "{{{1
     " In that  case, we want the  lookbehind to be  applied to all of  them, not
     " just the first one.
     "}}}
-endfu
-
-fu! cmdline#transform#reset() abort "{{{1
-    " called by `readline#undo()`
-    " necessary to re-perform a transformation we've undone by mistake
-    unlet! s:did_transform
 endfu
 
