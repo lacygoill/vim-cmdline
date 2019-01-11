@@ -3,6 +3,17 @@ if exists('g:autoloaded_cmdline#cycle')
 endif
 let g:autoloaded_cmdline#cycle = 1
 
+" TODO:
+" If we press  c-g by accident on  the command-line, and we move  forward in the
+" cycle, we should be able to undo and recover the previous command with c-_.
+"
+" also, we should have multiple tabstops (not just one).
+" useful for a command like:
+"
+"         noa vim //gj `find . -type f -cmin -60` | cw
+"                 ^                           ^
+"                 tabstop 1                   tabstop 2
+
 let s:cycles = {}
 
 fu! cmdline#cycle#pass(cycles) abort "{{{1

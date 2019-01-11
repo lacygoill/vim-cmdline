@@ -266,6 +266,24 @@ call s:cycle_configure('et',
 \                      'tabf *@',
 \                      'tabf %:h/**/*@')
 
+" TODO:
+" `:filter` doesn't support all commands.
+" Maybe we  could install a wrapper  command (`:Filter`) which would  do the job
+" for the commands which are not supported.
+" See `:h  :index`, and  search for  all the commands  which could  benefit from
+" `:filter`:
+"
+"         :args
+"         :autocmd
+"         :augroup
+"         :changes
+"         :function
+"         :ilist (:dlist, :isearch?, :dsearch?)
+"         :history
+"         :marks
+"         :reg
+"         :tags
+
 call s:cycle_configure('f',
 \                      'Verb filter /@/ map',
 \                      'Verb filter /@/ ab',

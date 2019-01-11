@@ -1,35 +1,4 @@
 " TODO:
-" `:filter` doesn't support all commands.
-" Maybe we  could install a wrapper  command (`:Filter`) which would  do the job
-" for the commands which are not supported.
-" See `:h  :index`, and  search for  all the commands  which could  benefit from
-" `:filter`:
-"
-"         :args
-"         :autocmd
-"         :augroup
-"         :changes
-"         :function
-"         :ilist (:dlist, :isearch?, :dsearch?)
-"         :history
-"         :marks
-"         :reg
-"         :tags
-"
-" also, create a complete cycle (c-g f).
-
-" TODO:
-" If we press  c-g by accident on  the command-line, and we move  forward in the
-" cycle, we should be able to undo and recover the previous command with c-_.
-"
-" also, we should have multiple tabstops (not just one).
-" useful for a command like:
-"
-"         noa vim //gj `find . -type f -cmin -60` | cw
-"                 ^                           ^
-"                 tabstop 1                   tabstop 2
-
-" TODO:
 "
 "     :echo map(range(65,90)+range(97,122), {i,v -> nr2char(v)})
 "     :echo filter(map(range(65,90)+range(97,122), {i,v -> nr2char(v)}), {i,v -> })
