@@ -1,8 +1,9 @@
 " TODO: remove all occurrences of `\v` in this project
 
 " TODO:
-" Maybe we could install a wrapper command  (:filter) which would do the job for
-" the commands which are not supported.
+" `:filter` doesn't support all commands.
+" Maybe we  could install a wrapper  command (`:Filter`) which would  do the job
+" for the commands which are not supported.
 " See `:h  :index`, and  search for  all the commands  which could  benefit from
 " `:filter`:
 "
@@ -10,7 +11,6 @@
 "         :autocmd
 "         :augroup
 "         :changes
-"         :clist (:llist)
 "         :function
 "         :ilist (:dlist, :isearch?, :dsearch?)
 "         :history
@@ -58,7 +58,7 @@ fu! cmdline#transform#main() abort "{{{1
     if s:did_transform >= 1 && cmdtype is# ':'
         " If  we invoke  this function  twice on  the same  Ex command-line,  it
         " shouldn't do anything the 2nd time.
-        " Because we only have one transformation atm (s:capture_subpatterns()),
+        " Because we only have one transformation atm (`s:capture_subpatterns()`),
         " and re-applying it doesn't make sense.
         return ''
     endif
@@ -80,43 +80,43 @@ fu! cmdline#transform#main() abort "{{{1
 endfu
 
 fu! s:capture_subpatterns() abort "{{{1
-    " If  we're on  the Ex  command-line (:),  we try  and guess  whether it
+    " If  we're on  the  Ex command-line  (`:`),  we try  and  guess whether  it
     " contains a substitution command.
-    let cmdline   = getcmdline()
-    let range     = matchstr(cmdline, '[%*]\|[^,]*,[^,]*\zes')
-    let cmdline   = substitute(cmdline, '^\V'.escape(range, '\').'\vs.\zs\\v', '', '')
-    let separator = cmdline =~# 's/' ? '/' : 's:' ? ':' : ''
+    let cmdline = getcmdline()
+    let pat_range = '\%([%*]\|[^,]*,[^,]*\)'
 
-    " If there's no substitution command we don't modify the command-line.
-    if empty(separator)
+    if cmdline !~# '^'.pat_range.'s[/:]'
+        " if there's no substitution command, don't modify the command-line
         return ''
     endif
 
-    " If there's one, we extract the pattern.
+    " extract the range, separator and the pattern
+    let range = matchstr(cmdline, pat_range)
+    let separator = matchstr(cmdline, '^'.pat_range.'s\zs.')
     let pat = split(cmdline, separator)[1]
 
-    " Then,  we  extract  from  the pattern  words  between  underscores  or
-    " uppercase letters; e.g.:
+    " from the pattern, extract words between underscores or uppercase letters:{{{
     "
     "         'OneTwoThree'   → ['One', 'Two', 'Three']
     "         'one_two_three' → ['one', 'two', 'three']
+    "}}}
     let subpatterns = split(pat, pat =~# '_' ? '_' : '\ze\u')
 
-    " Finally we return the keys to type.
+    " return the keys to type{{{
     "
-    "         join(map(subpatterns, '…'), '…')
-    "
-    " ... evaluates  to the original  pattern, with the addition  of parentheses
-    " around the subpatterns:
-    "
-    "            (One)(Two)(Three)
-    "      or    (one)_(two)_(three)
+    "                            ┌ original pattern, with the addition of parentheses around the subpatterns:
+    "                            │
+    "                            │          (One)(Two)(Three)
+    "                            │    or    (one)_(two)_(three)
+    "                            │
+    "                            ├──────────────────────────────────────────────────────────────────┐}}}
     let new_cmdline = range.'s/'.join(map(subpatterns, {i,v -> '\('.v.'\)'}), pat =~# '_' ? '_' : '') . '//g'
 
-    " Before returning the  keys, we position the cursor between  the last 2
-    " slashes.
     return "\<c-e>\<c-u>".new_cmdline
     \     ."\<c-b>".repeat("\<right>", strchars(new_cmdline, 1)-2)
+    "      ├─────────────────────────────────────────────────────┘{{{
+    "      └ position the cursor between the last 2 slashes
+    "}}}
 endfu
 
 fu! s:emit_add_to_undolist_c() abort "{{{1

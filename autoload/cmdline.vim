@@ -73,10 +73,10 @@ fu! cmdline#chain() abort "{{{1
             return feedkeys(':'.keys, 'in')
         endif
     endfor
-    if cmdline =~# '\v\C^(dli|il)%[ist]\s+'
-        call feedkeys(':'.cmdline[0].'j  '.split(cmdline, ' ')[1]."\<s-left>\<left>", 'in')
-    elseif cmdline =~# '\v\C^(cli|lli)'
-        call feedkeys(':sil '.repeat(cmdline[0], 2).' ', 'in')
+    if cmdline =~# '\C^\s*\%(dli\|\il\)\%[ist]\s\+'
+        call feedkeys(':'.matchstr(cmdline, '\S').'j  '.split(cmdline, ' ')[1]."\<s-left>\<left>", 'in')
+    elseif cmdline =~# '\C^\s*\%(cli\|lli\)'
+        call feedkeys(':sil '.repeat(matchstr(cmdline, '\S'), 2).' ', 'in')
     endif
 endfu
 
@@ -133,8 +133,12 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{1
         if a:enable
             call lg#map#restore(get(s:, 'my_editing_commands', []))
         else
-            let lhs_list = map(split(execute('cno'), '\n'), { i,v -> matchstr(v, '\vc\s+\zs\S+') })
-            call filter(lhs_list, { i,v -> !empty(v) })
+            let lhs_list = split(execute('cno'), '\n')
+            " ignore buffer-local mappings
+            call filter(lhs_list, {i,v -> v !~# '^c\s*\S*\s*\S*@'})
+            " extract lhs
+            call map(lhs_list, {i,v -> matchstr(v, 'c\s\+\zs\S\+')})
+            call filter(lhs_list, {i,v -> !empty(v)})
             let s:my_editing_commands = lg#map#save('c', 0, lhs_list)
 
             for lhs in lhs_list
