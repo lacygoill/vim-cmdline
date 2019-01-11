@@ -163,9 +163,6 @@ cno          <c-q>    <c-\>ecmdline#tab#restore_cmdline_after_expansion()<cr>
 cno  <expr><unique>  <c-s>  cmdline#transform()
 
 " Cycle through a set of arbitrary commands.
-" Each cycle is installed with `:CycleInstall` in:
-"
-"         ~/.vim/plugged/vim-cmdline/autoload/cmdline.vim
 cno  <unique>  <c-g>  <c-\>ecmdline#cycle#move(1)<cr>
 cno  <unique>  <m-g>  <c-\>ecmdline#cycle#move(0)<cr>
 
@@ -176,12 +173,13 @@ xno  <unique>  <c-g>s  :s///g<left><left><left>
 "   │ installing cycles reside
 "   │
 let s:cycles = []
-fu! s:cycle_configure(key, ...) abort
-    let cycle = map(copy(a:000), {i,v -> substitute(v, '<bar>', '|', 'g')})
-    exe 'nno  <unique>  <c-g>'.a:key
-        \ . ' :<c-u>'.substitute(a:1, '@', '', '')
-        \ .   '<c-b>'.repeat('<right>', stridx(cycle[0], '@'))
-    let s:cycles += [cycle]
+fu! s:cycle_configure(seq, ...) abort
+    let cmds = a:000
+    exe 'nno  <unique>  <c-g>'.a:seq
+        \ . ' :<c-u><c-r>=cmdline#cycle#set_seq('.string(a:seq).')<cr>'
+        \ . substitute(a:1, '@', '', '')
+        \ .   '<c-b>'.repeat('<right>', stridx(cmds[0], '@'))
+    let s:cycles += [[a:seq, cmds]]
 endfu
 
 " populate the arglist with:
@@ -293,48 +291,8 @@ call s:cycle_configure('v',
 \                      'noa vim /@/gj ## <bar> cw',
 \                      'noa vim /@/gj `find . -type f -cmin -60` <bar> cw',
 \                      'noa lvim /@/gj % <bar> lw',
-\                      'noa vim /@/gj ~/bin/**/*.sh ~/.shrc ~/.bashrc ~/.zshrc ~/.zshenv ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets | cw'
+\                      'noa vim /@/gj ~/bin/**/*.sh ~/.shrc ~/.bashrc ~/.zshrc ~/.zshenv ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets <bar> cw'
 \ )
-
-" TODO: add support for `<c-r>=expr<cr>`
-" This would require, among other things, to change these lines:
-"
-"     let s:last_cycle = {
-"         \ 'pos': s:cycle_{i}[cmdline].pos,
-"         \ 'cmdline': s:cycle_{i}[cmdline].new_cmd,
-"         \ }
-"
-"     →
-"
-"     let s:last_cycle = {
-"         \ 'pos': s:cycle_{i}[cmdline].pos,
-"         \ 'cmdline': substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>=\(.\{-}\)<cr>', '\=eval(submatch(1))', ''),
-"         \ }
-"
-"     return s:cycle_{i}[cmdline].new_cmd
-"
-"     →
-"
-"     return substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>=\(.\{-}\)<cr>', '\=eval(submatch(1))', '')
-"
-" in `./autoload/cmdline.vim`.
-" But  it would  cause  the cycling  with  `C-g`  to be  stuck  on each  command
-" containing `<c-r>=...<cr>`.
-" Probably because of this:
-"
-"     " try to find the cycle to which the current command-line belongs
-"     let i = 1
-"     while i <= s:nb_cycles
-"         if has_key(s:cycle_{i}, cmdline)
-"             break
-"         endif
-"         let i += 1
-"     endwhile
-"
-" We  wouldn't be  able to  determine to  which cycle  the current  command-line
-" belongs because it has been transformed.
-" So,  we  would  need  to  have  a database  of  cycles,  each  containing  the
-" transformed and UNtransformed command-line.
 
 " TODO: Remove `~/.shrc` from the last cycle once we've integrated this file into `~/.zshrc`.
 
