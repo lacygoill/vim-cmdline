@@ -95,24 +95,17 @@ fu! cmdline#cycle#move(is_fwd) abort "{{{1
     if i <= s:nb_cycles
         let s:last_cycle = {
             \ 'pos': s:cycle_{i}[cmdline].pos,
-            \ 'cmdline': s:cycle_{i}[cmdline].new_cmd,
+            \ 'cmdline': substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>=\(.\{-}\)<cr>', '\=eval(submatch(1))', ''),
             \ }
-            "     \ 'cmdline': s:cycle_{i}[cmdline].new_cmd,
-            "     \ 'cmdline': substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>=\(.\{-}\)<cr>', '\=eval(submatch(1))', ''),
+            " \ 'cmdline': s:cycle_{i}[cmdline].new_cmd,
     endif
     if i > s:nb_cycles
         call setcmdpos(get(get(s:, 'last_cycle', {}), 'pos', 1))
         return get(get(s:, 'last_cycle', {}), 'cmdline', '')
     elseif a:is_fwd
         call setcmdpos(s:cycle_{i}[cmdline].pos)
-        fu! s:to_return(i, cmdline) abort
-            return s:cycle_{a:i}[a:cmdline].new_cmd
-        endfu
-        exe 'cno <expr> <plug>(foobar) <sid>to_return('.i.', '.string(cmdline).')'
-        call feedkeys("\<plug>(foobar)", 'i')
-        return ''
-        "     return s:cycle_{i}[cmdline].new_cmd
-        "     return substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>=\(.\{-}\)<cr>', '\=eval(submatch(1))', '')
+        return substitute(s:cycle_{i}[cmdline].new_cmd, '\m\c<c-r>=\(.\{-}\)<cr>', '\=eval(submatch(1))', '')
+        " return s:cycle_{i}[cmdline].new_cmd
     else
         " get the previous command in the cycle,
         " and the position of the cursor on the latter

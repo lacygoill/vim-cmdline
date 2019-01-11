@@ -64,7 +64,7 @@ augroup my_lazy_loaded_cmdline
     \ |               call cmdline#remember(s:overlooked_commands)
     \ |               unlet! s:overlooked_commands
     \
-    \ |               call cmdline#pass_and_install_cycles(s:cycles)
+    \ |               call cmdline#cycle#pass(s:cycles)
     \ |               unlet! s:cycles
     \
     \ |               exe 'au! my_lazy_loaded_cmdline'
@@ -166,8 +166,8 @@ cno  <expr><unique>  <c-s>  cmdline#transform()
 " Each cycle is installed with `:CycleInstall` in:
 "
 "         ~/.vim/plugged/vim-cmdline/autoload/cmdline.vim
-cno  <unique>  <c-g>  <c-\>ecmdline#cycle(1)<cr>
-cno  <unique>  <m-g>  <c-\>ecmdline#cycle(0)<cr>
+cno  <unique>  <c-g>  <c-\>ecmdline#cycle#move(1)<cr>
+cno  <unique>  <m-g>  <c-\>ecmdline#cycle#move(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
