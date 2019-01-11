@@ -1,12 +1,7 @@
-" TODO:
-"
-"     :echo map(range(65,90)+range(97,122), {i,v -> nr2char(v)})
-"     :echo filter(map(range(65,90)+range(97,122), {i,v -> nr2char(v)}), {i,v -> })
-"           ^^^^^^^                                                    ^^^^^^^^^^^^
-"           create a transformation to automatically add this
-"           make it cycle between `filter()` and `map()`
+let s:PAT_RANGE = '\s*\%([%*]\|[^,]*,[^,]*\)'
 
-fu! cmdline#transform#main() abort "{{{1
+" Interface {{{1
+fu! cmdline#transform#main() abort "{{{2
     " number of times we've transformed the command-line
     let s:did_transform = get(s:, 'did_transform', -1) + 1
     augroup reset_did_tweak
@@ -35,27 +30,74 @@ fu! cmdline#transform#main() abort "{{{1
         \     .(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments())
     elseif cmdtype =~# ':'
         call cmdline#util#undo#emit_add_to_undolist_c()
-        return s:capture_subpatterns()
+        let cmdline = getcmdline()
+        let cmd = s:guess_what_the_cmdline_is(cmdline)
+        return s:transform(cmd, cmdline)
     else
         return ''
     endif
 endfu
-
-fu! s:capture_subpatterns() abort "{{{1
-    " If  we're on  the  Ex command-line  (`:`),  we try  and  guess whether  it
-    " contains a substitution command.
-    let cmdline = getcmdline()
-    let pat_range = '\%([%*]\|[^,]*,[^,]*\)'
-
-    if cmdline !~# '^'.pat_range.'s[/:]'
-        " if there's no substitution command, don't modify the command-line
-        return ''
+" }}}1
+" Core {{{1
+" Ex {{{2
+fu! s:guess_what_the_cmdline_is(cmdline) abort "{{{3
+    if a:cmdline =~# '^'.s:PAT_RANGE.'s[/:]'
+        " a substitution command
+        return ':s'
+    elseif a:cmdline =~# '\C^\s*echo'
+        return ':echo'
     endif
+endfu
+
+fu! s:transform(cmd, cmdline) abort "{{{3
+    if a:cmd is# ':s'
+        return s:capture_subpatterns(a:cmdline)
+    elseif a:cmd is# ':echo'
+        return s:map_filter(a:cmdline)
+    endif
+    return ''
+endfu
+
+fu! s:map_filter(cmdline) abort "{{{3
+    " Purpose:{{{
+    "
+    "     :echo [1,2,3]
+    "     :echo map([1,2,3], {i,v -> })~
+    "
+    "     :echo map([1,2,3], {i,v -> })
+    "     :echo filter([1,2,3], {i,v -> })~
+    "
+    "     :echo filter([1,2,3], {i,v -> v != 2})
+    "     :echo map(filter([1,2,3], {i,v -> v != 2}), {i,v -> })~
+    "}}}
+
+    " if `map()`/`filter()` is used, with an empty lambda, toggle it
+    if a:cmdline =~# '\C^\s*echo\s*\%(map\|filter\)(.*,\s*{i,v\s*->\s*})'
+        let new_cmdline = substitute(a:cmdline,
+            \ '^\s*echo\s*\zs\(map\|filter\)\ze(',
+            \ '\={"map": "filter", "filter": "map"}[submatch(1)]',
+            \ '')
+    else
+        " otherwise, add a new `map()`/`filter()`
+        if a:cmdline =~# '\C^\s*echo\s*\%(map\|filter\)(.*,\s*{i,v\s*->\s*})'
+        let new_cmdline = substitute(a:cmdline, '^\s*echo\s*\zs', 'map(', '')
+        let new_cmdline = substitute(new_cmdline, '$', ', {i,v -> })', '')
+    endif
+    return "\<c-e>\<c-u>".new_cmdline
+    \     ."\<c-b>".repeat("\<right>", strchars(new_cmdline, 1)-2)
+endfu
+
+fu! s:capture_subpatterns(cmdline) abort "{{{3
+    " Purpose:{{{
+    "
+    "     :%s/foo_bar_baz//g
+    "     :%s/\(foo\)_\(bar\)_\(baz\)//g~
+    "}}}
 
     " extract the range, separator and the pattern
-    let range = matchstr(cmdline, pat_range)
-    let separator = matchstr(cmdline, '^'.pat_range.'s\zs.')
-    let pat = split(cmdline, separator)[1]
+    let range = matchstr(a:cmdline, s:PAT_RANGE)
+    let separator = matchstr(a:cmdline, '^'.s:PAT_RANGE.'s\zs.')
+    let pat = split(a:cmdline, separator)[1]
 
     " from the pattern, extract words between underscores or uppercase letters:{{{
     "
@@ -80,12 +122,13 @@ fu! s:capture_subpatterns() abort "{{{1
     "      └ position the cursor between the last 2 slashes
     "}}}
 endfu
-
-fu! s:replace_with_equiv_class() abort "{{{1
+"}}}2
+" Search {{{2
+fu! s:replace_with_equiv_class() abort "{{{3
     return substitute(get(s:, 'orig_cmdline', ''), '\a', '[[=\0=]]', 'g')
 endfu
 
-fu! s:search_outside_comments() abort "{{{1
+fu! s:search_outside_comments() abort "{{{3
     " we should probably save `cmdline` in  a script-local variable if we want
     " to cycle between several transformations
     if empty(&l:cms)
