@@ -3,13 +3,26 @@ if exists('g:autoloaded_cmdline#cycle')
 endif
 let g:autoloaded_cmdline#cycle = 1
 
-" TODO:
-" We should have multiple tabstops (not just one).
+" TODO: We should support multiple tabstops (not just one).
+"
 " Useful for a command like:
 "
 "         noa vim //gj `find . -type f -cmin -60` | cw
 "                 ^                           ^
 "                 tabstop 1                   tabstop 2
+"
+" The difficulty is how to track  the changes operated on the command-line (like
+" the removal of a word by pressing <kbd>C-w</kbd>).
+" Maybe text properties could help, but for  the moment they're only meant to be
+" used for a *buffer* text.
+" In the previous  example, we could reliably find the  first tabstop by looking
+" for `^noa\s*vim\s*/`, and the second tabstop by looking for `-\d*.\s*|\s*cw$`.
+"
+" We would  have to temporarily  remap <kbd>Tab</kbd> and <kbd>S-Tab</kbd>  to a
+" function which jumps across the tabstops.
+" And <kbd>C-g Tab</kbd> to a function which presses the original `Tab`.
+" The mappings should  probably be local to  the buffer, and be  removed when we
+" quit the command-line.
 
 let s:cycles = {}
 

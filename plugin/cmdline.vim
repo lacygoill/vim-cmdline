@@ -357,3 +357,4 @@ call s:cycle_configure('!',
 "         \ ]
 
 let s:overlooked_commands = []
+
