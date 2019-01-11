@@ -80,28 +80,29 @@ augroup my_cmdline_chain
 
     " TODO:
     " The following autocmds are not  handled by `cmdline#chain()`, because they
-    " don't  execute simple  Ex commands. Still,  it's a  bit weird  to have  an
-    " autocmd handling simple  commands (+ 2 less simple), and  a bunch of other
-    " related autocmds handling more complex commands.
+    " don't execute simple Ex commands.
+    " Still, it's a bit  weird to have an autocmd handling  simple commands (+ 2
+    " less simple), and a bunch of  other related autocmds handling more complex
+    " commands.
     "
     " Try to find a way to consolidate all cases in `cmdline#chain()`.
     " Refactor it, so that when it handles complex commands, the code is readable.
-    " No long    if … | then … | elseif … | … | elseif … | …
+    " No long: `if ... | then ... | elseif ... | ... | elseif ... | ...`.
 
     " We use a timer to avoid reenabling the editing commands before having left
-    " the command-line completely. Otherwise E501.
-    au CmdlineLeave : if getcmdline() =~# '\v^\s*vi%[sual]\s*$'
+    " the command-line completely; otherwise `E501`.
+    au CmdlineLeave : if getcmdline() =~# '^\s*vi\%[sual]\s*$'
                   \ |     call timer_start(0, {-> execute('ToggleEditingCommands 1')})
                   \ | endif
 
     " enable the  item in  the statusline  showing our  position in  the arglist
     " after we execute an `:args` command
-    au CmdlineLeave : if getcmdline() =~# '\v\C^%(tab\s+)?ar%[gs]\s+'
-                  \ |     call timer_start(0, { -> execute('let g:my_stl_list_position = 2 | redraw!') })
+    au CmdlineLeave : if getcmdline() =~# '\C^\%(tab\s\+\)\=ar\%[gs]\s+'
+                  \ |     call timer_start(0, {-> execute('let g:my_stl_list_position = 2 | redraw!')})
                   \ | endif
 
     " sometimes, we type `:h functionz)` instead of `:h function()`
-    au CmdlineLeave : if getcmdline() =~# '\v\C^h%[elp]\s+\S+z\)\s*$'
+    au CmdlineLeave : if getcmdline() =~# '\C^h\%[elp]\s\+\S\+z)\s*$'
                   \ |     call cmdline#fix_typo('z')
                   \ | endif
 
@@ -118,9 +119,9 @@ augroup END
 " Purpose:{{{
 " We have several custom mappings in command-line mode.
 " Some of them are bound to custom functions.
-" They interfere / add noise / bug (cr) when we're in debug or Ex mode.
-" We install this command so that it can be used to toggle them when needed,
-" in other plugins/vimrc/….
+" They interfere / add noise / bug (`CR`) when we're in debug or Ex mode.
+" We install this command so that it can  be used to toggle them when needed, in
+" other plugins or in our vimrc.
 "}}}
 " Usage:{{{
 "         ToggleEditingCommands 0  →  disable
@@ -148,19 +149,19 @@ cno          <c-q>    <c-\>ecmdline#tab#restore_cmdline_after_expansion()<cr>
 
 " The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
 "
-"     • on the search command-line, it translates the pattern so that:
+"    • on the search command-line, it translates the pattern so that:
 "
-"           - it's searched outside comments
+"        - it's searched outside comments
 "
-"           - all alphabetical characters are replaced with their corresponding
-"             equivalence class
+"        - all alphabetical characters are replaced with their corresponding
+"        equivalence class
 "
-"     • on the Ex command-line, if the latter contains a substitution command,
-"       inside the pattern, it captures the words written in snake case or
-"       camel case inside parentheses, so that we can refer to them easily
-"       with backref in the replacement.
+"    • on the Ex command-line, if the latter contains a substitution command,
+"      inside the pattern, it captures the words written in snake case or
+"      camel case inside parentheses, so that we can refer to them easily
+"      with backref in the replacement.
 "}}}
-cno  <expr><unique>  <c-s>  cmdline#transform()
+cno  <expr><unique>  <c-s>  cmdline#transform#main()
 
 " Cycle through a set of arbitrary commands.
 cno  <unique>  <c-g>  <c-\>ecmdline#cycle#move(1)<cr>
@@ -284,21 +285,41 @@ call s:cycle_configure('p',
 
 call s:cycle_configure('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
 
+fu! s:snr()
+    return matchstr(expand('<sfile>'), '<SNR>\d\+_')
+endfu
+fu! s:filetype_specific_vimgrep() abort
+    if &ft is# 'zsh'
+        return '/usr/share/zsh/**'
+    elseif &ft =~# '^\%(bash\|sh\)$'
+        return  '~/bin/**/*.sh'
+            \ . ' ~/.shrc'
+            \ . ' ~/.bashrc'
+            \ . ' ~/.zshrc'
+            \ . ' ~/.zshenv'
+            \ . ' ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets'
+    else
+        return  '~/.vim/**/*.vim'
+            \ . ' ~/.vim/**/*.snippets'
+            \ . ' ~/.vim/template/**'
+            \ . ' ~/.vim/vimrc'
+    endif
+endfu
 call s:cycle_configure('v',
-\                      'noa vim /@/gj ~/.vim/**/*.vim ~/.vim/**/*.snippets ~/.vim/template/** ~/.vim/vimrc <bar> cw',
 \                      'noa vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
+\                      'noa vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr> <bar> cw',
 \                      'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
 \                      'noa vim /@/gj ## <bar> cw',
 \                      'noa vim /@/gj `find . -type f -cmin -60` <bar> cw',
 \                      'noa lvim /@/gj % <bar> lw',
-\                      'noa vim /@/gj ~/bin/**/*.sh ~/.shrc ~/.bashrc ~/.zshrc ~/.zshenv ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets <bar> cw'
 \ )
 
 " TODO: Remove `~/.shrc` from the last cycle once we've integrated this file into `~/.zshrc`.
 
 " TODO: `:[l]vim[grep]` is not asynchronous.
-" Add an async command (using  &grepprg?).
+" Add an async command (using  `&grepprg`?).
 " For inspiration:
+"
 "     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
 
 com! -bar Redraw call cmdline#redraw()
