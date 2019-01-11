@@ -3,7 +3,7 @@ if exists('g:autoloaded_cmdline#cycle')
 endif
 let g:autoloaded_cmdline#cycle = 1
 
-" TODO: We should support multiple tabstops (not just one).
+" TODO: Maybe we should support multiple tabstops (not just one).{{{
 "
 " Useful for a command like:
 "
@@ -23,6 +23,12 @@ let g:autoloaded_cmdline#cycle = 1
 " And <kbd>C-g Tab</kbd> to a function which presses the original `Tab`.
 " The mappings should  probably be local to  the buffer, and be  removed when we
 " quit the command-line.
+"
+" For the  moment, I  don't implement  this feature,  because there  aren't many
+" commands which would benefit from it.
+" This would rarely be useful, and the amount of saved keystrokes seems dubious,
+" while the increased complexity would make the code harder to maintain.
+"}}}
 
 let s:cycles = {}
 
@@ -58,10 +64,14 @@ fu! cmdline#cycle#move(is_fwd) abort "{{{1
         return cmdline
     endif
 
+    " extract our index position in the cycle, and the cmds in the latter
     let [idx, cmds] = s:cycles[s:seq]
+    " get the new index position
     let idx = (idx + (a:is_fwd ? 1 : -1)) % len(cmds)
-    let pos = cmds[idx].pos
+    " get the new command, and our initial position on the latter
     let new_cmd = cmds[idx].cmd
+    let pos = cmds[idx].pos
+    " update the new index position
     let s:cycles[s:seq][0] = idx
 
     augroup reset_cycle_index
