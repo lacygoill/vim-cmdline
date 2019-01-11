@@ -34,12 +34,12 @@ fu! cmdline#transform#main() abort "{{{1
         if get(s:, 'did_transform', 0) ==# 0
             let s:orig_cmdline = cmdline
         endif
-        call s:emit_add_to_undolist_c()
+        call cmdline#util#undo#emit_add_to_undolist_c()
         return "\<c-e>\<c-u>"
         \     .(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments())
 
     elseif cmdtype =~# ':'
-        call s:emit_add_to_undolist_c()
+        call cmdline#util#undo#emit_add_to_undolist_c()
         return s:capture_subpatterns()
     else
         return ''
@@ -84,15 +84,6 @@ fu! s:capture_subpatterns() abort "{{{1
     "      ├─────────────────────────────────────────────────────┘{{{
     "      └ position the cursor between the last 2 slashes
     "}}}
-endfu
-
-fu! s:emit_add_to_undolist_c() abort "{{{1
-    " We want to be able to undo the transformation.
-    " We emit  a custom event, so  that we can  add the current line  to our
-    " undo list in `vim-readline`.
-    if exists('#User#add_to_undolist_c')
-        do <nomodeline> User add_to_undolist_c
-    endif
 endfu
 
 fu! s:replace_with_equiv_class() abort "{{{1

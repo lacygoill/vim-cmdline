@@ -4,11 +4,8 @@ endif
 let g:autoloaded_cmdline#cycle = 1
 
 " TODO:
-" If we press  c-g by accident on  the command-line, and we move  forward in the
-" cycle, we should be able to undo and recover the previous command with c-_.
-"
-" also, we should have multiple tabstops (not just one).
-" useful for a command like:
+" We should have multiple tabstops (not just one).
+" Useful for a command like:
 "
 "         noa vim //gj `find . -type f -cmin -60` | cw
 "                 ^                           ^
@@ -61,6 +58,10 @@ fu! cmdline#cycle#move(is_fwd) abort "{{{1
 
     exe 'cno <plug>(cycle-new-cmd) '.new_cmd.'<c-r>=setcmdpos('.pos.')[-1]<cr>'
 
+    " If we  press <kbd>C-g</kbd> by accident  on the command-line, and  we move
+    " forward in the cycle,  we should be able to undo  and recover the previous
+    " command with <kbd>C-_</kbd>.
+    call cmdline#util#undo#emit_add_to_undolist_c()
     call feedkeys("\<plug>(cycle-new-cmd)", 'i')
     return ''
 endfu
