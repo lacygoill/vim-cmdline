@@ -1,5 +1,3 @@
-" TODO: remove all occurrences of `\v` in this project
-
 " TODO:
 " `:filter` doesn't support all commands.
 " Maybe we  could install a wrapper  command (`:Filter`) which would  do the job
