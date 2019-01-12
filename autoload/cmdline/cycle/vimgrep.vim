@@ -17,6 +17,7 @@ fu! s:filetype_specific_vimgrep() abort
     if &ft is# 'zsh'
         return '/usr/share/zsh/**'
     elseif &ft =~# '^\%(bash\|sh\)$'
+        " TODO: Remove `~/.shrc` once we've integrated this file into `~/.zshrc`.
         return  '~/bin/**/*.sh'
             \ . ' ~/.shrc'
             \ . ' ~/.bashrc'

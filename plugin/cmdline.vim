@@ -166,111 +166,115 @@ cno  <unique>  <m-g>  <c-\>e cmdline#cycle#main#move(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
-" populate the arglist with:
-"
-"    • all the files in a directory
-"    • all the files in the output of a shell command
-call cmdline#cycle#main#set('a',
-    \ 'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
-    \ 'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
+augroup delay_cycles_set
+    au!
+    au CmdlineEnter : call s:cycles_set() | exe 'au! delay_cycles_set' | aug! delay_cycles_set
+augroup END
 
+fu! s:cycles_set() abort
+    " populate the arglist with:
+    "
+    "    • all the files in a directory
+    "    • all the files in the output of a shell command
+    call cmdline#cycle#main#set('a',
+        \ 'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
+        \ 'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
 
-" populate the qfl with the output of a shell command
-" Why not using `:cexpr`?{{{
-"
-" It suffers from an issue regarding a possible pipe in the shell command.
-" You have to escape it, which is  inconsistent with how a bar is interpreted by
-" Vim in other contexts.
-" I don't want to remember this quirk.
-"}}}
-call cmdline#cycle#main#set('c',
-    \ 'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
+    " populate the qfl with the output of a shell command
+    " Why not using `:cexpr`?{{{
+    "
+    " It suffers from an issue regarding a possible pipe in the shell command.
+    " You have to escape it, which is  inconsistent with how a bar is interpreted by
+    " Vim in other contexts.
+    " I don't want to remember this quirk.
+    "}}}
+    call cmdline#cycle#main#set('c',
+        \ 'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
 
-"                       ┌ definition
-"                       │
-call cmdline#cycle#main#set('d',
-    \ 'Verb nno @',
-    \ 'Verb com @',
-    \ 'Verb au @',
-    \ 'Verb au * <buffer=@>',
-    \ 'Verb fu @',
-    \ 'Verb fu {''<lambda>@''}')
+    "                       ┌ definition
+    "                       │
+    call cmdline#cycle#main#set('d',
+        \ 'Verb nno @',
+        \ 'Verb com @',
+        \ 'Verb au @',
+        \ 'Verb au * <buffer=@>',
+        \ 'Verb fu @',
+        \ 'Verb fu {''<lambda>@''}')
 
-call cmdline#cycle#main#set('ee',
-    \ 'tabe $MYVIMRC@',
-    \ 'e $MYVIMRC@',
-    \ 'sp $MYVIMRC@',
-    \ 'vs $MYVIMRC@')
+    call cmdline#cycle#main#set('ee',
+        \ 'tabe $MYVIMRC@',
+        \ 'e $MYVIMRC@',
+        \ 'sp $MYVIMRC@',
+        \ 'vs $MYVIMRC@')
 
-call cmdline#cycle#main#set('em',
-    \ 'tabe /tmp/vimrc@',
-    \ 'tabe /tmp/vim.vim@')
+    call cmdline#cycle#main#set('em',
+        \ 'tabe /tmp/vimrc@',
+        \ 'tabe /tmp/vim.vim@')
 
-" search a file in:{{{
-"
-"         • the working directory
-"         • ~/.vim
-"         • the directory of the current buffer
-"}}}
-call cmdline#cycle#main#set('ef',
-    \ 'fin ~/.vim/**/*@',
-    \ 'fin *@',
-    \ 'fin %:h/**/*@')
-" Why `fin *@`, and not `fin **/*@`?{{{
-"
-" 1. It's useless to add `**` because we already included it inside 'path'.
-"    And `:find` searches in all paths of 'path'.
-"    So, it will use `**` as a prefix.
-"
-" 2. If we used `fin **/*@`, the path of the candidates would be relative to
-"    the working directory.
-"    It's too verbose. We just need their name.
-"
-"     Btw, you may wonder what happens when we type `:fin *bar` and press Tab or
-"    C-d,  while  there  are two  files  with  the  same  name `foobar`  in  two
-"    directories in the working directory.
-"
-"     The answer is  simple: for each candidate, Vim prepends  the previous path
-"    component to  remove the ambiguity. If it's  not enough, it goes  on adding
-"    path components until it's not needed anymore.
-"}}}
+    " search a file in:{{{
+    "
+    "         • the working directory
+    "         • ~/.vim
+    "         • the directory of the current buffer
+    "}}}
+    call cmdline#cycle#main#set('ef',
+        \ 'fin ~/.vim/**/*@',
+        \ 'fin *@',
+        \ 'fin %:h/**/*@')
+    " Why `fin *@`, and not `fin **/*@`?{{{
+    "
+    " 1. It's useless to add `**` because we already included it inside 'path'.
+    "    And `:find` searches in all paths of 'path'.
+    "    So, it will use `**` as a prefix.
+    "
+    " 2. If we used `fin **/*@`, the path of the candidates would be relative to
+    "    the working directory.
+    "    It's too verbose. We just need their name.
+    "
+    "     Btw, you may wonder what happens when we type `:fin *bar` and press Tab or
+    "    C-d,  while  there  are two  files  with  the  same  name `foobar`  in  two
+    "    directories in the working directory.
+    "
+    "     The answer is  simple: for each candidate, Vim prepends  the previous path
+    "    component to  remove the ambiguity. If it's  not enough, it goes  on adding
+    "    path components until it's not needed anymore.
+    "}}}
 
-call cmdline#cycle#main#set('es',
-    \ 'sf ~/.vim/**/*@',
-    \ 'sf *@',
-    \ 'sf %:h/**/*@')
+    call cmdline#cycle#main#set('es',
+        \ 'sf ~/.vim/**/*@',
+        \ 'sf *@',
+        \ 'sf %:h/**/*@')
 
-call cmdline#cycle#main#set('ev',
-    \ 'vert sf ~/.vim/**/*@',
-    \ 'vert sf *@',
-    \ 'vert sf %:h/**/*@')
+    call cmdline#cycle#main#set('ev',
+        \ 'vert sf ~/.vim/**/*@',
+        \ 'vert sf *@',
+        \ 'vert sf %:h/**/*@')
 
-call cmdline#cycle#main#set('et',
-    \ 'tabf ~/.vim/**/*@',
-    \ 'tabf *@',
-    \ 'tabf %:h/**/*@')
+    call cmdline#cycle#main#set('et',
+        \ 'tabf ~/.vim/**/*@',
+        \ 'tabf *@',
+        \ 'tabf %:h/**/*@')
 
-" `:filter` doesn't support all commands.
-" We install a  wrapper command which emulates `:filter` for  the commands which
-" are not supported.
-call cmdline#cycle#filter#install()
+    " `:filter` doesn't support all commands.
+    " We install a  wrapper command which emulates `:filter` for  the commands which
+    " are not supported.
+    call cmdline#cycle#filter#install()
 
-call cmdline#cycle#main#set('p', 'put =execute(''@'')')
+    call cmdline#cycle#main#set('p', 'put =execute(''@'')')
 
-call cmdline#cycle#main#set('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
+    call cmdline#cycle#main#set('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
+
+    " TODO: `:[l]vim[grep]` is not asynchronous.
+    " Add an async command (using  `&grepprg`?).
+    " For inspiration:
+    "
+    "     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
+
+    com! -bar Redraw call cmdline#redraw()
+    call cmdline#cycle#main#set('!', 'Redraw <bar> sil !sr wref @')
+endfu
 
 call cmdline#cycle#vimgrep#install()
-
-" TODO: Remove `~/.shrc` from the last cycle once we've integrated this file into `~/.zshrc`.
-
-" TODO: `:[l]vim[grep]` is not asynchronous.
-" Add an async command (using  `&grepprg`?).
-" For inspiration:
-"
-"     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
-
-com! -bar Redraw call cmdline#redraw()
-call cmdline#cycle#main#set('!', 'Redraw <bar> sil !sr wref @')
 
 " Variable {{{1
 
