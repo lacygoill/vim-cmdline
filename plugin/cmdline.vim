@@ -61,14 +61,11 @@ augroup my_lazy_loaded_cmdline
     " the command-line, when we change the focused window for the first time.
     au CmdlineEnter : call cmdline#auto_uppercase()
     \
-    \ |               call cmdline#remember(s:overlooked_commands)
-    \ |               unlet! s:overlooked_commands
-    \
-    \ |               call cmdline#cycle#pass(s:cycles)
-    \ |               unlet! s:cycles
-    \
     \ |               exe 'au! my_lazy_loaded_cmdline'
     \ |               aug! my_lazy_loaded_cmdline
+    \
+    \ |               call cmdline#remember(s:overlooked_commands)
+    \ |               unlet! s:overlooked_commands
 augroup END
 
 augroup my_cmdline_chain
@@ -169,28 +166,14 @@ cno  <unique>  <m-g>  <c-\>ecmdline#cycle#move(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
-"   ┌ need  this variable to  pass the commands that  are in each  cycle we're
-"   │ going to configure, to the `autoload/`  script, where the bulk of the code
-"   │ installing cycles reside
-"   │
-let s:cycles = []
-fu! s:cycle_configure(seq, ...) abort
-    let cmds = a:000
-    let pos = cmdline#util#cycle#find_tabstop(a:1)
-    exe 'nno  <unique>  <c-g>'.a:seq
-        \ . ' :<c-u><c-r>=cmdline#cycle#set_seq('.string(a:seq).')<cr>'
-        \ . substitute(a:1, '@', '', '')
-        \ .   '<c-r>=setcmdpos('.pos.')[-1]<cr>'
-    let s:cycles += [[a:seq, cmds]]
-endfu
-
 " populate the arglist with:
 "
 "    • all the files in a directory
 "    • all the files in the output of a shell command
-call s:cycle_configure('a',
+call cmdline#cycle#configure('a',
 \                      'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
 \                      'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
+
 
 " populate the qfl with the output of a shell command
 " Why not using `:cexpr`?{{{
@@ -200,12 +183,12 @@ call s:cycle_configure('a',
 " Vim in other contexts.
 " I don't want to remember this quirk.
 "}}}
-call s:cycle_configure('c',
+call cmdline#cycle#configure('c',
 \                      'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
 
 "                       ┌ definition
 "                       │
-call s:cycle_configure('d',
+call cmdline#cycle#configure('d',
 \                      'Verb nno @',
 \                      'Verb com @',
 \                      'Verb au @',
@@ -213,13 +196,13 @@ call s:cycle_configure('d',
 \                      'Verb fu @',
 \                      'Verb fu {''<lambda>@''}')
 
-call s:cycle_configure('ee',
+call cmdline#cycle#configure('ee',
 \                      'tabe $MYVIMRC@',
 \                      'e $MYVIMRC@',
 \                      'sp $MYVIMRC@',
 \                      'vs $MYVIMRC@')
 
-call s:cycle_configure('em',
+call cmdline#cycle#configure('em',
 \                      'tabe /tmp/vimrc@',
 \                      'tabe /tmp/vim.vim@')
 
@@ -229,7 +212,7 @@ call s:cycle_configure('em',
 "         • ~/.vim
 "         • the directory of the current buffer
 "}}}
-call s:cycle_configure('ef',
+call cmdline#cycle#configure('ef',
 \                      'fin ~/.vim/**/*@',
 \                      'fin *@',
 \                      'fin %:h/**/*@')
@@ -252,17 +235,17 @@ call s:cycle_configure('ef',
 "    path components until it's not needed anymore.
 "}}}
 
-call s:cycle_configure('es',
+call cmdline#cycle#configure('es',
 \                      'sf ~/.vim/**/*@',
 \                      'sf *@',
 \                      'sf %:h/**/*@')
 
-call s:cycle_configure('ev',
+call cmdline#cycle#configure('ev',
 \                      'vert sf ~/.vim/**/*@',
 \                      'vert sf *@',
 \                      'vert sf %:h/**/*@')
 
-call s:cycle_configure('et',
+call cmdline#cycle#configure('et',
 \                      'tabf ~/.vim/**/*@',
 \                      'tabf *@',
 \                      'tabf %:h/**/*@')
@@ -362,7 +345,7 @@ fu! s:is_filterable(first_word) abort
     return 0
 endfu
 
-call s:cycle_configure('f',
+call cmdline#cycle#configure('f',
 \                      'Verb Filter /@/ map',
 \                      'Verb Filter /@/ ab',
 \                      'Verb Filter /@/ %#',
@@ -376,10 +359,10 @@ call s:cycle_configure('f',
 \                      'Verb Filter /@/ hi',
 \                      'Verb Filter /@/ ls')
 
-call s:cycle_configure('p',
+call cmdline#cycle#configure('p',
 \                      'put =execute(''@'')')
 
-call s:cycle_configure('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
+call cmdline#cycle#configure('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
 
 fu! s:snr()
     return matchstr(expand('<sfile>'), '<SNR>\d\+_')
@@ -401,7 +384,7 @@ fu! s:filetype_specific_vimgrep() abort
             \ . ' ~/.vim/vimrc'
     endif
 endfu
-call s:cycle_configure('v',
+call cmdline#cycle#configure('v',
 \                      'noa vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
 \                      'noa vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr> <bar> cw',
 \                      'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
@@ -419,7 +402,7 @@ call s:cycle_configure('v',
 "     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
 
 com! -bar Redraw call cmdline#redraw()
-call s:cycle_configure('!',
+call cmdline#cycle#configure('!',
 \                      'Redraw <bar> sil !sr wref @')
 
 " Variable {{{1

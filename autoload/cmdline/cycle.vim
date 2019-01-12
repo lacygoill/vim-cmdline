@@ -31,17 +31,25 @@ let g:autoloaded_cmdline#cycle = 1
 "}}}
 
 let s:cycles = {}
+let s:seq_and_cmds = []
+augroup delay_cycle_install
+    au!
+    au CmdlineEnter : for [seq, cmds] in s:seq_and_cmds | call s:install(seq, cmds) | endfor
+augroup END
 
-fu! cmdline#cycle#pass(cycles) abort "{{{1
-    for cycle in a:cycles
-        call s:install(cycle)
-    endfor
+fu! cmdline#cycle#configure(seq, ...) abort "{{{1
+    let cmds = a:000
+    let pos = cmdline#util#cycle#find_tabstop(a:1)
+    exe 'nno  <unique>  <c-g>'.a:seq
+        \ . ' :<c-u><c-r>=cmdline#cycle#set_seq('.string(a:seq).')<cr>'
+        \ . substitute(a:1, '@', '', '')
+        \ .   '<c-r>=setcmdpos('.pos.')[-1]<cr>'
+    let s:seq_and_cmds += [[a:seq, cmds]]
 endfu
 
-fu! s:install(cycle) abort "{{{1
-    let seq = a:cycle[0]
-    let cmds = a:cycle[1]
+fu! s:install(seq, cmds) abort "{{{1
     " cmds = ['cmd1', 'cmd2']
+    let cmds = deepcopy(a:cmds)
 
     let positions = map(deepcopy(cmds), {i,v -> cmdline#util#cycle#find_tabstop(v)})
 
@@ -51,7 +59,7 @@ fu! s:install(cycle) abort "{{{1
         \ }})
     " cmds = [{'cmd': 'cmd1', 'pos': 12}, {'cmd': 'cmd2', 'pos': 34}]
 
-    call extend(s:cycles, {seq: [0, cmds]})
+    call extend(s:cycles, {a:seq: [0, cmds]})
 endfu
 
 fu! cmdline#cycle#set_seq(seq) abort "{{{1
