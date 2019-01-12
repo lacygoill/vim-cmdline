@@ -254,53 +254,13 @@ call cmdline#cycle#set('et',
 " We install a  wrapper command which emulates `:filter` for  the commands which
 " are not supported.
 call cmdline#filter#install()
-call cmdline#cycle#set('f',
-\                      'Verb Filter /@/ map',
-\                      'Verb Filter /@/ ab',
-\                      'Verb Filter /@/ %#',
-\                      'Verb Filter /@/ com',
-\                      'Verb Filter /@/ old',
-\                      'Verb Filter /@/ chi',
-\                      'Verb Filter /@/ mess',
-\                      'Verb Filter /@/ scr',
-\                      'Verb Filter /@/ let',
-\                      'Verb Filter /@/ set',
-\                      'Verb Filter /@/ hi',
-\                      'Verb Filter /@/ ls')
 
 call cmdline#cycle#set('p',
 \                      'put =execute(''@'')')
 
 call cmdline#cycle#set('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
 
-fu! s:snr()
-    return matchstr(expand('<sfile>'), '<SNR>\d\+_')
-endfu
-fu! s:filetype_specific_vimgrep() abort
-    if &ft is# 'zsh'
-        return '/usr/share/zsh/**'
-    elseif &ft =~# '^\%(bash\|sh\)$'
-        return  '~/bin/**/*.sh'
-            \ . ' ~/.shrc'
-            \ . ' ~/.bashrc'
-            \ . ' ~/.zshrc'
-            \ . ' ~/.zshenv'
-            \ . ' ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets'
-    else
-        return  '~/.vim/**/*.vim'
-            \ . ' ~/.vim/**/*.snippets'
-            \ . ' ~/.vim/template/**'
-            \ . ' ~/.vim/vimrc'
-    endif
-endfu
-call cmdline#cycle#set('v',
-\                      'noa vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
-\                      'noa vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr> <bar> cw',
-\                      'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
-\                      'noa vim /@/gj ## <bar> cw',
-\                      'noa vim /@/gj `find . -type f -cmin -60` <bar> cw',
-\                      'noa lvim /@/gj % <bar> lw',
-\ )
+call cmdline#vimgrep#install()
 
 " TODO: Remove `~/.shrc` from the last cycle once we've integrated this file into `~/.zshrc`.
 

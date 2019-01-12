@@ -65,6 +65,20 @@ let s:FILTERABLE_COMMANDS = [
     \ 'set[lg]',
     \ 'sig\%[n]',
     \ ]
+
+call cmdline#cycle#set('f',
+\                      'Verb Filter /@/ map',
+\                      'Verb Filter /@/ ab',
+\                      'Verb Filter /@/ %#',
+\                      'Verb Filter /@/ com',
+\                      'Verb Filter /@/ old',
+\                      'Verb Filter /@/ chi',
+\                      'Verb Filter /@/ mess',
+\                      'Verb Filter /@/ scr',
+\                      'Verb Filter /@/ let',
+\                      'Verb Filter /@/ set',
+\                      'Verb Filter /@/ hi',
+\                      'Verb Filter /@/ ls')
 " }}}1
 " Interface {{{1
 fu! cmdline#filter#install() abort "{{{2
