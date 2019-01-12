@@ -1,4 +1,5 @@
-fu! cmdline#cycle#vimgrep#install() abort
+" Interface {{{1
+fu! cmdline#cycle#vimgrep#install() abort "{{{2
     call cmdline#cycle#main#set('v',
         \ 'noa vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
         \ 'noa vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr> <bar> cw',
@@ -8,12 +9,9 @@ fu! cmdline#cycle#vimgrep#install() abort
         \ 'noa lvim /@/gj % <bar> lw',
         \ )
 endfu
-
-fu! s:snr()
-    return matchstr(expand('<sfile>'), '<SNR>\d\+_')
-endfu
-
-fu! s:filetype_specific_vimgrep() abort
+" }}}1
+" Core {{{1
+fu! s:filetype_specific_vimgrep() abort "{{{2
     if &ft is# 'zsh'
         return '/usr/share/zsh/**'
     elseif &ft =~# '^\%(bash\|sh\)$'
@@ -30,5 +28,10 @@ fu! s:filetype_specific_vimgrep() abort
             \ . ' ~/.vim/template/**'
             \ . ' ~/.vim/vimrc'
     endif
+endfu
+" }}}1
+" Utilities {{{1
+fu! s:snr() "{{{2
+    return matchstr(expand('<sfile>'), '.*\zs<SNR>\d\+_')
 endfu
 

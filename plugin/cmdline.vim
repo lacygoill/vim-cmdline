@@ -259,6 +259,8 @@ fu! s:cycles_set() abort
     " are not supported.
     call cmdline#cycle#filter#install()
 
+    call cmdline#cycle#vimgrep#install()
+
     call cmdline#cycle#main#set('p', 'put =execute(''@'')')
 
     call cmdline#cycle#main#set('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
@@ -272,8 +274,6 @@ fu! s:cycles_set() abort
     com! -bar Redraw call cmdline#redraw()
     call cmdline#cycle#main#set('!', 'Redraw <bar> sil !sr wref @')
 endfu
-
-call cmdline#cycle#vimgrep#install()
 
 " Variable {{{1
 
