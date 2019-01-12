@@ -179,17 +179,6 @@ fu! s:cycles_set() abort
         \ 'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
         \ 'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
 
-    " populate the qfl with the output of a shell command
-    " Why not using `:cexpr`?{{{
-    "
-    " It suffers from an issue regarding a possible pipe in the shell command.
-    " You have to escape it, which is  inconsistent with how a bar is interpreted by
-    " Vim in other contexts.
-    " I don't want to remember this quirk.
-    "}}}
-    call cmdline#cycle#main#set('c',
-        \ 'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
-
     "                       ┌ definition
     "                       │
     call cmdline#cycle#main#set('d',
@@ -238,17 +227,14 @@ fu! s:cycles_set() abort
     "    component to  remove the ambiguity. If it's  not enough, it goes  on adding
     "    path components until it's not needed anymore.
     "}}}
-
     call cmdline#cycle#main#set('es',
         \ 'sf ~/.vim/**/*@',
         \ 'sf *@',
         \ 'sf %:h/**/*@')
-
     call cmdline#cycle#main#set('ev',
         \ 'vert sf ~/.vim/**/*@',
         \ 'vert sf *@',
         \ 'vert sf %:h/**/*@')
-
     call cmdline#cycle#main#set('et',
         \ 'tabf ~/.vim/**/*@',
         \ 'tabf *@',
@@ -259,17 +245,20 @@ fu! s:cycles_set() abort
     " are not supported.
     call cmdline#cycle#filter#install()
 
+    " populate the qfl with the output of a shell command
+    " Why not using `:cexpr`?{{{
+    "
+    " It suffers from an issue regarding a possible pipe in the shell command.
+    " You have to escape it, which is  inconsistent with how a bar is interpreted by
+    " Vim in other contexts.
+    " I don't want to remember this quirk.
+    "}}}
+    call cmdline#cycle#main#set('g',
+        \ 'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
     call cmdline#cycle#vimgrep#install()
 
     call cmdline#cycle#main#set('p', 'put =execute(''@'')')
-
     call cmdline#cycle#main#set('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
-
-    " TODO: `:[l]vim[grep]` is not asynchronous.
-    " Add an async command (using  `&grepprg`?).
-    " For inspiration:
-    "
-    "     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
 
     com! -bar Redraw call cmdline#redraw()
     call cmdline#cycle#main#set('!', 'Redraw <bar> sil !sr wref @')

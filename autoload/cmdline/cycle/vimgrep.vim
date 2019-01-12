@@ -1,5 +1,11 @@
 " Interface {{{1
 fu! cmdline#cycle#vimgrep#install() abort "{{{2
+    " TODO: `:[l]vim[grep]` is not asynchronous.
+    " Add an async command (using  `&grepprg`?).
+    " For inspiration:
+    "
+    "     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
+
     call cmdline#cycle#main#set('v',
         \ 'noa vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
         \ 'noa vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr> <bar> cw',
