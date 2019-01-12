@@ -1,5 +1,5 @@
-fu! cmdline#vimgrep#install() abort
-    call cmdline#cycle#set('v',
+fu! cmdline#cycle#vimgrep#install() abort
+    call cmdline#cycle#main#set('v',
         \ 'noa vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
         \ 'noa vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr> <bar> cw',
         \ 'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',

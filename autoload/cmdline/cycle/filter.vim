@@ -1,7 +1,7 @@
-if exists('g:autoloaded_cmdline#filter')
+if exists('g:autoloaded_cmdline#cycle#filter')
     finish
 endif
-let g:autoloaded_cmdline#filter = 1
+let g:autoloaded_cmdline#cycle#filter = 1
 
 " Init {{{1
 
@@ -66,7 +66,7 @@ let s:FILTERABLE_COMMANDS = [
     \ 'sig\%[n]',
     \ ]
 
-call cmdline#cycle#set('f',
+call cmdline#cycle#main#set('f',
 \                      'Verb Filter /@/ map',
 \                      'Verb Filter /@/ ab',
 \                      'Verb Filter /@/ %#',
@@ -81,7 +81,7 @@ call cmdline#cycle#set('f',
 \                      'Verb Filter /@/ ls')
 " }}}1
 " Interface {{{1
-fu! cmdline#filter#install() abort "{{{2
+fu! cmdline#cycle#filter#install() abort "{{{2
     com! -bang -complete=command -nargs=+ Filter  call s:filter(<q-args>, <bang>0)
 endfu
 " }}}1

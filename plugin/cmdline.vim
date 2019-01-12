@@ -161,8 +161,8 @@ cno          <c-q>    <c-\>ecmdline#tab#restore_cmdline_after_expansion()<cr>
 cno  <expr><unique>  <c-s>  cmdline#transform#main()
 
 " Cycle through a set of arbitrary commands.
-cno  <unique>  <c-g>  <c-\>e cmdline#cycle#move(1)<cr>
-cno  <unique>  <m-g>  <c-\>e cmdline#cycle#move(0)<cr>
+cno  <unique>  <c-g>  <c-\>e cmdline#cycle#main#move(1)<cr>
+cno  <unique>  <m-g>  <c-\>e cmdline#cycle#main#move(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
@@ -170,9 +170,9 @@ xno  <unique>  <c-g>s  :s///g<left><left><left>
 "
 "    • all the files in a directory
 "    • all the files in the output of a shell command
-call cmdline#cycle#set('a',
-\                      'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
-\                      'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
+call cmdline#cycle#main#set('a',
+    \ 'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
+    \ 'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
 
 
 " populate the qfl with the output of a shell command
@@ -183,28 +183,28 @@ call cmdline#cycle#set('a',
 " Vim in other contexts.
 " I don't want to remember this quirk.
 "}}}
-call cmdline#cycle#set('c',
-\                      'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
+call cmdline#cycle#main#set('c',
+    \ 'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
 
 "                       ┌ definition
 "                       │
-call cmdline#cycle#set('d',
-\                      'Verb nno @',
-\                      'Verb com @',
-\                      'Verb au @',
-\                      'Verb au * <buffer=@>',
-\                      'Verb fu @',
-\                      'Verb fu {''<lambda>@''}')
+call cmdline#cycle#main#set('d',
+    \ 'Verb nno @',
+    \ 'Verb com @',
+    \ 'Verb au @',
+    \ 'Verb au * <buffer=@>',
+    \ 'Verb fu @',
+    \ 'Verb fu {''<lambda>@''}')
 
-call cmdline#cycle#set('ee',
-\                      'tabe $MYVIMRC@',
-\                      'e $MYVIMRC@',
-\                      'sp $MYVIMRC@',
-\                      'vs $MYVIMRC@')
+call cmdline#cycle#main#set('ee',
+    \ 'tabe $MYVIMRC@',
+    \ 'e $MYVIMRC@',
+    \ 'sp $MYVIMRC@',
+    \ 'vs $MYVIMRC@')
 
-call cmdline#cycle#set('em',
-\                      'tabe /tmp/vimrc@',
-\                      'tabe /tmp/vim.vim@')
+call cmdline#cycle#main#set('em',
+    \ 'tabe /tmp/vimrc@',
+    \ 'tabe /tmp/vim.vim@')
 
 " search a file in:{{{
 "
@@ -212,10 +212,10 @@ call cmdline#cycle#set('em',
 "         • ~/.vim
 "         • the directory of the current buffer
 "}}}
-call cmdline#cycle#set('ef',
-\                      'fin ~/.vim/**/*@',
-\                      'fin *@',
-\                      'fin %:h/**/*@')
+call cmdline#cycle#main#set('ef',
+    \ 'fin ~/.vim/**/*@',
+    \ 'fin *@',
+    \ 'fin %:h/**/*@')
 " Why `fin *@`, and not `fin **/*@`?{{{
 "
 " 1. It's useless to add `**` because we already included it inside 'path'.
@@ -235,32 +235,31 @@ call cmdline#cycle#set('ef',
 "    path components until it's not needed anymore.
 "}}}
 
-call cmdline#cycle#set('es',
-\                      'sf ~/.vim/**/*@',
-\                      'sf *@',
-\                      'sf %:h/**/*@')
+call cmdline#cycle#main#set('es',
+    \ 'sf ~/.vim/**/*@',
+    \ 'sf *@',
+    \ 'sf %:h/**/*@')
 
-call cmdline#cycle#set('ev',
-\                      'vert sf ~/.vim/**/*@',
-\                      'vert sf *@',
-\                      'vert sf %:h/**/*@')
+call cmdline#cycle#main#set('ev',
+    \ 'vert sf ~/.vim/**/*@',
+    \ 'vert sf *@',
+    \ 'vert sf %:h/**/*@')
 
-call cmdline#cycle#set('et',
-\                      'tabf ~/.vim/**/*@',
-\                      'tabf *@',
-\                      'tabf %:h/**/*@')
+call cmdline#cycle#main#set('et',
+    \ 'tabf ~/.vim/**/*@',
+    \ 'tabf *@',
+    \ 'tabf %:h/**/*@')
 
 " `:filter` doesn't support all commands.
 " We install a  wrapper command which emulates `:filter` for  the commands which
 " are not supported.
-call cmdline#filter#install()
+call cmdline#cycle#filter#install()
 
-call cmdline#cycle#set('p',
-\                      'put =execute(''@'')')
+call cmdline#cycle#main#set('p', 'put =execute(''@'')')
 
-call cmdline#cycle#set('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
+call cmdline#cycle#main#set('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
 
-call cmdline#vimgrep#install()
+call cmdline#cycle#vimgrep#install()
 
 " TODO: Remove `~/.shrc` from the last cycle once we've integrated this file into `~/.zshrc`.
 
@@ -271,8 +270,7 @@ call cmdline#vimgrep#install()
 "     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
 
 com! -bar Redraw call cmdline#redraw()
-call cmdline#cycle#set('!',
-\                      'Redraw <bar> sil !sr wref @')
+call cmdline#cycle#main#set('!', 'Redraw <bar> sil !sr wref @')
 
 " Variable {{{1
 

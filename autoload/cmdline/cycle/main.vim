@@ -1,7 +1,7 @@
-if exists('g:autoloaded_cmdline#cycle')
+if exists('g:autoloaded_cmdline#cycle#main')
     finish
 endif
-let g:autoloaded_cmdline#cycle = 1
+let g:autoloaded_cmdline#cycle#main = 1
 
 " TODO: Maybe we should support multiple tabstops (not just one).{{{
 "
@@ -40,17 +40,17 @@ augroup delay_cycle_install
 augroup END
 
 " Interface {{{1
-fu! cmdline#cycle#set(seq, ...) abort "{{{2
+fu! cmdline#cycle#main#set(seq, ...) abort "{{{2
     let cmds = a:000
-    let pos = cmdline#util#cycle#find_tabstop(a:1)
+    let pos = s:find_tabstop(a:1)
     exe 'nno  <unique>  <c-g>'.a:seq
-        \ . ' :<c-u><c-r>=cmdline#cycle#set_seq('.string(a:seq).')<cr>'
+        \ . ' :<c-u><c-r>=cmdline#cycle#main#set_seq('.string(a:seq).')<cr>'
         \ . substitute(a:1, '@', '', '')
         \ .   '<c-r>=setcmdpos('.pos.')[-1]<cr>'
     let s:seq_and_cmds += [[a:seq, cmds]]
 endfu
 
-fu! cmdline#cycle#move(is_fwd) abort "{{{2
+fu! cmdline#cycle#main#move(is_fwd) abort "{{{2
     let cmdline = getcmdline()
 
     if getcmdtype() isnot# ':' || !s:is_valid_cycle()
@@ -87,7 +87,7 @@ fu! s:install(seq, cmds) abort "{{{2
     " cmds = ['cmd1', 'cmd2']
     let cmds = deepcopy(a:cmds)
 
-    let positions = map(deepcopy(cmds), {i,v -> cmdline#util#cycle#find_tabstop(v)})
+    let positions = map(deepcopy(cmds), {i,v -> s:find_tabstop(v)})
 
     call map(cmds, {i,v -> {
         \     'cmd': substitute(v, '@', '', ''),
@@ -107,13 +107,23 @@ fu! s:delay_cycle_install() abort "{{{2
 endfu
 " }}}1
 " Utilities {{{1
+fu! s:find_tabstop(rhs) abort "{{{2
+    " Why not simply `return stridx(a:rhs, '@')`?{{{
+    "
+    " The rhs may contain special sequences such as `<bar>` or `<c-r>`.
+    " They need to be translated first.
+    "}}}
+    exe 'nno <plug>(cycle-find-tabstop) :'.a:rhs
+    return stridx(maparg('<plug>(cycle-find-tabstop)'), '@')
+endfu
+
 fu! s:is_valid_cycle() abort "{{{2
     return has_key(s:cycles, s:seq)
         \ && type(s:cycles[s:seq]) == type([])
         \ && len(s:cycles[s:seq]) == 2
 endfu
 
-fu! cmdline#cycle#set_seq(seq) abort "{{{2
+fu! cmdline#cycle#main#set_seq(seq) abort "{{{2
     let s:seq = a:seq
     return ''
 endfu
