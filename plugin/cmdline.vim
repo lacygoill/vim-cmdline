@@ -165,6 +165,19 @@ cno  <unique>  <m-g>  <c-\>e cmdline#cycle#main#move(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
+" TODO: Try to use `TextChangedI` to implement sth similar to `complete()` in ultisnips.{{{
+"
+" It would be useful when there're too many similar commands in a cycle:
+"
+"     :verb filter // [map|ab|%#|com|old|chi|mess|scr|ls]
+"     :verb filter // m[ap|ess]
+"     :verb filter // mess
+"
+" We would  install a  temporary autocmd  when we  enter the  command-line which
+" would inspect the latter.
+"
+" We would need a new function.
+"}}}
 augroup delay_cycles_set
     au!
     au CmdlineEnter : call s:cycles_set() | exe 'au! delay_cycles_set' | aug! delay_cycles_set
@@ -201,9 +214,9 @@ fu! s:cycles_set() abort
 
     " search a file in:{{{
     "
-    "         • the working directory
-    "         • ~/.vim
-    "         • the directory of the current buffer
+    "    • the working directory
+    "    • ~/.vim
+    "    • the directory of the current buffer
     "}}}
     call cmdline#cycle#main#set('ef',
         \ 'fin ~/.vim/**/*@',
