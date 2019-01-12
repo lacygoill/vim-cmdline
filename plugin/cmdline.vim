@@ -277,26 +277,72 @@ call s:cycle_configure('et',
 "         :autocmd
 "         :augroup
 "         :changes
-"         :function
 "         :ilist (:dlist, :isearch?, :dsearch?)
 "         :history
-"         :marks
 "         :reg
 "         :tags
 
+com! -bang -complete=command -nargs=+ Filter  call s:filter(<q-args>, <bang>0)
+fu! s:filter(cmd, bang) abort
+    let pat = matchstr(a:cmd, '/\zs.\{-}\ze/')
+
+    let cmd = matchstr(a:cmd, '/.\{-}/\s*\zs.*')
+    let first_word = matchstr(cmd, '\S*')
+    if s:is_filterable(first_word)
+        if pat is# ''
+            exe 'filter'.(a:bang ? '!': '').' '.substitute(a:cmd, '/\zs.\{-}\ze/', @/, '')
+        else
+            exe 'filter'.(a:bang ? '!': '').' '.a:cmd
+        endif
+        return
+    endif
+
+    let output = split(execute(cmd), '\n')
+    echo join(filter(output, {i,v -> a:bang ? v !~# pat : v =~# pat}), "\n")
+endfu
+
+let s:FILTERABLE_COMMANDS = [
+    \ '%\=#',
+    \ 'ab\%[breviate]',
+    \ 'buffers',
+    \ 'chi\%[story]',
+    \ 'cl\%[ist]',
+    \ 'com\%[mand]',
+    \ 'files',
+    \ 'hi\%[ghlight]',
+    \ 'ju\%[mps]',
+    \ 'l\%[ist]',
+    \ 'let',
+    \ 'lli\%[st]',
+    \ 'ls',
+    \ 'map',
+    \ 'mes\%[sages]',
+    \ 'old\%[files]',
+    \ 'scr\%[iptnames]',
+    \ 'se\%[t]',
+    \ ]
+fu! s:is_filterable(first_word) abort
+    for cmd in s:FILTERABLE_COMMANDS
+        if a:first_word =~# '^\C'.cmd.'$'
+            return 1
+        endif
+    endfor
+    return 0
+endfu
+
 call s:cycle_configure('f',
-\                      'Verb filter /@/ map',
-\                      'Verb filter /@/ ab',
-\                      'Verb filter /@/ %#',
-\                      'Verb filter /@/ com',
-\                      'Verb filter /@/ old',
-\                      'Verb filter /@/ chi',
-\                      'Verb filter /@/ mess',
-\                      'Verb filter /@/ scr',
-\                      'Verb filter /@/ let',
-\                      'Verb filter /@/ set',
-\                      'Verb filter /@/ hi',
-\                      'Verb filter /@/ ls')
+\                      'Verb Filter /@/ map',
+\                      'Verb Filter /@/ ab',
+\                      'Verb Filter /@/ %#',
+\                      'Verb Filter /@/ com',
+\                      'Verb Filter /@/ old',
+\                      'Verb Filter /@/ chi',
+\                      'Verb Filter /@/ mess',
+\                      'Verb Filter /@/ scr',
+\                      'Verb Filter /@/ let',
+\                      'Verb Filter /@/ set',
+\                      'Verb Filter /@/ hi',
+\                      'Verb Filter /@/ ls')
 
 call s:cycle_configure('p',
 \                      'put =execute(''@'')')
