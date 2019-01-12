@@ -60,11 +60,11 @@ augroup my_lazy_loaded_cmdline
     " the command-line, when we change the focused window for the first time.
     au CmdlineEnter : call cmdline#auto_uppercase()
     \
-    \ |               exe 'au! my_lazy_loaded_cmdline'
-    \ |               aug! my_lazy_loaded_cmdline
-    \
     \ |               call cmdline#remember(s:overlooked_commands)
     \ |               unlet! s:overlooked_commands
+    \
+    \ |               exe 'au! my_lazy_loaded_cmdline'
+    \ |               aug! my_lazy_loaded_cmdline
 augroup END
 
 augroup my_cmdline_chain
