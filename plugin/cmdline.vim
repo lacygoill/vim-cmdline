@@ -267,28 +267,15 @@ call s:cycle_configure('et',
 \                      'tabf *@',
 \                      'tabf %:h/**/*@')
 
-" TODO:
 " `:filter` doesn't support all commands.
-" Maybe we  could install a wrapper  command (`:Filter`) which would  do the job
-" for the commands which are not supported.
-" See `:h  :index`, and  search for  all the commands  which could  benefit from
-" `:filter`:
-"
-"         :args
-"         :autocmd
-"         :augroup
-"         :changes
-"         :ilist (:dlist, :isearch?, :dsearch?)
-"         :history
-"         :reg
-"         :tags
-
+" We install a  wrapper command which emulates `:filter` for  the commands which
+" are not supported.
 com! -bang -complete=command -nargs=+ Filter  call s:filter(<q-args>, <bang>0)
 fu! s:filter(cmd, bang) abort
     let pat = matchstr(a:cmd, '/\zs.\{-}\ze/')
 
     let cmd = matchstr(a:cmd, '/.\{-}/\s*\zs.*')
-    let first_word = matchstr(cmd, '\S*')
+    let first_word = matchstr(cmd, '\a*\|#')
     if s:is_filterable(first_word)
         if pat is# ''
             exe 'filter'.(a:bang ? '!': '').' '.substitute(a:cmd, '/\zs.\{-}\ze/', @/, '')
@@ -298,30 +285,73 @@ fu! s:filter(cmd, bang) abort
         return
     endif
 
-    let output = split(execute(cmd), '\n')
+    let output = cmd is# 'args'
+        \ ?     argv()
+        \ :     split(execute(cmd), '\n')
+    " useful if we re-execute a second `:Filter` without leaving the command-line
+    redraw
     echo join(filter(output, {i,v -> a:bang ? v !~# pat : v =~# pat}), "\n")
 endfu
 
+" `:Filter /pat/ cmd` should just run the built-in `:filter` if it can filter `:cmd`.
+" We need to teach `:Filter` which commands should not be tampered with.
 let s:FILTERABLE_COMMANDS = [
-    \ '%\=#',
-    \ 'ab\%[breviate]',
+    \ '#',
+    \ 'l\%[ist]',
+    \ 'nu\%[mber]',
+    \ 'p\%[rint]',
+    \
+    \ 'breakl\%[ist]',
     \ 'buffers',
-    \ 'chi\%[story]',
+    \
+    \ '[cl]hi\%[story]',
+    \
     \ 'cl\%[ist]',
+    \ 'lli\%[st]',
+    \
     \ 'com\%[mand]',
     \ 'files',
     \ 'hi\%[ghlight]',
     \ 'ju\%[mps]',
-    \ 'l\%[ist]',
     \ 'let',
-    \ 'lli\%[st]',
     \ 'ls',
+    \
     \ 'map',
+    \ 'nm\%[ap]',
+    \ 'vm\%[ap]',
+    \ 'xm\%[ap]',
+    \ 'smap',
+    \ 'om\%[ap]',
+    \ 'map!',
+    \ 'im\%[ap]',
+    \ 'lm\%[ap]',
+    \ 'cm\%[ap]',
+    \ 'tma\%[p]',
+    \ 'no\%[remap]',
+    \ 'nn\%[oremap]',
+    \ 'vn\%[oremap]',
+    \ 'xn\%[oremap]',
+    \ 'snor\%[emap]',
+    \ 'ono\%[remap]',
+    \ 'no\%[remap]!',
+    \ 'ino\%[remap]',
+    \ 'ln\%[oremap]',
+    \ 'cno\%[remap]',
+    \ 'tno\%[remap]',
+    \
+    \ 'ab\%[breviate]',
+    \ 'norea\%[bbrev]',
+    \ 'ca\%[bbrev]',
+    \ 'cnorea\%[bbrev]',
+    \ 'ia\%[bbrev]',
+    \ 'inorea\%[bbrev]',
+    \
     \ 'mes\%[sages]',
-    \ 'nu\%[mber]',
     \ 'old\%[files]',
     \ 'scr\%[iptnames]',
     \ 'se\%[t]',
+    \ 'set[lg]',
+    \ 'sig\%[n]',
     \ ]
 fu! s:is_filterable(first_word) abort
     for cmd in s:FILTERABLE_COMMANDS
