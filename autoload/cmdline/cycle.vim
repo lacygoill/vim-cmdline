@@ -31,13 +31,16 @@ let g:autoloaded_cmdline#cycle = 1
 "}}}
 
 let s:cycles = {}
+
+" the installation of cycles takes a few ms (too long)
 let s:seq_and_cmds = []
 augroup delay_cycle_install
     au!
-    au CmdlineEnter : for [seq, cmds] in s:seq_and_cmds | call s:install(seq, cmds) | endfor
+    au CmdlineEnter : call s:delay_cycle_install()
 augroup END
 
-fu! cmdline#cycle#configure(seq, ...) abort "{{{1
+" Interface {{{1
+fu! cmdline#cycle#set(seq, ...) abort "{{{2
     let cmds = a:000
     let pos = cmdline#util#cycle#find_tabstop(a:1)
     exe 'nno  <unique>  <c-g>'.a:seq
@@ -47,27 +50,7 @@ fu! cmdline#cycle#configure(seq, ...) abort "{{{1
     let s:seq_and_cmds += [[a:seq, cmds]]
 endfu
 
-fu! s:install(seq, cmds) abort "{{{1
-    " cmds = ['cmd1', 'cmd2']
-    let cmds = deepcopy(a:cmds)
-
-    let positions = map(deepcopy(cmds), {i,v -> cmdline#util#cycle#find_tabstop(v)})
-
-    call map(cmds, {i,v -> {
-        \     'cmd': substitute(v, '@', '', ''),
-        \     'pos': positions[i],
-        \ }})
-    " cmds = [{'cmd': 'cmd1', 'pos': 12}, {'cmd': 'cmd2', 'pos': 34}]
-
-    call extend(s:cycles, {a:seq: [0, cmds]})
-endfu
-
-fu! cmdline#cycle#set_seq(seq) abort "{{{1
-    let s:seq = a:seq
-    return ''
-endfu
-
-fu! cmdline#cycle#move(is_fwd) abort "{{{1
+fu! cmdline#cycle#move(is_fwd) abort "{{{2
     let cmdline = getcmdline()
 
     if getcmdtype() isnot# ':' || !s:is_valid_cycle()
@@ -99,11 +82,39 @@ fu! cmdline#cycle#move(is_fwd) abort "{{{1
     return ''
 endfu
 " }}}1
+" Core {{{1
+fu! s:install(seq, cmds) abort "{{{2
+    " cmds = ['cmd1', 'cmd2']
+    let cmds = deepcopy(a:cmds)
 
+    let positions = map(deepcopy(cmds), {i,v -> cmdline#util#cycle#find_tabstop(v)})
+
+    call map(cmds, {i,v -> {
+        \     'cmd': substitute(v, '@', '', ''),
+        \     'pos': positions[i],
+        \ }})
+    " cmds = [{'cmd': 'cmd1', 'pos': 12}, {'cmd': 'cmd2', 'pos': 34}]
+
+    call extend(s:cycles, {a:seq: [0, cmds]})
+endfu
+
+fu! s:delay_cycle_install() abort "{{{2
+    for [seq, cmds] in s:seq_and_cmds
+        call s:install(seq, cmds)
+    endfor
+    au! delay_cycle_install
+    aug! delay_cycle_install
+endfu
+" }}}1
 " Utilities {{{1
 fu! s:is_valid_cycle() abort "{{{2
     return has_key(s:cycles, s:seq)
         \ && type(s:cycles[s:seq]) == type([])
         \ && len(s:cycles[s:seq]) == 2
+endfu
+
+fu! cmdline#cycle#set_seq(seq) abort "{{{2
+    let s:seq = a:seq
+    return ''
 endfu
 

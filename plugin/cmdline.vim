@@ -161,8 +161,8 @@ cno          <c-q>    <c-\>ecmdline#tab#restore_cmdline_after_expansion()<cr>
 cno  <expr><unique>  <c-s>  cmdline#transform#main()
 
 " Cycle through a set of arbitrary commands.
-cno  <unique>  <c-g>  <c-\>ecmdline#cycle#move(1)<cr>
-cno  <unique>  <m-g>  <c-\>ecmdline#cycle#move(0)<cr>
+cno  <unique>  <c-g>  <c-\>e cmdline#cycle#move(1)<cr>
+cno  <unique>  <m-g>  <c-\>e cmdline#cycle#move(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
@@ -170,7 +170,7 @@ xno  <unique>  <c-g>s  :s///g<left><left><left>
 "
 "    • all the files in a directory
 "    • all the files in the output of a shell command
-call cmdline#cycle#configure('a',
+call cmdline#cycle#set('a',
 \                      'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
 \                      'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
 
@@ -183,12 +183,12 @@ call cmdline#cycle#configure('a',
 " Vim in other contexts.
 " I don't want to remember this quirk.
 "}}}
-call cmdline#cycle#configure('c',
+call cmdline#cycle#set('c',
 \                      'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
 
 "                       ┌ definition
 "                       │
-call cmdline#cycle#configure('d',
+call cmdline#cycle#set('d',
 \                      'Verb nno @',
 \                      'Verb com @',
 \                      'Verb au @',
@@ -196,13 +196,13 @@ call cmdline#cycle#configure('d',
 \                      'Verb fu @',
 \                      'Verb fu {''<lambda>@''}')
 
-call cmdline#cycle#configure('ee',
+call cmdline#cycle#set('ee',
 \                      'tabe $MYVIMRC@',
 \                      'e $MYVIMRC@',
 \                      'sp $MYVIMRC@',
 \                      'vs $MYVIMRC@')
 
-call cmdline#cycle#configure('em',
+call cmdline#cycle#set('em',
 \                      'tabe /tmp/vimrc@',
 \                      'tabe /tmp/vim.vim@')
 
@@ -212,7 +212,7 @@ call cmdline#cycle#configure('em',
 "         • ~/.vim
 "         • the directory of the current buffer
 "}}}
-call cmdline#cycle#configure('ef',
+call cmdline#cycle#set('ef',
 \                      'fin ~/.vim/**/*@',
 \                      'fin *@',
 \                      'fin %:h/**/*@')
@@ -235,17 +235,17 @@ call cmdline#cycle#configure('ef',
 "    path components until it's not needed anymore.
 "}}}
 
-call cmdline#cycle#configure('es',
+call cmdline#cycle#set('es',
 \                      'sf ~/.vim/**/*@',
 \                      'sf *@',
 \                      'sf %:h/**/*@')
 
-call cmdline#cycle#configure('ev',
+call cmdline#cycle#set('ev',
 \                      'vert sf ~/.vim/**/*@',
 \                      'vert sf *@',
 \                      'vert sf %:h/**/*@')
 
-call cmdline#cycle#configure('et',
+call cmdline#cycle#set('et',
 \                      'tabf ~/.vim/**/*@',
 \                      'tabf *@',
 \                      'tabf %:h/**/*@')
@@ -345,7 +345,7 @@ fu! s:is_filterable(first_word) abort
     return 0
 endfu
 
-call cmdline#cycle#configure('f',
+call cmdline#cycle#set('f',
 \                      'Verb Filter /@/ map',
 \                      'Verb Filter /@/ ab',
 \                      'Verb Filter /@/ %#',
@@ -359,10 +359,10 @@ call cmdline#cycle#configure('f',
 \                      'Verb Filter /@/ hi',
 \                      'Verb Filter /@/ ls')
 
-call cmdline#cycle#configure('p',
+call cmdline#cycle#set('p',
 \                      'put =execute(''@'')')
 
-call cmdline#cycle#configure('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
+call cmdline#cycle#set('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
 
 fu! s:snr()
     return matchstr(expand('<sfile>'), '<SNR>\d\+_')
@@ -384,7 +384,7 @@ fu! s:filetype_specific_vimgrep() abort
             \ . ' ~/.vim/vimrc'
     endif
 endfu
-call cmdline#cycle#configure('v',
+call cmdline#cycle#set('v',
 \                      'noa vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
 \                      'noa vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr> <bar> cw',
 \                      'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
@@ -402,7 +402,7 @@ call cmdline#cycle#configure('v',
 "     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
 
 com! -bar Redraw call cmdline#redraw()
-call cmdline#cycle#configure('!',
+call cmdline#cycle#set('!',
 \                      'Redraw <bar> sil !sr wref @')
 
 " Variable {{{1
