@@ -43,9 +43,11 @@ fu! s:install(cycle) abort "{{{1
     let cmds = a:cycle[1]
     " cmds = ['cmd1', 'cmd2']
 
+    let positions = map(deepcopy(cmds), {i,v -> cmdline#util#cycle#find_tabstop(v)})
+
     call map(cmds, {i,v -> {
         \     'cmd': substitute(v, '@', '', ''),
-        \     'pos':     stridx(v, '@')+1,
+        \     'pos': positions[i],
         \ }})
     " cmds = [{'cmd': 'cmd1', 'pos': 12}, {'cmd': 'cmd2', 'pos': 34}]
 

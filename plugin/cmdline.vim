@@ -176,10 +176,11 @@ xno  <unique>  <c-g>s  :s///g<left><left><left>
 let s:cycles = []
 fu! s:cycle_configure(seq, ...) abort
     let cmds = a:000
+    let pos = cmdline#util#cycle#find_tabstop(a:1)
     exe 'nno  <unique>  <c-g>'.a:seq
         \ . ' :<c-u><c-r>=cmdline#cycle#set_seq('.string(a:seq).')<cr>'
         \ . substitute(a:1, '@', '', '')
-        \ .   '<c-b>'.repeat('<right>', stridx(cmds[0], '@'))
+        \ .   '<c-r>=setcmdpos('.pos.')[-1]<cr>'
     let s:cycles += [[a:seq, cmds]]
 endfu
 
@@ -317,6 +318,7 @@ let s:FILTERABLE_COMMANDS = [
     \ 'ls',
     \ 'map',
     \ 'mes\%[sages]',
+    \ 'nu\%[mber]',
     \ 'old\%[files]',
     \ 'scr\%[iptnames]',
     \ 'se\%[t]',
