@@ -79,12 +79,10 @@ fu! s:map_filter(cmdline) abort "{{{3
             \ '')
     else
         " otherwise, add a new `map()`/`filter()`
-        if a:cmdline =~# '\C^\s*echo\s*\%(map\|filter\)(.*,\s*{i,v\s*->\s*})'
         let new_cmdline = substitute(a:cmdline, '^\s*echo\s*\zs', 'map(', '')
         let new_cmdline = substitute(new_cmdline, '$', ', {i,v -> })', '')
     endif
-    return "\<c-e>\<c-u>".new_cmdline
-    \     ."\<c-b>".repeat("\<right>", strchars(new_cmdline, 1)-2)
+    return "\<c-e>\<c-u>".new_cmdline."\<left>\<left>"
 endfu
 
 fu! s:capture_subpatterns(cmdline) abort "{{{3
@@ -116,11 +114,7 @@ fu! s:capture_subpatterns(cmdline) abort "{{{3
     "                            ├──────────────────────────────────────────────────────────────────┐}}}
     let new_cmdline = range.'s/'.join(map(subpatterns, {i,v -> '\('.v.'\)'}), pat =~# '_' ? '_' : '') . '//g'
 
-    return "\<c-e>\<c-u>".new_cmdline
-    \     ."\<c-b>".repeat("\<right>", strchars(new_cmdline, 1)-2)
-    "      ├─────────────────────────────────────────────────────┘{{{
-    "      └ position the cursor between the last 2 slashes
-    "}}}
+    return "\<c-e>\<c-u>".new_cmdline."\<left>\<left>"
 endfu
 "}}}2
 " Search {{{2
