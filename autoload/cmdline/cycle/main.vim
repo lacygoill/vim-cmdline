@@ -119,7 +119,10 @@ fu! s:find_tabstop(rhs) abort "{{{2
 endfu
 
 fu! s:is_valid_cycle() abort "{{{2
-    return has_key(s:cycles, s:seq)
+    " We test  the existence of  `s:seq` because it may  not exist, if  we press
+    " `C-g` by accident, without having entered a cycle before that.
+    return exists('s:seq')
+        \ && has_key(s:cycles, s:seq)
         \ && type(s:cycles[s:seq]) == type([])
         \ && len(s:cycles[s:seq]) == 2
 endfu
