@@ -165,19 +165,6 @@ cno  <unique>  <m-g>  <c-\>e cmdline#cycle#main#move(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
-" TODO: Try to use `TextChangedI` to implement sth similar to `complete()` in ultisnips.{{{
-"
-" It would be useful when there're too many similar commands in a cycle:
-"
-"     :verb filter // [map|ab|%#|com|old|chi|mess|scr|ls]
-"     :verb filter // m[ap|ess]
-"     :verb filter // mess
-"
-" We would  install a  temporary autocmd  when we  enter the  command-line which
-" would inspect the latter.
-"
-" We would need a new function.
-"}}}
 augroup delay_cycles_set
     au!
     au CmdlineEnter : call s:cycles_set() | exe 'au! delay_cycles_set' | aug! delay_cycles_set
@@ -189,7 +176,8 @@ fu! s:cycles_set() abort
     "    • all the files in a directory
     "    • all the files in the output of a shell command
     call cmdline#cycle#main#set('a',
-        \ 'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})` <bar> let g:my_stl_list_position = 2',
+        \ 'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})`'
+        \ .  '<bar> let g:my_stl_list_position = 2',
         \ 'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
 
     "                       ┌ definition

@@ -13,16 +13,25 @@ let g:autoloaded_cmdline#cycle#main = 1
 "
 " The difficulty is how to track  the changes operated on the command-line (like
 " the removal of a word by pressing <kbd>C-w</kbd>).
-" Maybe text properties could help, but for  the moment they're only meant to be
-" used for a *buffer* text.
+"
+" See here for inspiration:
+"
+"     https://gist.github.com/lacygoill/c8ccf30dfac6393f737e3fa4efccdf9d
+"
+" ---
+"
 " In the previous  example, we could reliably find the  first tabstop by looking
 " for `^noa\s*vim\s*/`, and the second tabstop by looking for `-\d*.\s*|\s*cw$`.
+"
+" ---
 "
 " We would  have to temporarily  remap <kbd>Tab</kbd> and <kbd>S-Tab</kbd>  to a
 " function which jumps across the tabstops.
 " And <kbd>C-g Tab</kbd> to a function which presses the original `Tab`.
 " The mappings should  probably be local to  the buffer, and be  removed when we
 " quit the command-line.
+"
+" ---
 "
 " For the  moment, I  don't implement  this feature,  because there  aren't many
 " commands which would benefit from it.
