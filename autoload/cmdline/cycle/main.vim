@@ -30,7 +30,6 @@ let g:autoloaded_cmdline#cycle#main = 1
 " while the increased complexity would make the code harder to maintain.
 "}}}
 
-" FIXME: Start Vim, and immediately press `: C-g`
 let s:cycles = {}
 
 " the installation of cycles takes a few ms (too long)
