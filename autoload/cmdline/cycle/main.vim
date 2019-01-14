@@ -114,6 +114,23 @@ fu! s:find_tabstop(rhs) abort "{{{2
     " They need to be translated first.
     "}}}
     exe 'nno <plug>(cycle-find-tabstop) :'.a:rhs
+    " In reality, we should add `1`, but  we don't need to{{{
+    "
+    " because we've defined the previous  `<plug>` mapping with a leading colon,
+    " which is taken into account by `maparg()`.
+    "
+    " IOW, the output is right because of 2 errors which cancel one another:
+    "
+    "    - we don't add an offset (`1`) while we should
+    "
+    "    - we add a leading colon
+    "
+    "     It's useless, because we never see it when we're cycling.
+    "
+    "     The `<plug>`  mapping would  *not* be wrong  without `:`,  because its
+    "     purpose is not  to be pressed, but to get  the translation of possible
+    "     special characters in the rhs.
+    "}}}
     return stridx(maparg('<plug>(cycle-find-tabstop)'), '@')
 endfu
 
