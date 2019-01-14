@@ -66,23 +66,29 @@ let s:FILTERABLE_COMMANDS = [
     \ 'sig\%[n]',
     \ ]
 
-call cmdline#cycle#main#set('f',
-\                      'Verb Filter /@/ map',
-\                      'Verb Filter /@/ ab',
-\                      'Verb Filter /@/ %#',
-\                      'Verb Filter /@/ com',
-\                      'Verb Filter /@/ old',
-\                      'Verb Filter /@/ chi',
-\                      'Verb Filter /@/ mess',
-\                      'Verb Filter /@/ scr',
-\                      'Verb Filter /@/ let',
-\                      'Verb Filter /@/ set',
-\                      'Verb Filter /@/ hi',
-\                      'Verb Filter /@/ ls')
+call cmdline#cycle#main#set('f', 'Verb Filter /@/ map')
 " }}}1
 " Interface {{{1
 fu! cmdline#cycle#filter#install() abort "{{{2
-    com! -bang -complete=command -nargs=+ Filter  call s:filter(<q-args>, <bang>0)
+    com! -bang -complete=custom,s:filter_completion -nargs=+ Filter  call s:filter(<q-args>, <bang>0)
+endfu
+
+fu! s:filter_completion(_arglead, cmdline, pos) abort "{{{2
+    let candidates = [
+        \ '%#',
+        \ 'ab',
+        \ 'chi',
+        \ 'com',
+        \ 'hi',
+        \ 'let',
+        \ 'ls',
+        \ 'map',
+        \ 'mess',
+        \ 'old',
+        \ 'scr',
+        \ 'set',
+        \ ]
+    return join(candidates, "\n")
 endfu
 " }}}1
 " Core {{{1
