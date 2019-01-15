@@ -66,7 +66,7 @@ let s:FILTERABLE_COMMANDS = [
     \ 'sig\%[n]',
     \ ]
 
-call cmdline#cycle#main#set('f', 'Verb Filter /@/ map')
+call cmdline#cycle#main#set('f', 'Verb Filter /@/ ')
 " }}}1
 " Interface {{{1
 fu! cmdline#cycle#filter#install() abort "{{{2
