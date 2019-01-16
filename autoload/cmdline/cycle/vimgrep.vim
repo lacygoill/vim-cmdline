@@ -39,9 +39,14 @@ fu! s:filetype_specific_vimgrep() abort "{{{2
 endfu
 
 fu! s:vimgrep(args, in_loclist) abort "{{{2
+    let script = $HOME.'/bin/vimgrep.sh'
+    if !executable(script)
+        echom script . ' is not executable'
+        return
+    endif
     let tempfile = tempname()
     let cmd = printf('%s %s %s %s',
-        \ $HOME.'/bin/vimgrep.sh ',
+        \ script,
         \ has('nvim') ? 'nvim' : 'vim',
         \ tempfile,
         \ a:args
