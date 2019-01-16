@@ -63,6 +63,19 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
 endfu
 
 fu! s:handler(in_loclist, tempfile, ...) abort "{{{2
+"                                   │
+"                                   └ the handler doesn't receive the same number of arguments in Vim and Neovim{{{
+"
+" In Vim, it receives 2 arguments.
+" From `:h job-exit_cb`:
+"
+" > exit_cb": handler
+" > Callback for when the job ends.
+" > The arguments are the job and the exit status.
+"
+" In Neovim, it receives 3 arguments: `job_id`, `data` and `event`.
+" See `:h job-control-usage`
+"}}}
     exe (a:in_loclist ? 'l' : 'c').'getfile '.a:tempfile
     cw
 endfu
