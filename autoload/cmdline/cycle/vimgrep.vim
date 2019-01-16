@@ -1,6 +1,10 @@
 " Interface {{{1
 
-" Where did you get the inspiration for this `:Vim` command?{{{
+" Why a wrapper command around `:[l]vim`?{{{
+"
+" To make it async.
+"}}}
+" Where did you get the inspiration?{{{
 "
 "     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
 "}}}
