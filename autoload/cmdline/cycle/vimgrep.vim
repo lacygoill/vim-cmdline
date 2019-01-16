@@ -49,6 +49,7 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
         return
     endif
     let tempfile = tempname()
+    let title = (a:in_loclist ? ':Lvim ' : ':Vim ').a:args
     let cmd = printf('%s %s %s %s',
         \ script,
         \ has('nvim') ? 'nvim' : 'vim',
@@ -56,15 +57,18 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
         \ a:args
         \ )
     if has('nvim')
-        call jobstart(cmd, {'on_exit': function('s:handler', [a:in_loclist, tempfile])})
+        call jobstart(cmd,
+            \ {'on_exit': function('s:handler', [a:in_loclist, tempfile, title])})
     else
-        call job_start(cmd, {'exit_cb': function('s:handler', [a:in_loclist, tempfile])})
+        call job_start(cmd,
+            \ {'exit_cb': function('s:handler', [a:in_loclist, tempfile, title])})
     endif
 endfu
 
-fu! s:handler(in_loclist, tempfile, ...) abort "{{{2
-"                                   │
-"                                   └ the handler doesn't receive the same number of arguments in Vim and Neovim{{{
+fu! s:handler(in_loclist, tempfile, title, ...) abort "{{{2
+"                                          │
+"                                          └ the handler doesn't receive the same number of arguments{{{
+"                                            in Vim and Neovim
 "
 " In Vim, it receives 2 arguments.
 " From `:h job-exit_cb`:
@@ -76,6 +80,10 @@ fu! s:handler(in_loclist, tempfile, ...) abort "{{{2
 "}}}
     exe (a:in_loclist ? 'l' : 'c').'getfile '.a:tempfile
     cw
+    call setqflist([], 'a', {'title': a:title})
+    " If you were moving in a buffer  while the callback is invoked and open the
+    " qf window, some stray characters may be printed in the status line.
+    redraw!
 endfu
 " }}}1
 " Utilities {{{1
