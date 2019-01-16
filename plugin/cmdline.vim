@@ -256,9 +256,13 @@ fu! s:cycles_set() abort
     "}}}
     call cmdline#cycle#main#set('g',
         \ 'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
+
+    " we want a different pattern depending on the filetype
+    " we want `:vimgrep` to be run asynchronously
     call cmdline#cycle#vimgrep#install()
 
     call cmdline#cycle#main#set('p', 'put =execute(''@'')')
+
     call cmdline#cycle#main#set('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
 
     com! -bar Redraw call cmdline#redraw()
