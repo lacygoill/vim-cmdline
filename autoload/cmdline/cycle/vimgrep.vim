@@ -69,8 +69,6 @@ fu! s:handler(in_loclist, tempfile, ...) abort "{{{2
 " In Vim, it receives 2 arguments.
 " From `:h job-exit_cb`:
 "
-" > exit_cb": handler
-" > Callback for when the job ends.
 " > The arguments are the job and the exit status.
 "
 " In Neovim, it receives 3 arguments: `job_id`, `data` and `event`.
