@@ -132,7 +132,7 @@ fu! cmdline#cycle#vimgrep#write_matches() abort "{{{2
     exe 'noa vim '.args[0]
     let matches = map(getqflist(),
         \ {i,v -> printf('%s:%d:%d:%s', bufname(v.bufnr), v.lnum, v.col, v.text)})
-    call writefile(matches, expand('%:p'))
+    call writefile(matches, expand('%:p'), 's')
 endfu
 
 fu! s:handler(in_loclist, tempfile, title, ...) abort "{{{2
