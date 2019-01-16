@@ -5,6 +5,14 @@ fu! cmdline#cycle#vimgrep#install() abort "{{{2
     " For inspiration:
     "
     "     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
+    "
+    " If you need to study how async is handled in the wild:
+    "
+    "     https://github.com/yegappan/asyncmake (125 sloc)
+    "     https://github.com/chrisbra/vim-autoread (145)
+    "     https://github.com/foxik/vim-makejob (197)
+    "     https://github.com/prabirshrestha/async.vim (243)
+    "     https://github.com/metakirby5/codi.vim (747)
 
     call cmdline#cycle#main#set('v',
         \ 'noa vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
