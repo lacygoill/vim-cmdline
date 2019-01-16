@@ -33,7 +33,6 @@ fu! cmdline#cycle#vimgrep#install() abort
         \ 'noa Vim /@/gj `find . -type f -cmin -60`',
         \ 'noa Lvim /@/gj %',
         \ )
-    " foo|bar
 endfu
 " }}}1
 " Core {{{1
