@@ -17,14 +17,23 @@ com! -nargs=* Vim call s:vimgrep(<q-args>, 0)
 com! -nargs=* Lvim call s:vimgrep(<q-args>, 1)
 
 fu! cmdline#cycle#vimgrep#install() abort
+    " Why don't you add `<bar> cw` in your mappings?{{{
+    "
+    " `:Vim` is a custom command, which isn't defined with `-bar`.
+    " So, if it sees  `| cw`, it will wrongly interpret it as  being part of its
+    " argument.
+    " We don't  define `:Vim`  with `-bar`  because we  may need  to look  for a
+    " pattern which contains a bar.
+    "}}}
     call cmdline#cycle#main#set('v',
-        \ 'noa Vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
-        \ 'noa Vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr> <bar> cw',
-        \ 'noa Vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
-        \ 'noa Vim /@/gj ## <bar> cw',
-        \ 'noa Vim /@/gj `find . -type f -cmin -60` <bar> cw',
-        \ 'noa Lvim /@/gj % <bar> lw',
+        \ 'noa Vim /@/gj ./**/*.<c-r>=expand("%:e")<cr>',
+        \ 'noa Vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr>',
+        \ 'noa Vim /@/gj $VIMRUNTIME/**/*.vim',
+        \ 'noa Vim /@/gj ##',
+        \ 'noa Vim /@/gj `find . -type f -cmin -60`',
+        \ 'noa Lvim /@/gj %',
         \ )
+    " foo|bar
 endfu
 " }}}1
 " Core {{{1
