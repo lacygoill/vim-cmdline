@@ -1,26 +1,20 @@
 " Interface {{{1
-fu! cmdline#cycle#vimgrep#install() abort "{{{2
-    " TODO: `:[l]vim[grep]` is not asynchronous.
-    " Add an async command (using  `&grepprg`?).
-    " For inspiration:
-    "
-    "     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
-    "
-    " If you need to study how async is handled in the wild:
-    "
-    "     https://github.com/yegappan/asyncmake (125 sloc)
-    "     https://github.com/chrisbra/vim-autoread (145)
-    "     https://github.com/foxik/vim-makejob (197)
-    "     https://github.com/prabirshrestha/async.vim (243)
-    "     https://github.com/metakirby5/codi.vim (747)
 
+" Where did you get the inspiration for this `:Vim` command?{{{
+"
+"     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
+"}}}
+com! -nargs=* Vim call s:vimgrep('<args>', 0)
+com! -nargs=* Lvim call s:vimgrep('<args>', 1)
+
+fu! cmdline#cycle#vimgrep#install() abort
     call cmdline#cycle#main#set('v',
-        \ 'noa vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
-        \ 'noa vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr> <bar> cw',
-        \ 'noa vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
-        \ 'noa vim /@/gj ## <bar> cw',
-        \ 'noa vim /@/gj `find . -type f -cmin -60` <bar> cw',
-        \ 'noa lvim /@/gj % <bar> lw',
+        \ 'noa Vim /@/gj ./**/*.<c-r>=expand("%:e")<cr> <bar> cw',
+        \ 'noa Vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr> <bar> cw',
+        \ 'noa Vim /@/gj $VIMRUNTIME/**/*.vim <bar> cw',
+        \ 'noa Vim /@/gj ## <bar> cw',
+        \ 'noa Vim /@/gj `find . -type f -cmin -60` <bar> cw',
+        \ 'noa Lvim /@/gj % <bar> lw',
         \ )
 endfu
 " }}}1
@@ -42,6 +36,26 @@ fu! s:filetype_specific_vimgrep() abort "{{{2
             \ . ' ~/.vim/template/**'
             \ . ' ~/.vim/vimrc'
     endif
+endfu
+
+fu! s:vimgrep(args, in_loclist) abort "{{{2
+    let tempfile = tempname()
+    let cmd = printf('%s %s %s %s',
+        \ $HOME.'/bin/vimgrep.sh ',
+        \ has('nvim') ? 'nvim' : 'vim',
+        \ tempfile,
+        \ a:args
+        \ )
+    if has('nvim')
+        call jobstart(cmd, {'on_exit': function('s:handler', [a:in_loclist, tempfile])})
+    else
+        call job_start(cmd, {'exit_cb': function('s:handler', [a:in_loclist, tempfile])})
+    endif
+endfu
+
+fu! s:handler(in_loclist, tempfile, ...) abort "{{{2
+    exe (a:in_loclist ? 'l' : 'c').'getfile '.a:tempfile
+    cw
 endfu
 " }}}1
 " Utilities {{{1
