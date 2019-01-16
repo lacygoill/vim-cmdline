@@ -84,7 +84,7 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     "
     "     $ nvim
     "     :call jobstart('nvim +''call writefile(["test"], "/tmp/log", "s")'' +qa!')
-    "     ✘               ^
+    "                     ^✘
     "
     " The job is in an interruptible sleep:
     "
@@ -97,7 +97,7 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     "
     "     $ nvim
     "     :call jobstart('vim +''call writefile(["test"], "/tmp/log")'' +qa!')
-    "     ✔               ^
+    "                     ^✔
     "}}}
     let cmd = [
     \ '/bin/bash', '-c',
