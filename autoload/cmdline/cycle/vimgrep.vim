@@ -26,12 +26,12 @@ fu! cmdline#cycle#vimgrep#install() abort
     " pattern which contains a bar.
     "}}}
     call cmdline#cycle#main#set('v',
-        \ 'noa Vim /@/gj ./**/*.<c-r>=expand("%:e")<cr>',
-        \ 'noa Vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr>',
-        \ 'noa Vim /@/gj $VIMRUNTIME/**/*.vim',
-        \ 'noa Vim /@/gj ##',
-        \ 'noa Vim /@/gj `find . -type f -cmin -60`',
-        \ 'noa Lvim /@/gj %',
+        \ 'Vim /@/gj ./**/*.<c-r>=expand("%:e")<cr>',
+        \ 'Vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr>',
+        \ 'Vim /@/gj $VIMRUNTIME/**/*.vim',
+        \ 'Vim /@/gj ##',
+        \ 'Vim /@/gj `find . -type f -cmin -60`',
+        \ 'Lvim /@/gj %',
         \ )
 endfu
 " }}}1
@@ -134,10 +134,10 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     let title = (a:in_loclist ? ':Lvim ' : ':Vim ').args
     if has('nvim')
         call jobstart(cmd,
-        \ {'on_exit': function('s:handler', [a:in_loclist, tempfile, title])})
+        \ {'on_exit': function('s:callback', [a:in_loclist, tempfile, title])})
     else
         call job_start(cmd,
-        \ {'exit_cb': function('s:handler', [a:in_loclist, tempfile, title])})
+        \ {'exit_cb': function('s:callback', [a:in_loclist, tempfile, title])})
     endif
 endfu
 
@@ -152,9 +152,9 @@ fu! cmdline#cycle#vimgrep#write_matches() abort "{{{2
     call writefile(matches, expand('%:p'), 's')
 endfu
 
-fu! s:handler(in_loclist, tempfile, title, ...) abort "{{{2
+fu! s:callback(in_loclist, tempfile, title, ...) abort "{{{2
 "                                          │
-"                                          └ the handler doesn't receive the same number of arguments{{{
+"                                          └ the callback doesn't receive the same number of arguments{{{
 "                                            in Vim and Neovim
 "
 " In Vim, it receives 2 arguments.
