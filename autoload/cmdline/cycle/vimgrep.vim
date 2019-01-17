@@ -68,7 +68,7 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     " There's no  guarantee that the current  file and the arglist of  the 2 Vim
     " processes are the same.
     "}}}
-    let args = substitute(a:args, '^\(\i\@!\&.\)\1\ze[gj ]\{,2}\s*', '/'.escape(@/, '/').'/', '')
+    let args = substitute(a:args, '^\(\i\@!\&.\)\1\ze[gj]\{,2}\s\+', '/'.escape(@/, '/').'/', '')
     "                               ├────────────┘{{{
     "                               └ 2 consecutive and identical non-identifier characters
     "}}}
@@ -108,12 +108,12 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     " We don't, because for some reason a Neovim job started from Neovim doesn't exit.
     "
     "     $ nvim
-    "     :call jobstart('nvim +''call writefile(["test"], "/tmp/log", "s")'' +qa!')
-    "                     ^✘
+    "     :call jobstart(['/bin/bash', '-c', 'nvim +''call writefile(["test"], "/tmp/log", "s")'' +qa!'])
+    "                                         ^✘
     "
     " The job is in an interruptible sleep:
     "
-    "     :let job = jobstart('nvim +''call writefile(["test"], "/tmp/log", "s")'' +qa!')
+    "     :let job = jobstart(['/bin/bash', '-c', 'nvim +''call writefile(["test"], "/tmp/log", "s")'' +qa!'])
     "     :exe '!ps aux | grep '.jobpid(job)
     "     user  1234  ... Ss  ...  nvim +call writefile(["test"], "/tmp/log") +qa!~
     "                     ^✘
@@ -121,8 +121,8 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     " The issue disappears if we start a Vim job:
     "
     "     $ nvim
-    "     :call jobstart('vim +''call writefile(["test"], "/tmp/log")'' +qa!')
-    "                     ^✔
+    "     :call jobstart(['/bin/bash', '-c', 'vim +''call writefile(["test"], "/tmp/log", "s")'' +qa!'])
+    "                                         ^✔
     "}}}
     let cmd = [
         \ '/bin/bash', '-c',
