@@ -59,15 +59,20 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     let tempfile = tempname()
     " Why do you modify the arguments?{{{
     "
-    " If we didn't provide a pattern, the new Vim process will replace it with
-    " the contents of its search register.
+    " If we didn't provide a pattern (`:Vim // files`), the new Vim process will
+    " replace it with the contents of its search register.
     " But there's no  guarantee that the search register of  this Vim process is
     " identical to the one of our current Vim process.
     "
-    " Same thing for `##`.
-    " There's no guarantee that the arglist of the 2 Vim processes are the same.
+    " Same thing for `%` and `##`.
+    " There's no  guarantee that the current  file and the arglist of  the 2 Vim
+    " processes are the same.
     "}}}
-    let args = substitute(a:args, '^//\ze\s\+', '/'.escape(@/, '/').'/', '')
+    let args = substitute(a:args, '^\(\i\@!\&.\)\1\ze[gj ]\{,2}\s*', '/'.escape(@/, '/').'/', '')
+    "                               ├────────────┘{{{
+    "                               └ 2 consecutive and identical non-identifier characters
+    "}}}
+    let args = substitute(args, '\s\+\zs%\s*$', fnameescape(expand('%:p')), '')
     let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(), {i,v -> fnameescape(v)})), '')
     let title = (a:in_loclist ? ':Lvim ' : ':Vim ').args
     " Why do you write the arguments in a file?  Why not passing them as arguments to `write_matches()`?{{{
@@ -160,9 +165,15 @@ fu! s:handler(in_loclist, tempfile, title, ...) abort "{{{2
 " In Neovim, it receives 3 arguments: `job_id`, `data` and `event`.
 " See `:h job-control-usage`
 "}}}
-    exe (a:in_loclist ? 'l' : 'c').'getfile '.a:tempfile
-    cw
-    call setqflist([], 'a', {'title': a:title})
+    if a:in_loclist
+        exe 'lgetfile '.a:tempfile
+        lw
+        call setloclist(0, [], 'a', {'title': a:title})
+    else
+        exe 'cgetfile '.a:tempfile
+        cw
+        call setqflist([], 'a', {'title': a:title})
+    endif
     " If you were moving in a buffer  while the callback is invoked and open the
     " qf window, some stray characters may be printed in the status line.
     redraw!
