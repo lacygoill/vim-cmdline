@@ -63,8 +63,12 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     " the contents of its search register.
     " But there's no  guarantee that the search register of  this Vim process is
     " identical to the one of our current Vim process.
+    "
+    " Same thing for `##`.
+    " There's no guarantee that the arglist of the 2 Vim processes are the same.
     "}}}
-    let args = substitute(a:args, '^//', '/'.escape(@/, '/').'/', '')
+    let args = substitute(a:args, '^//\ze\s\+', '/'.escape(@/, '/').'/', '')
+    let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(), {i,v -> fnameescape(v)})), '')
     let title = (a:in_loclist ? ':Lvim ' : ':Vim ').args
     " Why do you write the arguments in a file?  Why not passing them as arguments to `write_matches()`?{{{
     "
