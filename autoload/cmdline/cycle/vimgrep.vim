@@ -57,13 +57,21 @@ endfu
 
 fu! s:vimgrep(args, in_loclist) abort "{{{2
     let tempfile = tempname()
-    let title = (a:in_loclist ? ':Lvim ' : ':Vim ').a:args
+    " Why do you modify the arguments?{{{
+    "
+    " If we didn't provide a pattern, the new Vim process will replace it with
+    " the contents of its search register.
+    " But there's no  guarantee that the search register of  this Vim process is
+    " identical to the one of our current Vim process.
+    "}}}
+    let args = substitute(a:args, '^//', '/'.escape(@/, '/').'/', '')
+    let title = (a:in_loclist ? ':Lvim ' : ':Vim ').args
     " Why do you write the arguments in a file?  Why not passing them as arguments to `write_matches()`?{{{
     "
     " They could contain some quotes.
     " When that happens, I have no idea how to protect them.
     "}}}
-    call writefile([a:args], tempfile, 's')
+    call writefile([args], tempfile, 's')
     " Why don't you start Vim directly?  Why start a new shell?{{{
     "
     " A (Neo)Vim job started directly from a Vim instance doesn't work as expected:
@@ -114,7 +122,7 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     \ . ' +qa! '
     \ . tempfile
     \ ]
-    let title = (a:in_loclist ? ':Lvim ' : ':Vim ').a:args
+    let title = (a:in_loclist ? ':Lvim ' : ':Vim ').args
     if has('nvim')
         call jobstart(cmd,
         \ {'on_exit': function('s:handler', [a:in_loclist, tempfile, title])})
