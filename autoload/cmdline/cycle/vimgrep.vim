@@ -125,12 +125,12 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     "                     ^✔
     "}}}
     let cmd = [
-    \ '/bin/bash', '-c',
-    \  'vim'
-    \ . ' +''call cmdline#cycle#vimgrep#write_matches()'''
-    \ . ' +qa! '
-    \ . tempfile
-    \ ]
+        \ '/bin/bash', '-c',
+        \  'vim'
+        \ . ' +''call cmdline#cycle#vimgrep#write_matches()'''
+        \ . ' +qa! '
+        \ . tempfile
+        \ ]
     let title = (a:in_loclist ? ':Lvim ' : ':Vim ').args
     if has('nvim')
         call jobstart(cmd,
