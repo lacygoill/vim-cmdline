@@ -263,7 +263,9 @@ fu! s:cycles_set() abort
 
     call cmdline#cycle#main#set('p', 'put =execute(''@'')')
 
-    call cmdline#cycle#main#set('s', '%s/@//g', '%s/@//gc', '%s/@//gn', '%s/`.\{-}\zs''/`/gc')
+    " we may want a different substitution in  a qf buffer (if the `context` key
+    " of the qfl is a dictionary with a `populate` key)
+    call cmdline#cycle#substitute#install()
 
     com! -bar Redraw call cmdline#redraw()
     call cmdline#cycle#main#set('!', 'Redraw <bar> sil !sr wref @')
