@@ -26,7 +26,7 @@ fu! cmdline#cycle#vimgrep#install() abort
     " pattern which contains a bar.
     "}}}
     call cmdline#cycle#main#set('v',
-        \ 'Vim /@/gj ./**/*.<c-r>=expand("%:e")<cr>',
+        \ 'Vim /@/gj ./**/*.<c-r>='.s:snr().'get_extension()<cr>',
         \ 'Vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr>',
         \ 'Vim /@/gj $VIMRUNTIME/**/*.vim',
         \ 'Vim /@/gj ##',
@@ -180,6 +180,16 @@ fu! s:callback(in_loclist, tempfile, title, ...) abort "{{{2
 endfu
 " }}}1
 " Utilities {{{1
+fu! s:get_extension() abort "{{{2
+    let ext = expand('%:e')
+    if ext is# ''
+        let ext = split(execute('au'), '\n')
+        call filter(ext, {i,v -> v =~# 'setf\s\+'.&ft})
+        let ext = matchstr(get(ext, 0, ''), '\*\.\zs\S\+')
+    endif
+    return ext
+endfu
+
 fu! s:snr() "{{{2
     return matchstr(expand('<sfile>'), '.*\zs<SNR>\d\+_')
 endfu
