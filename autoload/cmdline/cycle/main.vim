@@ -45,8 +45,8 @@ let s:cycles = {}
 let s:seq_and_cmds = []
 augroup delay_cycle_install
     au!
-    au CmdlineEnter : call s:delay_cycle_install()
-    au CmdlineEnter : exe 'au! delay_cycle_install' | aug! delay_cycle_install
+    au CmdlineEnter : sil! call s:delay_cycle_install()
+        \ | exe 'au! delay_cycle_install' | aug! delay_cycle_install
 augroup END
 
 " Interface {{{1

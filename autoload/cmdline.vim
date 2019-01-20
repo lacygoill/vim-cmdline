@@ -64,9 +64,9 @@ fu! cmdline#chain() abort "{{{1
                 set nomore
                 augroup restore_more
                     au!
-                    au CmdlineLeave * exe 'set '.(s:more_save ? '' : 'no').'more'
+                    au CmdlineLeave * sil! exe 'set '.(s:more_save ? '' : 'no').'more'
                         \ | unlet! s:more_save
-                    au CmdlineLeave * exe 'au! restore_more' | aug! restore_more
+                        \ | exe 'au! restore_more' | aug! restore_more
                 augroup END
             endif
             return feedkeys(':'.keys, 'in')
@@ -104,8 +104,8 @@ endfu
 fu! cmdline#redraw() abort "{{{1
     augroup cmdline_redraw
         au!
-        au CmdlineLeave * call timer_start(0, {-> execute('redraw!')})
-        au CmdlineLeave * exe 'au! cmdline_redraw' | aug! cmdline_redraw
+        au CmdlineLeave * sil! call timer_start(0, {-> execute('redraw!')})
+            \ | exe 'au! cmdline_redraw' | aug! cmdline_redraw
     augroup END
 endfu
 

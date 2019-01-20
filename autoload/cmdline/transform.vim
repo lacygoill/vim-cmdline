@@ -7,7 +7,7 @@ fu! cmdline#transform#main() abort "{{{2
     augroup reset_did_tweak
         au!
         au CmdlineLeave  /,\?,:  unlet! s:did_transform s:orig_cmdline
-        au CmdlineLeave  /,\?,:  exe 'au! reset_did_tweak' | aug! reset_did_tweak
+            \ | exe 'au! reset_did_tweak' | aug! reset_did_tweak
     augroup END
 
     let cmdtype = getcmdtype()
