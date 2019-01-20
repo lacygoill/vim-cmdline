@@ -186,7 +186,9 @@ endfu
 " Utilities {{{1
 fu! s:get_extension() abort "{{{2
     let ext = expand('%:e')
-    if ext is# ''
+    if &ft is# 'dirvish' && expand('%:p') =~? '/wiki/'
+        let ext = 'md'
+    elseif ext is# ''
         let ext = split(execute('au'), '\n')
         call filter(ext, {i,v -> v =~# 'setf\s\+'.&ft})
         let ext = matchstr(get(ext, 0, ''), '\*\.\zs\S\+')
