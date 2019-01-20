@@ -46,6 +46,7 @@ let s:seq_and_cmds = []
 augroup delay_cycle_install
     au!
     au CmdlineEnter : call s:delay_cycle_install()
+    au CmdlineEnter : exe 'au! delay_cycle_install' | aug! delay_cycle_install
 augroup END
 
 " Interface {{{1
@@ -111,8 +112,6 @@ fu! s:delay_cycle_install() abort "{{{2
     for [seq, cmds] in s:seq_and_cmds
         call s:install(seq, cmds)
     endfor
-    au! delay_cycle_install
-    aug! delay_cycle_install
 endfu
 " }}}1
 " Utilities {{{1

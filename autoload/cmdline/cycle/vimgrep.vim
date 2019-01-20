@@ -131,13 +131,19 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
         \ . ' +qa! '
         \ . tempfile
         \ ]
-    let title = (a:in_loclist ? ':Lvim ' : ':Vim ').args
+    if a:in_loclist
+        call setloclist(0, [], ' ', {'title': ':Lvim '.args})
+        let qfid = getloclist(0, {'id' : 0}).id
+    else
+        call setqflist([], ' ', {'title' : ':Lvim '.args})
+        let qfid = getqflist({'id' : 0}).id
+    endif
     if has('nvim')
         call jobstart(cmd,
-        \ {'on_exit': function('s:callback', [a:in_loclist, tempfile, title])})
+        \ {'on_exit': function('s:callback', [a:in_loclist, tempfile])})
     else
         call job_start(cmd,
-        \ {'exit_cb': function('s:callback', [a:in_loclist, tempfile, title])})
+        \ {'exit_cb': function('s:callback', [a:in_loclist, tempfile])})
     endif
 endfu
 
@@ -152,10 +158,10 @@ fu! cmdline#cycle#vimgrep#write_matches() abort "{{{2
     call writefile(matches, expand('%:p'), 's')
 endfu
 
-fu! s:callback(in_loclist, tempfile, title, ...) abort "{{{2
-"                                          │
-"                                          └ the callback doesn't receive the same number of arguments{{{
-"                                            in Vim and Neovim
+fu! s:callback(in_loclist, tempfile, ...) abort "{{{2
+"                                    │
+"                                    └ the callback doesn't receive the same number of arguments{{{
+"                                      in Vim and Neovim
 "
 " In Vim, it receives 2 arguments.
 " From `:h job-exit_cb`:
@@ -168,11 +174,9 @@ fu! s:callback(in_loclist, tempfile, title, ...) abort "{{{2
     if a:in_loclist
         exe 'lgetfile '.a:tempfile
         lw
-        call setloclist(0, [], 'a', {'title': a:title})
     else
         exe 'cgetfile '.a:tempfile
         cw
-        call setqflist([], 'a', {'title': a:title})
     endif
     " If you were moving in a buffer  while the callback is invoked and open the
     " qf window, some stray characters may be printed in the status line.
