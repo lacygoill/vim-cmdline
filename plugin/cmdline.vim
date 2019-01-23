@@ -142,14 +142,14 @@ cno          <c-q>    <c-\>ecmdline#tab#restore_cmdline_after_expansion()<cr>
 
 " The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
 "
-"    • on the search command-line, it translates the pattern so that:
+"    - on the search command-line, it translates the pattern so that:
 "
 "        - it's searched outside comments
 "
 "        - all alphabetical characters are replaced with their corresponding
 "        equivalence class
 "
-"    • on the Ex command-line, if the latter contains a substitution command,
+"    - on the Ex command-line, if the latter contains a substitution command,
 "      inside the pattern, it captures the words written in snake case or
 "      camel case inside parentheses, so that we can refer to them easily
 "      with backref in the replacement.
@@ -164,15 +164,15 @@ xno  <unique>  <c-g>s  :s///g<left><left><left>
 
 augroup delay_cycles_set
     au!
-    au CmdlineEnter : sil! call s:cycles_set()
+    au CmdlineEnter,CursorHold * sil! call s:cycles_set()
         \ | exe 'au! delay_cycles_set' | aug! delay_cycles_set
 augroup END
 
 fu! s:cycles_set() abort
     " populate the arglist with:
     "
-    "    • all the files in a directory
-    "    • all the files in the output of a shell command
+    "    - all the files in a directory
+    "    - all the files in the output of a shell command
     call cmdline#cycle#main#set('a',
         \ 'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})`'
         \ .  '<bar> let g:my_stl_list_position = 2',
@@ -200,9 +200,9 @@ fu! s:cycles_set() abort
 
     " search a file in:{{{
     "
-    "    • the working directory
-    "    • ~/.vim
-    "    • the directory of the current buffer
+    "    - the working directory
+    "    - ~/.vim
+    "    - the directory of the current buffer
     "}}}
     call cmdline#cycle#main#set('ef',
         \ 'fin ~/.vim/**/*@',

@@ -183,7 +183,7 @@ fu! s:get_extension() abort "{{{2
     let ext = expand('%:e')
     if &ft is# 'dirvish' && expand('%:p') =~? '/wiki/'
         let ext = 'md'
-    elseif ext is# ''
+    elseif ext is# '' && bufname('%') isnot# ''
         let ext = split(execute('au'), '\n')
         call filter(ext, {i,v -> v =~# 'setf\s\+'.&ft})
         let ext = matchstr(get(ext, 0, ''), '\*\.\zs\S\+')
