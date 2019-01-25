@@ -73,7 +73,8 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     "                               └ 2 consecutive and identical non-identifier characters
     "}}}
     let args = substitute(args, '\s\+\zs%\s*$', fnameescape(expand('%:p')), '')
-    let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(), {i,v -> fnameescape(v)})), '')
+    let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(),
+        \ {i,v -> fnameescape(fnamemodify(v,':p'))})), '')
     " Why do you write the arguments in a file?  Why not passing them as arguments to `write_matches()`?{{{
     "
     " They could contain some quotes.
@@ -147,7 +148,7 @@ fu! cmdline#cycle#vimgrep#write_matches() abort "{{{2
     endif
     exe 'noa vim '.args[0]
     let matches = map(getqflist(),
-        \ {i,v -> printf('%s:%d:%d:%s', bufname(v.bufnr), v.lnum, v.col, v.text)})
+        \ {i,v -> printf('%s:%d:%d:%s', fnamemodify(bufname(v.bufnr), ':p'), v.lnum, v.col, v.text)})
     call writefile(matches, expand('%:p'), 's')
 endfu
 
