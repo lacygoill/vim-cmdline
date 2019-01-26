@@ -57,6 +57,7 @@ endfu
 
 fu! s:vimgrep(args, in_loclist) abort "{{{2
     let tempfile = tempname()
+
     " Why do you modify the arguments?{{{
     "
     " If we didn't provide a pattern (`:Vim // files`), the new Vim process will
@@ -68,19 +69,15 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     " There's no  guarantee that the current  file and the arglist of  the 2 Vim
     " processes are the same.
     "}}}
-    let args = substitute(a:args, '^\(\i\@!\&.\)\1\ze[gj]\{,2}\s\+', '/'.escape(@/, '/').'/', '')
-    "                               ├────────────┘{{{
-    "                               └ 2 consecutive and identical non-identifier characters
-    "}}}
-    let args = substitute(args, '\s\+\zs%\s*$', fnameescape(expand('%:p')), '')
-    let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(),
-        \ {i,v -> fnameescape(fnamemodify(v,':p'))})), '')
+    let args = s:get_modified_args(a:args)
+
     " Why do you write the arguments in a file?  Why not passing them as arguments to `write_matches()`?{{{
     "
     " They could contain some quotes.
     " When that happens, I have no idea how to protect them.
     "}}}
     call writefile([args], tempfile, 's')
+
     " Why don't you start Vim directly?  Why start a new shell?{{{
     "
     " A (Neo)Vim job started directly from a Vim instance doesn't work as expected:
@@ -190,6 +187,19 @@ fu! s:get_extension() abort "{{{2
         let ext = matchstr(get(ext, 0, ''), '\*\.\zs\S\+')
     endif
     return ext
+endfu
+
+fu! s:get_modified_args(args) abort "{{{2
+    let pat = '^\(\i\@!\&.\)\1\ze[gj]\{,2}\s\+'
+    "           ├────────────┘
+    "           └ 2 consecutive and identical non-identifier characters
+    let rep = '/'.escape(@/, '\/').'/'
+    let args = substitute(a:args, pat, rep, '')
+
+    let args = substitute(args, '\s\+\zs%\s*$', fnameescape(expand('%:p')), '')
+    let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(),
+        \ {i,v -> fnameescape(fnamemodify(v,':p'))})), '')
+    return args
 endfu
 
 fu! s:snr() "{{{2
