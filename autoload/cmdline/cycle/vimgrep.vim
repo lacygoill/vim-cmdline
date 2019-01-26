@@ -194,6 +194,14 @@ fu! s:get_modified_args(args) abort "{{{2
     "           ├────────────┘
     "           └ 2 consecutive and identical non-identifier characters
     let rep = '/'.escape(@/, '\/').'/'
+    "                         │{{{
+    "                         └ `substitute()` will remove any backslash, because
+    "                            some sequences are special (like `\1` or `\u`);
+    "                            See: :h sub-replace-special
+    "
+    "                            If our pattern contains a backslash (like in `\s`),
+    "                            we need it to be preserved.
+    "}}}
     let args = substitute(a:args, pat, rep, '')
 
     let args = substitute(args, '\s\+\zs%\s*$', fnameescape(expand('%:p')), '')
