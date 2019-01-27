@@ -65,9 +65,9 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     " But there's no  guarantee that the search register of  this Vim process is
     " identical to the one of our current Vim process.
     "
-    " Same thing for `%` and `##`.
-    " There's no  guarantee that the current  file and the arglist of  the 2 Vim
-    " processes are the same.
+    " Same thing for `.`, `..`, `%` and `##`.
+    " There's no guarantee  that the current working directory,  its parent, the
+    " current file and the arglist of the 2 Vim processes are the same.
     "}}}
     let args = s:get_modified_args(a:args)
 
@@ -203,6 +203,9 @@ fu! s:get_modified_args(args) abort "{{{2
     "                            we need it to be preserved.
     "}}}
     let args = substitute(a:args, pat, rep, '')
+
+    let args = substitute(args, '\\\@1<! \zs.\ze/', fnameescape(getcwd()), 'g')
+    let args = substitute(args, '\\\@1<! \zs..\ze/', fnameescape(fnamemodify(getcwd(), ':h')), 'g')
 
     let args = substitute(args, '\s\+\zs%\s*$', fnameescape(expand('%:p')), '')
     let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(),
