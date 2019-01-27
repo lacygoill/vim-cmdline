@@ -204,8 +204,8 @@ fu! s:get_modified_args(args) abort "{{{2
     "}}}
     let args = substitute(a:args, pat, rep, '')
 
-    let args = substitute(args, '\\\@1<! \zs.\ze/', fnameescape(getcwd()), 'g')
-    let args = substitute(args, '\\\@1<! \zs..\ze/', fnameescape(fnamemodify(getcwd(), ':h')), 'g')
+    let args = substitute(args, '\\\@1<! \zs\.\ze/', fnameescape(getcwd()), 'g')
+    let args = substitute(args, '\\\@1<! \zs\.\.\ze/', fnameescape(fnamemodify(getcwd(), ':h')), 'g')
 
     let args = substitute(args, '\s\+\zs%\s*$', fnameescape(expand('%:p')), '')
     let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(),
