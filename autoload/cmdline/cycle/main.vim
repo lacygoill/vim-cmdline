@@ -55,7 +55,7 @@ fu! cmdline#cycle#main#set(seq, ...) abort "{{{2
     let pos = s:find_tabstop(a:1)
     exe 'nno  <unique>  <c-g>'.a:seq
         \ . ' :<c-u><c-r>=cmdline#cycle#main#set_seq('.string(a:seq).')<cr>'
-        \ . substitute(a:1, '@', '', '')
+        \ . substitute(a:1, '§', '', '')
         \ .   '<c-r>=setcmdpos('.pos.')[-1]<cr>'
     let s:seq_and_cmds += [[a:seq, cmds]]
 endfu
@@ -100,7 +100,7 @@ fu! s:install(seq, cmds) abort "{{{2
     let positions = map(deepcopy(cmds), {i,v -> s:find_tabstop(v)})
 
     call map(cmds, {i,v -> {
-        \     'cmd': substitute(v, '@', '', ''),
+        \     'cmd': substitute(v, '§', '', ''),
         \     'pos': positions[i],
         \ }})
     " cmds = [{'cmd': 'cmd1', 'pos': 12}, {'cmd': 'cmd2', 'pos': 34}]
@@ -116,7 +116,7 @@ endfu
 " }}}1
 " Utilities {{{1
 fu! s:find_tabstop(rhs) abort "{{{2
-    " Why not simply `return stridx(a:rhs, '@')`?{{{
+    " Why not simply `return stridx(a:rhs, '§')`?{{{
     "
     " The rhs may contain special sequences such as `<bar>` or `<c-r>`.
     " They need to be translated first.
@@ -139,7 +139,7 @@ fu! s:find_tabstop(rhs) abort "{{{2
     "     purpose is not  to be pressed, but to get  the translation of possible
     "     special characters in the rhs.
     "}}}
-    return stridx(maparg('<plug>(cycle-find-tabstop)'), '@')
+    return stridx(maparg('<plug>(cycle-find-tabstop)'), '§')
 endfu
 
 fu! s:is_valid_cycle() abort "{{{2

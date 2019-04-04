@@ -1,8 +1,33 @@
 " Interface {{{1
 fu! cmdline#cycle#substitute#install() abort "{{{2
+    " What's this `let list = ...`?{{{
+    "
+    " Suppose you have this text:
+    "
+    "     pat1
+    "     text
+    "     pat2
+    "     text
+    "     pat3
+    "     text
+    "
+    "     foo
+    "     bar
+    "     baz
+    "
+    " And you want to move `foo`, `bar` and `baz` after `pat1`, `pat2` and `pat3`.
+    "
+    "    1. yank the `foo`, `bar`, `baz` block
+    "
+    "    2. visually select the `pat1`, `pat2`, `pat3` block,
+    "       then leave to get back to normal mode
+    "
+    "    3. invoke the substitution command after writing the pattern `pat\d`
+    "}}}
     call cmdline#cycle#main#set('s',
-        \ '<c-r>='.s:snr().'filetype_specific_substitute()<cr>@',
+        \ '<c-r>='.s:snr().'filetype_specific_substitute()<cr>§',
         \ '%s/`.\{-}\zs''/`/gc',
+        \ 'let list = split(@", "\n") <bar> *s/§\zs/\=remove(list, 0)/'
         \ )
 endfu
 " }}}1

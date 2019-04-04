@@ -174,29 +174,29 @@ fu! s:cycles_set() abort
     "    - all the files in a directory
     "    - all the files in the output of a shell command
     call cmdline#cycle#main#set('a',
-        \ 'sp <bar> args `=filter(glob(''@./**/*'', 0, 1), {i,v -> filereadable(v)})`'
+        \ 'sp <bar> args `=filter(glob(''§./**/*'', 0, 1), {i,v -> filereadable(v)})`'
         \ .  '<bar> let g:my_stl_list_position = 2',
-        \ 'sp <bar> sil args `=systemlist(''@'')` <bar> let g:my_stl_list_position = 2')
+        \ 'sp <bar> sil args `=systemlist(''§'')` <bar> let g:my_stl_list_position = 2')
 
     "                       ┌ definition
     "                       │
     call cmdline#cycle#main#set('d',
-        \ 'Verb nno @',
-        \ 'Verb com @',
-        \ 'Verb au @',
-        \ 'Verb au * <buffer=@>',
-        \ 'Verb fu @',
-        \ 'Verb fu {''<lambda>@''}')
+        \ 'Verb nno §',
+        \ 'Verb com §',
+        \ 'Verb au §',
+        \ 'Verb au * <buffer=§>',
+        \ 'Verb fu §',
+        \ 'Verb fu {''<lambda>§''}')
 
     call cmdline#cycle#main#set('ee',
-        \ 'tabe $MYVIMRC@',
-        \ 'e $MYVIMRC@',
-        \ 'sp $MYVIMRC@',
-        \ 'vs $MYVIMRC@')
+        \ 'tabe $MYVIMRC§',
+        \ 'e $MYVIMRC§',
+        \ 'sp $MYVIMRC§',
+        \ 'vs $MYVIMRC§')
 
     call cmdline#cycle#main#set('em',
-        \ 'tabe /tmp/vimrc@',
-        \ 'tabe /tmp/vim.vim@')
+        \ 'tabe /tmp/vimrc§',
+        \ 'tabe /tmp/vim.vim§')
 
     " search a file in:{{{
     "
@@ -205,16 +205,16 @@ fu! s:cycles_set() abort
     "    - the directory of the current buffer
     "}}}
     call cmdline#cycle#main#set('ef',
-        \ 'fin ~/.vim/**/*@',
-        \ 'fin *@',
-        \ 'fin %:h/**/*@')
-    " Why `fin *@`, and not `fin **/*@`?{{{
+        \ 'fin ~/.vim/**/*§',
+        \ 'fin *§',
+        \ 'fin %:h/**/*§')
+    " Why `fin *§`, and not `fin **/*§`?{{{
     "
     " 1. It's useless to add `**` because we already included it inside 'path'.
     "    And `:find` searches in all paths of 'path'.
     "    So, it will use `**` as a prefix.
     "
-    " 2. If we used `fin **/*@`, the path of the candidates would be relative to
+    " 2. If we used `fin **/*§`, the path of the candidates would be relative to
     "    the working directory.
     "    It's too verbose. We just need their name.
     "
@@ -227,17 +227,17 @@ fu! s:cycles_set() abort
     "    path components until it's not needed anymore.
     "}}}
     call cmdline#cycle#main#set('es',
-        \ 'sf ~/.vim/**/*@',
-        \ 'sf *@',
-        \ 'sf %:h/**/*@')
+        \ 'sf ~/.vim/**/*§',
+        \ 'sf *§',
+        \ 'sf %:h/**/*§')
     call cmdline#cycle#main#set('ev',
-        \ 'vert sf ~/.vim/**/*@',
-        \ 'vert sf *@',
-        \ 'vert sf %:h/**/*@')
+        \ 'vert sf ~/.vim/**/*§',
+        \ 'vert sf *§',
+        \ 'vert sf %:h/**/*§')
     call cmdline#cycle#main#set('et',
-        \ 'tabf ~/.vim/**/*@',
-        \ 'tabf *@',
-        \ 'tabf %:h/**/*@')
+        \ 'tabf ~/.vim/**/*§',
+        \ 'tabf *§',
+        \ 'tabf %:h/**/*§')
 
     " `:filter` doesn't support all commands.
     " We install a  wrapper command which emulates `:filter` for  the commands which
@@ -253,20 +253,20 @@ fu! s:cycles_set() abort
     " I don't want to remember this quirk.
     "}}}
     call cmdline#cycle#main#set('g',
-        \ 'sil call system(''grep -RHIinos @ . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
+        \ 'sil call system(''grep -RHIins § . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
 
     " we want a different pattern depending on the filetype
     " we want `:vimgrep` to be run asynchronously
     call cmdline#cycle#vimgrep#install()
 
-    call cmdline#cycle#main#set('p', 'put =execute(''@'')')
+    call cmdline#cycle#main#set('p', 'put =execute(''§'')')
 
     " we may want a different substitution in  a qf buffer (if the `context` key
     " of the qfl is a dictionary with a `populate` key)
     call cmdline#cycle#substitute#install()
 
     com! -bar Redraw call cmdline#redraw()
-    call cmdline#cycle#main#set('!', 'Redraw <bar> sil !sr wref @')
+    call cmdline#cycle#main#set('!', 'Redraw <bar> sil !sr wref §')
 endfu
 
 " Variable {{{1

@@ -26,12 +26,12 @@ fu! cmdline#cycle#vimgrep#install() abort
     " pattern which contains a bar.
     "}}}
     call cmdline#cycle#main#set('v',
-        \ 'Vim /@/gj ./**/*.<c-r>='.s:snr().'get_extension()<cr>',
-        \ 'Vim /@/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr>',
-        \ 'Vim /@/gj $VIMRUNTIME/**/*.vim',
-        \ 'Vim /@/gj ##',
-        \ 'Vim /@/gj `find . -type f -cmin -60`',
-        \ 'Lvim /@/gj %',
+        \ 'Vim /§/gj ./**/*.<c-r>='.s:snr().'get_extension()<cr>',
+        \ 'Vim /§/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr>',
+        \ 'Vim /§/gj $VIMRUNTIME/**/*.vim',
+        \ 'Vim /§/gj ##',
+        \ 'Vim /§/gj `find . -type f -cmin -60`',
+        \ 'Lvim /§/gj %',
         \ )
 endfu
 " }}}1

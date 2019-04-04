@@ -64,7 +64,7 @@ fu! cmdline#tab#restore_cmdline_after_expansion() abort "{{{2
     call timer_start(0, {-> execute('unlet! s:cmdline_before_expansion')})
     return get(s:, 'cmdline_before_expansion', getcmdline())
 endfu
-
+" }}}1
 " Utility {{{1
 fu! s:save_cmdline_before_expansion() abort "{{{2
     " The returned  key will  be pressed  from a  mapping while  in command-line
