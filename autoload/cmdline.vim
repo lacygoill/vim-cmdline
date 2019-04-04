@@ -62,12 +62,8 @@ fu! cmdline#chain() abort "{{{1
                 " even if it takes more than one screen; don't stop after the first
                 " screen to display the message:    -- More --
                 set nomore
-                augroup restore_more
-                    au!
-                    au CmdlineLeave * sil! exe 'set '.(s:more_save ? '' : 'no').'more'
-                        \ | unlet! s:more_save
-                        \ | exe 'au! restore_more' | aug! restore_more
-                augroup END
+                au CmdlineLeave * ++once sil! exe 'set '.(s:more_save ? '' : 'no').'more'
+                    \ | unlet! s:more_save
             endif
             return feedkeys(':'.keys, 'in')
         endif
@@ -102,11 +98,7 @@ fu! cmdline#fix_typo(label) abort "{{{1
 endfu
 
 fu! cmdline#redraw() abort "{{{1
-    augroup cmdline_redraw
-        au!
-        au CmdlineLeave * sil! call timer_start(0, {-> execute('redraw!')})
-            \ | exe 'au! cmdline_redraw' | aug! cmdline_redraw
-    augroup END
+    au CmdlineLeave * ++once sil! call timer_start(0, {-> execute('redraw!')})
 endfu
 
 fu! cmdline#remember(list) abort "{{{1

@@ -43,11 +43,7 @@ let s:cycles = {}
 
 " the installation of cycles takes a few ms (too long)
 let s:seq_and_cmds = []
-augroup delay_cycle_install
-    au!
-    au CmdlineEnter : sil! call s:delay_cycle_install()
-        \ | exe 'au! delay_cycle_install' | aug! delay_cycle_install
-augroup END
+au CmdlineEnter : ++once sil! call s:delay_cycle_install()
 
 " Interface {{{1
 fu! cmdline#cycle#main#set(seq, ...) abort "{{{2

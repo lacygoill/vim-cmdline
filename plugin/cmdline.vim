@@ -53,16 +53,12 @@ cnorea <expr>  pc    getcmdtype() is# ':'  && getcmdpos() ==# 3  ? 'sil! PlugCle
 
 " Autocmds {{{1
 
-augroup my_lazy_loaded_cmdline
-    au!
-    " Do NOT write a bar after a backslash  on an empty line: it would result in
-    " 2 consecutive bars (empty command). This would print a line of a buffer on
-    " the command-line, when we change the focused window for the first time.
-    au CmdlineEnter : sil! call cmdline#auto_uppercase()
-        \ |           sil! call cmdline#remember(s:overlooked_commands)
-        \ |           unlet! s:overlooked_commands
-        \ |           exe 'au! my_lazy_loaded_cmdline' | aug! my_lazy_loaded_cmdline
-augroup END
+" Do NOT write a bar after a backslash  on an empty line: it would result in
+" 2 consecutive bars (empty command). This would print a line of a buffer on
+" the command-line, when we change the focused window for the first time.
+au CmdlineEnter : ++once sil! call cmdline#auto_uppercase()
+    \ |           sil! call cmdline#remember(s:overlooked_commands)
+    \ |           unlet! s:overlooked_commands
 
 augroup my_cmdline_chain
     au!
@@ -162,11 +158,7 @@ cno  <unique>  <m-g>  <c-\>e cmdline#cycle#main#move(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
-augroup delay_cycles_set
-    au!
-    au CmdlineEnter,CursorHold * sil! call s:cycles_set()
-        \ | exe 'au! delay_cycles_set' | aug! delay_cycles_set
-augroup END
+au CmdlineEnter,CursorHold * ++once sil! call s:cycles_set()
 
 fu! s:cycles_set() abort
     " populate the arglist with:
