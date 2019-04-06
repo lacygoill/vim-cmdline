@@ -24,9 +24,15 @@ fu! cmdline#cycle#substitute#install() abort "{{{2
     "
     "    3. invoke the substitution command after writing the pattern `pat\d`
     "}}}
+    " If you think you can merge the two backticks substitutions, try your solution against these texts:{{{
+    "
+    "     example, ‘du --exclude='*.o'’ excludes files whose names end in
+    "
+    "     A block size  specification preceded by ‘'’ causes output  sizes to be displayed
+    "}}}
     call cmdline#cycle#main#set('s',
         \ '<c-r>='.s:snr().'filetype_specific_substitute()<cr>§',
-        \ '%s/`.\{-}\zs''/`/gc',
+        \ '%s/`\(.\{-}\)''/`\1`/gce <bar> %s/‘\(.\{-}\)’/`\1`/gce',
         \ 'let list = split(@", "\n") <bar> *s/§\zs/\=remove(list, 0)/'
         \ )
 endfu
