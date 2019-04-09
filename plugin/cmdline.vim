@@ -245,7 +245,7 @@ fu! s:cycles_set() abort
     " I don't want to remember this quirk.
     "}}}
     call cmdline#cycle#main#set('g',
-        \ 'sil call system(''grep -RHIins § . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
+        \ 'sil call system(''rg 2>/dev/null --vimgrep -i -L § . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
 
     " we want a different pattern depending on the filetype
     " we want `:vimgrep` to be run asynchronously
