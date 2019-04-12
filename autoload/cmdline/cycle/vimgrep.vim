@@ -65,9 +65,7 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     " But there's no  guarantee that the search register of  this Vim process is
     " identical to the one of our current Vim process.
     "
-    " Same thing for `.`, `..`, `%` and `##`.
-    " There's no guarantee  that the current working directory,  its parent, the
-    " current file and the arglist of the 2 Vim processes are the same.
+    " Same thing for `%` and `##`.
     "}}}
     let args = s:get_modified_args(a:args)
 
@@ -123,7 +121,8 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     "}}}
     let cmd = [
         \ '/bin/bash', '-c',
-        \  'vim'
+        \  (has('nvim') ? 'nvim' : 'vim')
+        \ . ' +' . shellescape('cd ' . getcwd())
         \ . ' +''call cmdline#cycle#vimgrep#write_matches()'''
         \ . ' +qa! '
         \ . tempfile
@@ -139,14 +138,15 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
 endfu
 
 fu! cmdline#cycle#vimgrep#write_matches() abort "{{{2
-    let args = readfile(expand('%:p'))
+    let tempfile = expand('%:p')
+    let args = readfile(tempfile)
     if empty(args)
         return
     endif
     exe 'noa vim '.args[0]
     let matches = map(getqflist(),
         \ {i,v -> printf('%s:%d:%d:%s', fnamemodify(bufname(v.bufnr), ':p'), v.lnum, v.col, v.text)})
-    call writefile(matches, expand('%:p'), 's')
+    call writefile(matches, tempfile, 's')
 endfu
 
 fu! s:callback(in_loclist, tempfile, title, ...) abort "{{{2
@@ -203,9 +203,6 @@ fu! s:get_modified_args(args) abort "{{{2
     "                            we need it to be preserved.
     "}}}
     let args = substitute(a:args, pat, rep, '')
-
-    let args = substitute(args, '\\\@1<! \zs\.\ze/', fnameescape(getcwd()), 'g')
-    let args = substitute(args, '\\\@1<! \zs\.\.\ze/', fnameescape(fnamemodify(getcwd(), ':h')), 'g')
 
     let args = substitute(args, '\s\+\zs%\s*$', fnameescape(expand('%:p')), '')
     let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(),
