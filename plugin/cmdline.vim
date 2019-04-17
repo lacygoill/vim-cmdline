@@ -158,8 +158,6 @@ cno  <unique>  <m-g>  <c-\>e cmdline#cycle#main#move(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
-au CmdlineEnter,CursorHold * ++once sil! call s:cycles_set()
-
 fu! s:cycles_set() abort
     " populate the arglist with:
     "
@@ -260,6 +258,8 @@ fu! s:cycles_set() abort
     com! -bar Redraw call cmdline#redraw()
     call cmdline#cycle#main#set('!', 'Redraw <bar> sil !sr wref §')
 endfu
+
+sil! call s:cycles_set()
 
 " Variable {{{1
 
