@@ -47,10 +47,6 @@ cnorea <expr>  fs    getcmdtype() is# ':'  && getcmdpos() ==# 3  ?  'FzLocate'  
 
 cnorea <expr>  ucs   getcmdtype() is# ':' && getcmdpos() ==# 4  ? 'UnicodeSearch'  : 'ucs'
 
-"     :pc
-"     :sil! PlugClean~
-cnorea <expr>  pc    getcmdtype() is# ':'  && getcmdpos() ==# 3  ? 'sil! PlugClean' : 'pc'
-
 " Autocmds {{{1
 
 " Do NOT write a bar after a backslash  on an empty line: it would result in
@@ -250,6 +246,21 @@ fu! s:cycles_set() abort
     call cmdline#cycle#vimgrep#install()
 
     call cmdline#cycle#main#set('p', 'put =execute(''§'')')
+
+    " When should I prefer this over `:WebPageRead`?{{{
+    "
+    " When you need to download code, or when you want to save the text in a file.
+    "
+    " Indeed, the buffer created by `:WebPageRead`  is not associated to a file,
+    " so you can't save it.
+    " I you want to save it, you need to yank the text and paste it in another buffer.
+    "
+    " Besides, the text  is formatted to not go beyond  100 characters per line,
+    " which could break some long line of code.
+    "}}}
+    call cmdline#cycle#main#set('r', 'exe ''r !curl -s '' . shellescape(''§'', 1)')
+    "                                                │
+    "                                                └ don't show progress meter, nor error messages
 
     " we may want a different substitution in  a qf buffer (if the `context` key
     " of the qfl is a dictionary with a `populate` key)
