@@ -93,7 +93,7 @@ augroup my_cmdline_chain
 
     " when we copy a line of vimscript and paste it on the command-line,
     " sometimes the newline gets copied and translated into a literal CR,
-    " which raises an error:    remove it
+    " which raises an error; remove it.
     au CmdlineLeave : if getcmdline() =~# '\r$'
                   \ |     call cmdline#fix_typo('cr')
                   \ | endif
