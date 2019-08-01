@@ -11,7 +11,7 @@ let g:autoloaded_cmdline#cycle#vimgrep = 1
 "}}}
 " Where did you get the inspiration?{{{
 "
-"     https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
+" https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
 "}}}
 com! -nargs=* Vim call s:vimgrep(<q-args>, 0)
 com! -nargs=* Lvim call s:vimgrep(<q-args>, 1)
@@ -40,7 +40,7 @@ fu! s:filetype_specific_vimgrep() abort "{{{2
     if &ft is# 'zsh'
         return '/usr/share/zsh/**'
     elseif &ft =~# '^\%(bash\|sh\)$'
-        " TODO: Remove `~/.shrc` once we've integrated this file into `~/.zshrc`.
+        " TODO: Remove `~/.shrc` once we've integrated it into `~/.zshrc`.
         return  '~/bin/**/*.sh'
             \ . ' ~/.shrc'
             \ . ' ~/.bashrc'
