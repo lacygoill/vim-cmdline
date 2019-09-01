@@ -111,7 +111,7 @@ fu! s:filter(cmd, bang) abort "{{{2
         \ :     split(execute(cmd), '\n')
     " useful if we re-execute a second `:Filter` without leaving the command-line
     redraw
-    echo join(filter(output, {i,v -> a:bang ? v !~# pat : v =~# pat}), "\n")
+    echo join(filter(output, {_,v -> a:bang ? v !~# pat : v =~# pat}), "\n")
 endfu
 " }}}1
 " Utilities {{{1

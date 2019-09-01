@@ -108,7 +108,7 @@ fu! s:capture_subpatterns(cmdline) abort "{{{3
     "                            │    or    (one)_(two)_(three)
     "                            │
     "                            ├──────────────────────────────────────────────────────────────────┐}}}
-    let new_cmdline = range.'s/'.join(map(subpatterns, {i,v -> '\('.v.'\)'}), pat =~# '_' ? '_' : '') . '//g'
+    let new_cmdline = range.'s/'.join(map(subpatterns, {_,v -> '\('.v.'\)'}), pat =~# '_' ? '_' : '') . '//g'
 
     return "\<c-e>\<c-u>".new_cmdline."\<left>\<left>"
 endfu

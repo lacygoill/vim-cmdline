@@ -160,7 +160,7 @@ fu! s:cycles_set() abort
     "    - all the files in a directory
     "    - all the files in the output of a shell command
     call cmdline#cycle#main#set('a',
-        \ 'sp <bar> args `=filter(glob(''§./**/*'', 0, 1), {i,v -> filereadable(v)})`'
+        \ 'sp <bar> args `=filter(glob(''§./**/*'', 0, 1), {_,v -> filereadable(v)})`'
         \ .  '<bar> let g:my_stl_list_position = 2',
         \ 'sp <bar> sil args `=systemlist(''§'')` <bar> let g:my_stl_list_position = 2')
 

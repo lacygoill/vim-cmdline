@@ -93,7 +93,7 @@ fu! s:install(seq, cmds) abort "{{{2
     " cmds = ['cmd1', 'cmd2']
     let cmds = deepcopy(a:cmds)
 
-    let positions = map(deepcopy(cmds), {i,v -> s:find_tabstop(v)})
+    let positions = map(deepcopy(cmds), {_,v -> s:find_tabstop(v)})
 
     call map(cmds, {i,v -> {
         \     'cmd': substitute(v, '§', '', ''),

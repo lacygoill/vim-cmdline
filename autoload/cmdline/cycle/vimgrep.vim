@@ -145,7 +145,7 @@ fu! cmdline#cycle#vimgrep#write_matches() abort "{{{2
     endif
     exe 'noa vim '.args[0]
     let matches = map(getqflist(),
-        \ {i,v -> printf('%s:%d:%d:%s', fnamemodify(bufname(v.bufnr), ':p'), v.lnum, v.col, v.text)})
+        \ {_,v -> printf('%s:%d:%d:%s', fnamemodify(bufname(v.bufnr), ':p'), v.lnum, v.col, v.text)})
     call writefile(matches, tempfile, 's')
 endfu
 
@@ -183,7 +183,7 @@ fu! s:get_extension() abort "{{{2
         let ext = 'md'
     elseif ext is# '' && bufname('%') isnot# ''
         let ext = split(execute('au'), '\n')
-        call filter(ext, {i,v -> v =~# 'setf\s\+'.&ft})
+        call filter(ext, {_,v -> v =~# 'setf\s\+'.&ft})
         let ext = matchstr(get(ext, 0, ''), '\*\.\zs\S\+')
     endif
     return ext
@@ -206,7 +206,7 @@ fu! s:get_modified_args(args) abort "{{{2
 
     let args = substitute(args, '\s\+\zs%\s*$', fnameescape(expand('%:p')), '')
     let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(),
-        \ {i,v -> fnameescape(fnamemodify(v,':p'))})), '')
+        \ {_,v -> fnameescape(fnamemodify(v,':p'))})), '')
     return args
 endfu
 

@@ -125,10 +125,10 @@ fu! cmdline#toggle_editing_commands(enable) abort "{{{1
         else
             let lhs_list = split(execute('cno'), '\n')
             " ignore buffer-local mappings
-            call filter(lhs_list, {i,v -> v !~# '^c\s*\S*\s*\S*@'})
+            call filter(lhs_list, {_,v -> v !~# '^c\s*\S*\s*\S*@'})
             " extract lhs
-            call map(lhs_list, {i,v -> matchstr(v, 'c\s\+\zs\S\+')})
-            call filter(lhs_list, {i,v -> !empty(v)})
+            call map(lhs_list, {_,v -> matchstr(v, 'c\s\+\zs\S\+')})
+            call filter(lhs_list, {_,v -> !empty(v)})
             let s:my_editing_commands = lg#map#save('c', 0, lhs_list)
 
             for lhs in lhs_list
