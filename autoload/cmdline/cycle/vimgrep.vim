@@ -42,14 +42,12 @@ fu! s:filetype_specific_vimgrep() abort "{{{2
     elseif &ft =~# '^\%(bash\|sh\)$'
         " TODO: Remove `~/.shrc` once we've integrated it into `~/.zshrc`.
         return  '~/bin/**/*.sh'
-            \ . ' ~/.shrc'
-            \ . ' ~/.bashrc'
-            \ . ' ~/.zshrc'
-            \ . ' ~/.zshenv'
+            \ . ' ~/.{shrc,bashrc,zshrc,zshenv}'
             \ . ' ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets'
     else
-        return  '~/.vim/**/*.vim'
-            \ . ' ~/.vim/**/*.snippets'
+        " TODO: Once you start writing unit tests, add them.
+        " For example, if you use the vader plugin, add `vader` inside `{snippets,vim}`.
+        return  '~/.vim/**/*.{snippets,vim}'
             \ . ' ~/.vim/template/**'
             \ . ' ~/.vim/vimrc'
     endif
