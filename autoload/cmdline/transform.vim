@@ -58,17 +58,17 @@ fu! s:map_filter(cmdline) abort "{{{3
     " Purpose:{{{
     "
     "     :echo [1,2,3]
-    "     :echo map([1,2,3], {i,v -> })~
+    "     :echo map([1,2,3], {_,v -> })~
     "
-    "     :echo map([1,2,3], {i,v -> })
-    "     :echo filter([1,2,3], {i,v -> })~
+    "     :echo map([1,2,3], {_,v -> })
+    "     :echo filter([1,2,3], {_,v -> })~
     "
-    "     :echo filter([1,2,3], {i,v -> v != 2})
-    "     :echo map(filter([1,2,3], {i,v -> v != 2}), {i,v -> })~
+    "     :echo filter([1,2,3], {_,v -> v != 2})
+    "     :echo map(filter([1,2,3], {_,v -> v != 2}), {_,v -> })~
     "}}}
 
     " if `map()`/`filter()` is used, with an empty lambda, toggle it
-    if a:cmdline =~# '\C^\s*echo\s*\%(map\|filter\)(.*,\s*{i,v\s*->\s*})'
+    if a:cmdline =~# '\C^\s*echo\s*\%(map\|filter\)(.*,\s*{[_i],v\s*->\s*})'
         let new_cmdline = substitute(a:cmdline,
             \ '^\s*echo\s*\zs\(map\|filter\)\ze(',
             \ '\={"map": "filter", "filter": "map"}[submatch(1)]',
@@ -76,7 +76,7 @@ fu! s:map_filter(cmdline) abort "{{{3
     else
         " otherwise, add a new `map()`/`filter()`
         let new_cmdline = substitute(a:cmdline, '^\s*echo\s*\zs', 'map(', '')
-        let new_cmdline = substitute(new_cmdline, '$', ', {i,v -> })', '')
+        let new_cmdline = substitute(new_cmdline, '$', ', {_,v -> })', '')
     endif
     return "\<c-e>\<c-u>".new_cmdline."\<left>\<left>"
 endfu

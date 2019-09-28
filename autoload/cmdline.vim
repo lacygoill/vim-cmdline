@@ -81,20 +81,20 @@ fu! cmdline#fix_typo(label) abort "{{{1
              \   'cr': "\<bs>\<cr>",
              \   'z' : "\<bs>\<bs>()\<cr>",
              \ }[a:label]
-    "                                    ┌─ do NOT replace this with `getcmdline()`:
+    "                                    ┌ do NOT replace this with `getcmdline()`:
     "                                    │
-    "                                    │      when the callback will be processed,
-    "                                    │      the old command-line will be lost
+    "                                    │     when the callback will be processed,
+    "                                    │     the old command-line will be lost
     "                                    │
     call timer_start(0, {-> feedkeys(':'.cmdline.keys, 'in')})
     "    │
-    "    └─ we can't send the keys right now, because the command hasn't been
-    "       executed yet; from `:h CmdWinLeave`:
+    "    └ we can't send the keys right now, because the command hasn't been
+    "      executed yet; from `:h CmdWinLeave`:
     "
-    "               “Before leaving the command-line.“
+    "          “Before leaving the command-line.“
     "
-    "       But it seems we can't modify the command either. Maybe it's locked.
-    "       So, we'll reexecute a new fixed command with the timer.
+    "      But it seems we can't modify the command either. Maybe it's locked.
+    "      So, we'll reexecute a new fixed command with the timer.
 endfu
 
 fu! cmdline#redraw() abort "{{{1
