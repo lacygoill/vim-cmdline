@@ -23,7 +23,7 @@ fu! cmdline#auto_uppercase() abort "{{{1
 endfu
 
 fu! cmdline#chain() abort "{{{1
-    " Do NOT write empty lines in this function (<kbd>gQ</kbd> → E501, E749).
+    " Do NOT write empty lines in this function (`gQ` → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
         \ '\%(g\|v\).*\%(#\@<!#\|nu\%[mber]\)' : [''        , 0],
@@ -81,7 +81,7 @@ fu! cmdline#fix_typo(label) abort "{{{1
              \   'cr': "\<bs>\<cr>",
              \   'z' : "\<bs>\<bs>()\<cr>",
              \ }[a:label]
-    "                                    ┌ do NOT replace this with `getcmdline()`:
+    "                                    ┌ do *not* replace this with `getcmdline()`:
     "                                    │
     "                                    │     when the callback will be processed,
     "                                    │     the old command-line will be lost
@@ -89,16 +89,12 @@ fu! cmdline#fix_typo(label) abort "{{{1
     call timer_start(0, {-> feedkeys(':'.cmdline.keys, 'in')})
     "    │
     "    └ we can't send the keys right now, because the command hasn't been
-    "      executed yet; from `:h CmdWinLeave`:
+    "      executed yet; from `:h CmdlineLeave`:
     "
     "          “Before leaving the command-line.“
     "
     "      But it seems we can't modify the command either. Maybe it's locked.
     "      So, we'll reexecute a new fixed command with the timer.
-endfu
-
-fu! cmdline#redraw() abort "{{{1
-    au CmdlineLeave * ++once sil! call timer_start(0, {-> execute('redraw!')})
 endfu
 
 fu! cmdline#remember(list) abort "{{{1
@@ -108,7 +104,7 @@ fu! cmdline#remember(list) abort "{{{1
             exe printf('
             \            au CmdlineLeave :
             \            if getcmdline() %s %s
-            \ |              call timer_start(0, {-> execute("echohl WarningMsg | echo %s | echohl NONE", "")})
+            \ |              exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
             \ |          endif
             \          ',     cmd.regex ? '=~#' : 'is#',
             \                 string(cmd.regex ? '^'.cmd.old.'$' : cmd.old),

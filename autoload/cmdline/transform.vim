@@ -4,7 +4,7 @@ let s:PAT_RANGE = '\s*\%([%*]\|[^,]*,[^,]*\)'
 fu! cmdline#transform#main() abort "{{{2
     " number of times we've transformed the command-line
     let s:did_transform = get(s:, 'did_transform', -1) + 1
-    au CmdlineLeave  /,\?,:  ++once unlet! s:did_transform s:orig_cmdline
+    au CmdlineLeave /,\?,: ++once unlet! s:did_transform s:orig_cmdline
 
     let cmdtype = getcmdtype()
     let cmdline = getcmdline()
@@ -15,10 +15,10 @@ fu! cmdline#transform#main() abort "{{{2
     "     endif
     "
     " It would prevent you from re-applying a transformation, after clearing the
-    " command-line (<kbd>C-u</kbd>) and writing a new command.
+    " command-line (`C-u`) and writing a new command.
     "}}}
     if cmdtype =~# '[/?]'
-        if get(s:, 'did_transform', 0) ==# 0
+        if get(s:, 'did_transform', 0) == 0
             let s:orig_cmdline = cmdline
         endif
         call cmdline#util#undo#emit_add_to_undolist_c()

@@ -57,18 +57,18 @@ fu! cmdline#tab#custom(is_fwd) abort "{{{2
 endfu
 
 fu! cmdline#tab#restore_cmdline_after_expansion() abort "{{{2
+    let cmdline = getcmdline()
     if !exists('s:cmdline_before_expansion')
-        return getcmdline()
+        return cmdline
     endif
     redraw
-    call timer_start(0, {-> execute('unlet! s:cmdline_before_expansion')})
-    return get(s:, 'cmdline_before_expansion', getcmdline())
+    au CmdlineChanged : ++once unlet! s:cmdline_before_expansion
+    return get(s:, 'cmdline_before_expansion', cmdline)
 endfu
 " }}}1
 " Utility {{{1
 fu! s:save_cmdline_before_expansion() abort "{{{2
-    " The returned  key will  be pressed  from a  mapping while  in command-line
-    " mode.
+    " The returned key will be pressed from a mapping while in command-line mode.
     " We want Vim to start a wildcard expansion.
     " So, we need to return whatever key is stored in 'wcm'.
     let l:key = nr2char(&wcm ? &wcm : &wc)
@@ -76,13 +76,10 @@ fu! s:save_cmdline_before_expansion() abort "{{{2
         return l:key
     endif
     let cmdline = getcmdline()
-    call timer_start(0, {-> s:save_if_wildmenu_is_active(cmdline)})
+    fu! s:save_if_wildmenu_is_active() abort closure
+        if wildmenumode() | let s:cmdline_before_expansion = cmdline | endif
+    endfu
+    au CmdlineChanged : ++once call s:save_if_wildmenu_is_active()
     return l:key
-endfu
-
-fu! s:save_if_wildmenu_is_active(cmdline) abort "{{{2
-    if wildmenumode()
-        let s:cmdline_before_expansion = a:cmdline
-    endif
 endfu
 

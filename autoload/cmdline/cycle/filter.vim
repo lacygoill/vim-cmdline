@@ -74,7 +74,7 @@ fu! cmdline#cycle#filter#install() abort "{{{2
 endfu
 
 fu! s:filter_completion(_arglead, cmdline, pos) abort "{{{2
-    let candidates = [
+    let matches = [
         \ '%#',
         \ 'ab',
         \ 'chi',
@@ -88,7 +88,7 @@ fu! s:filter_completion(_arglead, cmdline, pos) abort "{{{2
         \ 'scr',
         \ 'set',
         \ ]
-    return join(candidates, "\n")
+    return join(matches, "\n")
 endfu
 " }}}1
 " Core {{{1

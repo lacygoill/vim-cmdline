@@ -12,7 +12,7 @@ let g:autoloaded_cmdline#cycle#main = 1
 "                 tabstop 1                   tabstop 2
 "
 " The difficulty is how to track  the changes operated on the command-line (like
-" the removal of a word by pressing <kbd>C-w</kbd>).
+" the removal of a word by pressing `C-w`).
 "
 " See here for inspiration:
 "
@@ -25,9 +25,9 @@ let g:autoloaded_cmdline#cycle#main = 1
 "
 " ---
 "
-" We would  have to temporarily  remap <kbd>Tab</kbd> and <kbd>S-Tab</kbd>  to a
-" function which jumps across the tabstops.
-" And <kbd>C-g Tab</kbd> to a function which presses the original `Tab`.
+" We would have to temporarily remap `Tab` and `S-Tab` to a function which jumps
+" across the tabstops.
+" And `C-g Tab` to a function which presses the original `Tab`.
 " The mappings should  probably be local to  the buffer, and be  removed when we
 " quit the command-line.
 "
@@ -80,9 +80,9 @@ fu! cmdline#cycle#main#move(is_fwd) abort "{{{2
 
     exe 'cno <plug>(cycle-new-cmd) '.new_cmd.'<c-r>=setcmdpos('.pos.')[-1]<cr>'
 
-    " If we  press <kbd>C-g</kbd> by accident  on the command-line, and  we move
-    " forward in the cycle,  we should be able to undo  and recover the previous
-    " command with <kbd>C-_</kbd>.
+    " If we press `C-g` by accident on  the command-line, and we move forward in
+    " the cycle, we should be able to undo and recover the previous command with
+    " `C-_`.
     call cmdline#util#undo#emit_add_to_undolist_c()
     call feedkeys("\<plug>(cycle-new-cmd)", 'i')
     return ''

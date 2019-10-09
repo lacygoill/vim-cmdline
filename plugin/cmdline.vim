@@ -23,11 +23,11 @@ let g:loaded_cmdline = 1
 " fix some typos
 cnorea <expr>  \`    getcmdtype() =~# '[/?]'  ? '\t' : '\`'
 
-cnorea <expr>  soù   getcmdtype() =~# ':' && getcmdpos() ==# 4 ? 'so%' : 'soù'
-cnorea <expr>  sl    getcmdtype() is# ':' && getcmdpos() ==# 3  ? 'ls'             : 'sl'
-cnorea <expr>  hg    getcmdtype() is# ':' && getcmdpos() ==# 3  ? 'helpgrep'       : 'hg'
-cnorea <expr>  dig   getcmdtype() is# ':' && getcmdpos() ==# 4  ? 'verb Digraphs!' : 'dig'
-cnorea <expr>  ecoh  getcmdtype() is# ':' && getcmdpos() ==# 5  ? 'echo'           : 'ecoh'
+cnorea <expr>  soù   getcmdtype() =~# ':' && getcmdpos() == 4 ? 'so%' : 'soù'
+cnorea <expr>  sl    getcmdtype() is# ':' && getcmdpos() == 3  ? 'ls'             : 'sl'
+cnorea <expr>  hg    getcmdtype() is# ':' && getcmdpos() == 3  ? 'helpgrep'       : 'hg'
+cnorea <expr>  dig   getcmdtype() is# ':' && getcmdpos() == 4  ? 'verb Digraphs!' : 'dig'
+cnorea <expr>  ecoh  getcmdtype() is# ':' && getcmdpos() == 5  ? 'echo'           : 'ecoh'
 
 "         :fbl
 "         :FzBLines~
@@ -37,15 +37,15 @@ cnorea <expr>  ecoh  getcmdtype() is# ':' && getcmdpos() ==# 5  ? 'echo'        
 "         :FzLines~
 "         :fs
 "         :FzLocate~
-cnorea <expr>  fbl   getcmdtype() is# ':'  && getcmdpos() ==# 4  ?  'FzBLines'      : 'fbl'
-cnorea <expr>  fc    getcmdtype() is# ':'  && getcmdpos() ==# 3  ?  'FzCommands'    : 'fc'
-cnorea <expr>  fl    getcmdtype() is# ':'  && getcmdpos() ==# 3  ?  'FzLines'       : 'fl'
-cnorea <expr>  fs    getcmdtype() is# ':'  && getcmdpos() ==# 3  ?  'FzLocate'      : 'fs'
+cnorea <expr>  fbl   getcmdtype() is# ':'  && getcmdpos() == 4  ?  'FzBLines'      : 'fbl'
+cnorea <expr>  fc    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzCommands'    : 'fc'
+cnorea <expr>  fl    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzLines'       : 'fl'
+cnorea <expr>  fs    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzLocate'      : 'fs'
 "              │
 "              └ `fl` is already taken for `:FzLines`
 "                besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
 
-cnorea <expr>  ucs   getcmdtype() is# ':' && getcmdpos() ==# 4  ? 'UnicodeSearch'  : 'ucs'
+cnorea <expr>  ucs   getcmdtype() is# ':' && getcmdpos() == 4  ? 'UnicodeSearch'  : 'ucs'
 
 " Autocmds {{{1
 
@@ -60,7 +60,7 @@ augroup my_cmdline_chain
     au!
     " Automatically execute  command B when A  has just been executed  (chain of
     " commands). Inspiration:
-    "         https://gist.github.com/romainl/047aca21e338df7ccf771f96858edb86
+    " https://gist.github.com/romainl/047aca21e338df7ccf771f96858edb86
     au CmdlineLeave : call cmdline#chain()
 
     " TODO:
@@ -130,7 +130,7 @@ com! -bar -nargs=1 ToggleEditingCommands call cmdline#toggle_editing_commands(<a
 "}}}
 cno  <expr>  <tab>    cmdline#tab#custom(1)
 cno  <expr>  <s-tab>  cmdline#tab#custom(0)
-cno          <c-q>    <c-\>ecmdline#tab#restore_cmdline_after_expansion()<cr>
+cno          <c-q>    <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
 
 " The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
 "
@@ -200,7 +200,7 @@ fu! s:cycles_set() abort
     "    And `:find` searches in all paths of 'path'.
     "    So, it will use `**` as a prefix.
     "
-    " 2. If we used `fin **/*§`, the path of the candidates would be relative to
+    " 2. If we used `fin **/*§`, the path of the matches would be relative to
     "    the working directory.
     "    It's too verbose. We just need their name.
     "
@@ -208,7 +208,7 @@ fu! s:cycles_set() abort
     "    C-d,  while  there  are two  files  with  the  same  name `foobar`  in  two
     "    directories in the working directory.
     "
-    "     The answer is  simple: for each candidate, Vim prepends  the previous path
+    "     The answer is  simple: for each match, Vim prepends  the previous path
     "    component to  remove the ambiguity. If it's  not enough, it goes  on adding
     "    path components until it's not needed anymore.
     "}}}
@@ -265,9 +265,6 @@ fu! s:cycles_set() abort
     " we may want a different substitution in  a qf buffer (if the `context` key
     " of the qfl is a dictionary with a `populate` key)
     call cmdline#cycle#substitute#install()
-
-    com! -bar Redraw call cmdline#redraw()
-    call cmdline#cycle#main#set('!', 'Redraw <bar> sil !sr wref §')
 endfu
 
 sil! call s:cycles_set()
