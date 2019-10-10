@@ -81,12 +81,12 @@ fu! cmdline#fix_typo(label) abort "{{{1
              \   'cr': "\<bs>\<cr>",
              \   'z' : "\<bs>\<bs>()\<cr>",
              \ }[a:label]
-    "                                    ┌ do *not* replace this with `getcmdline()`:
-    "                                    │
-    "                                    │     when the callback will be processed,
-    "                                    │     the old command-line will be lost
-    "                                    │
-    call timer_start(0, {-> feedkeys(':'.cmdline.keys, 'in')})
+    "                                      ┌ do *not* replace this with `getcmdline()`:
+    "                                      │
+    "                                      │     when the callback will be processed,
+    "                                      │     the old command-line will be lost
+    "                                      │
+    call timer_start(0, {_ -> feedkeys(':'.cmdline.keys, 'in')})
     "    │
     "    └ we can't send the keys right now, because the command hasn't been
     "      executed yet; from `:h CmdlineLeave`:

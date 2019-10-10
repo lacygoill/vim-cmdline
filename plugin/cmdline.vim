@@ -7,12 +7,12 @@ let g:loaded_cmdline = 1
 " Unused_code:{{{
 "
 "         fu! s:strict_abbr(args, cmd) abort
-"             let l:lhs = matchstr(a:args, '^\s*\zs\S\+')
-"             let l:rhs = matchstr(a:args, '^\s*\S\+\s\+\zs.*')
+"             let lhs = matchstr(a:args, '^\s*\zs\S\+')
+"             let rhs = matchstr(a:args, '^\s*\S\+\s\+\zs.*')
 "             if a:cmd
-"                 exe printf("cnorea <expr> %s getcmdtype() is# ':' ? '%s' : '%s'", l:lhs, l:rhs, l:lhs)
+"                 exe printf("cnorea <expr> %s getcmdtype() is# ':' ? '%s' : '%s'", lhs, rhs, lhs)
 "             else
-"                 exe printf("cnorea <expr> %s getcmdtype() =~ '[/?]' ? '%s' : '%s'", l:lhs, l:rhs, l:lhs)
+"                 exe printf("cnorea <expr> %s getcmdtype() =~ '[/?]' ? '%s' : '%s'", lhs, rhs, lhs)
 "             endif
 "         endfu
 "
@@ -77,13 +77,13 @@ augroup my_cmdline_chain
     " We use a timer to avoid reenabling the editing commands before having left
     " the command-line completely; otherwise `E501`.
     au CmdlineLeave : if getcmdline() =~# '^\s*vi\%[sual]\s*$'
-                  \ |     call timer_start(0, {-> execute('ToggleEditingCommands 1')})
+                  \ |     call timer_start(0, {_ -> execute('ToggleEditingCommands 1')})
                   \ | endif
 
     " enable the  item in  the statusline  showing our  position in  the arglist
     " after we execute an `:args` command
     au CmdlineLeave : if getcmdline() =~# '\C^\%(tab\s\+\)\=ar\%[gs]\s+'
-                  \ |     call timer_start(0, {-> execute('let g:my_stl_list_position = 2 | redraw!')})
+                  \ |     call timer_start(0, {_ -> execute('let g:my_stl_list_position = 2 | redraw!')})
                   \ | endif
 
     " sometimes, we type `:h functionz)` instead of `:h function()`

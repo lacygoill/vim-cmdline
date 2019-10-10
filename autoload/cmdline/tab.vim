@@ -71,15 +71,15 @@ fu! s:save_cmdline_before_expansion() abort "{{{2
     " The returned key will be pressed from a mapping while in command-line mode.
     " We want Vim to start a wildcard expansion.
     " So, we need to return whatever key is stored in 'wcm'.
-    let l:key = nr2char(&wcm ? &wcm : &wc)
+    let key = nr2char(&wcm ? &wcm : &wc)
     if wildmenumode()
-        return l:key
+        return key
     endif
     let cmdline = getcmdline()
     fu! s:save_if_wildmenu_is_active() abort closure
         if wildmenumode() | let s:cmdline_before_expansion = cmdline | endif
     endfu
     au CmdlineChanged : ++once call s:save_if_wildmenu_is_active()
-    return l:key
+    return key
 endfu
 
