@@ -1,7 +1,7 @@
 let s:PAT_RANGE = '\s*\%([%*]\|[^,]*,[^,]*\)'
 
 " Interface {{{1
-fu! cmdline#transform#main() abort "{{{2
+fu cmdline#transform#main() abort "{{{2
     " number of times we've transformed the command-line
     let s:did_transform = get(s:, 'did_transform', -1) + 1
     au CmdlineLeave /,\?,: ++once unlet! s:did_transform s:orig_cmdline
@@ -36,7 +36,7 @@ endfu
 " }}}1
 " Core {{{1
 " Ex {{{2
-fu! s:guess_what_the_cmdline_is(cmdline) abort "{{{3
+fu s:guess_what_the_cmdline_is(cmdline) abort "{{{3
     if a:cmdline =~# '^'.s:PAT_RANGE.'s[/:]'
         " a substitution command
         return ':s'
@@ -45,7 +45,7 @@ fu! s:guess_what_the_cmdline_is(cmdline) abort "{{{3
     endif
 endfu
 
-fu! s:transform(cmd, cmdline) abort "{{{3
+fu s:transform(cmd, cmdline) abort "{{{3
     if a:cmd is# ':s'
         return s:capture_subpatterns(a:cmdline)
     elseif a:cmd is# ':echo'
@@ -54,7 +54,7 @@ fu! s:transform(cmd, cmdline) abort "{{{3
     return ''
 endfu
 
-fu! s:map_filter(cmdline) abort "{{{3
+fu s:map_filter(cmdline) abort "{{{3
     " Purpose:{{{
     "
     "     :echo [1,2,3]
@@ -81,7 +81,7 @@ fu! s:map_filter(cmdline) abort "{{{3
     return "\<c-e>\<c-u>".new_cmdline."\<left>\<left>"
 endfu
 
-fu! s:capture_subpatterns(cmdline) abort "{{{3
+fu s:capture_subpatterns(cmdline) abort "{{{3
     " Purpose:{{{
     "
     "     :%s/foo_bar_baz//g
@@ -114,11 +114,11 @@ fu! s:capture_subpatterns(cmdline) abort "{{{3
 endfu
 "}}}2
 " Search {{{2
-fu! s:replace_with_equiv_class() abort "{{{3
+fu s:replace_with_equiv_class() abort "{{{3
     return substitute(get(s:, 'orig_cmdline', ''), '\a', '[[=\0=]]', 'g')
 endfu
 
-fu! s:search_outside_comments() abort "{{{3
+fu s:search_outside_comments() abort "{{{3
     " we should probably save `cmdline` in  a script-local variable if we want
     " to cycle between several transformations
     if empty(&l:cms)

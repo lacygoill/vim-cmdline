@@ -13,10 +13,10 @@ let g:autoloaded_cmdline#cycle#vimgrep = 1
 "
 " https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
 "}}}
-com! -nargs=* Vim call s:vimgrep(<q-args>, 0)
-com! -nargs=* Lvim call s:vimgrep(<q-args>, 1)
+com -nargs=* Vim call s:vimgrep(<q-args>, 0)
+com -nargs=* Lvim call s:vimgrep(<q-args>, 1)
 
-fu! cmdline#cycle#vimgrep#install() abort
+fu cmdline#cycle#vimgrep#install() abort
     " Why don't you add `<bar> cw` in your mappings?{{{
     "
     " `:Vim` is a custom command, which isn't defined with `-bar`.
@@ -36,7 +36,7 @@ fu! cmdline#cycle#vimgrep#install() abort
 endfu
 " }}}1
 " Core {{{1
-fu! s:filetype_specific_vimgrep() abort "{{{2
+fu s:filetype_specific_vimgrep() abort "{{{2
     if &ft is# 'zsh'
         return '/usr/share/zsh/**'
     elseif &ft =~# '^\%(bash\|sh\)$'
@@ -53,7 +53,7 @@ fu! s:filetype_specific_vimgrep() abort "{{{2
     endif
 endfu
 
-fu! s:vimgrep(args, in_loclist) abort "{{{2
+fu s:vimgrep(args, in_loclist) abort "{{{2
     let tempfile = tempname()
 
     " Why do you modify the arguments?{{{
@@ -135,7 +135,7 @@ fu! s:vimgrep(args, in_loclist) abort "{{{2
     endif
 endfu
 
-fu! cmdline#cycle#vimgrep#write_matches() abort "{{{2
+fu cmdline#cycle#vimgrep#write_matches() abort "{{{2
     let tempfile = expand('%:p')
     let args = readfile(tempfile)
     if empty(args)
@@ -147,7 +147,7 @@ fu! cmdline#cycle#vimgrep#write_matches() abort "{{{2
     call writefile(matches, tempfile, 's')
 endfu
 
-fu! s:callback(in_loclist, tempfile, title, ...) abort "{{{2
+fu s:callback(in_loclist, tempfile, title, ...) abort "{{{2
 "                                          │
 "                                          └ the callback doesn't receive the same number of arguments{{{
 "                                            in Vim and Neovim
@@ -175,7 +175,7 @@ fu! s:callback(in_loclist, tempfile, title, ...) abort "{{{2
 endfu
 " }}}1
 " Utilities {{{1
-fu! s:get_extension() abort "{{{2
+fu s:get_extension() abort "{{{2
     let ext = expand('%:e')
     if &ft is# 'dirvish' && expand('%:p') =~? '/wiki/'
         let ext = 'md'
@@ -187,7 +187,7 @@ fu! s:get_extension() abort "{{{2
     return ext
 endfu
 
-fu! s:get_modified_args(args) abort "{{{2
+fu s:get_modified_args(args) abort "{{{2
     let pat = '^\(\i\@!\&.\)\1\ze[gj]\{,2}\s\+'
     "           ├────────────┘
     "           └ 2 consecutive and identical non-identifier characters
@@ -208,7 +208,7 @@ fu! s:get_modified_args(args) abort "{{{2
     return args
 endfu
 
-fu! s:snr() "{{{2
+fu s:snr() "{{{2
     return matchstr(expand('<sfile>'), '.*\zs<SNR>\d\+_')
 endfu
 

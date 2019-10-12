@@ -6,7 +6,7 @@ let g:loaded_cmdline = 1
 " Abbreviations {{{1
 " Unused_code:{{{
 "
-"         fu! s:strict_abbr(args, cmd) abort
+"         fu s:strict_abbr(args, cmd) abort
 "             let lhs = matchstr(a:args, '^\s*\zs\S\+')
 "             let rhs = matchstr(a:args, '^\s*\S\+\s\+\zs.*')
 "             if a:cmd
@@ -16,8 +16,8 @@ let g:loaded_cmdline = 1
 "             endif
 "         endfu
 "
-"         com! -nargs=+ Cab call s:strict_abbr(<q-args>, 1)
-"         com! -nargs=+ Sab call s:strict_abbr(<q-args>, 0)
+"         com -nargs=+ Cab call s:strict_abbr(<q-args>, 1)
+"         com -nargs=+ Sab call s:strict_abbr(<q-args>, 0)
 "}}}
 
 " fix some typos
@@ -112,7 +112,7 @@ augroup END
 "         ToggleEditingCommands 0  →  disable
 "         ToggleEditingCommands 1  →  enable
 "}}}
-com! -bar -nargs=1 ToggleEditingCommands call cmdline#toggle_editing_commands(<args>)
+com -bar -nargs=1 ToggleEditingCommands call cmdline#toggle_editing_commands(<args>)
 
 " Mappings {{{1
 
@@ -154,7 +154,7 @@ cno  <unique>  <m-g>  <c-\>e cmdline#cycle#main#move(0)<cr>
 
 xno  <unique>  <c-g>s  :s///g<left><left><left>
 
-fu! s:cycles_set() abort
+fu s:cycles_set() abort
     " populate the arglist with:
     "
     "    - all the files in a directory
@@ -281,5 +281,5 @@ sil! call s:cycles_set()
 "         \ {'old': 'x'         , 'new': 'ZZ'   , 'regex': 0},
 "         \ ]
 
-let s:overlooked_commands = []
+const s:overlooked_commands = []
 

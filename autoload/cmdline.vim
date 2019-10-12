@@ -3,12 +3,22 @@ if exists('g:autoloaded_cmdline')
 endif
 let g:autoloaded_cmdline = 1
 
-fu! cmdline#auto_uppercase() abort "{{{1
+fu cmdline#auto_uppercase() abort "{{{1
+    " We define  abbreviations in command-line  mode to automatically  replace a
+    " custom command name written in lowercase with uppercase characters.
 
-" We define abbreviations in command-line mode to automatically replace
-" a custom command name written in lowercase with uppercase characters.
-
-    let commands = getcompletion('[A-Z]?*', 'command')
+    " Do *not* use `getcompletion()`.{{{
+    "
+    "     let commands = getcompletion('[A-Z]?*', 'command')
+    "
+    " You would get the names of the global commands (✔) *and* the ones local to
+    " the current buffer (✘); we don't want the latter.
+    " Installing  a *global* abbreviation  for a *buffer-local*  command doesn't
+    " make sense.
+    "}}}
+    let commands = map(filter(split(execute('com'), '\n')[1:],
+    \ {_,v -> v =~# '^[^b]*\u\S'}),
+    \ {_,v -> matchstr(v, '\u\S*')})
 
     let pat = '^\%%(\%%(tab\<bar>vert\%%[ical]\)\s\+\)\=%s$\<bar>^\%%(''<,''>\<bar>\*\)%s$'
     for cmd in commands
@@ -22,7 +32,7 @@ fu! cmdline#auto_uppercase() abort "{{{1
     endfor
 endfu
 
-fu! cmdline#chain() abort "{{{1
+fu cmdline#chain() abort "{{{1
     " Do NOT write empty lines in this function (`gQ` → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
@@ -75,7 +85,7 @@ fu! cmdline#chain() abort "{{{1
     endif
 endfu
 
-fu! cmdline#fix_typo(label) abort "{{{1
+fu cmdline#fix_typo(label) abort "{{{1
     let cmdline = getcmdline()
     let keys = {
              \   'cr': "\<bs>\<cr>",
@@ -97,7 +107,7 @@ fu! cmdline#fix_typo(label) abort "{{{1
     "      So, we'll reexecute a new fixed command with the timer.
 endfu
 
-fu! cmdline#remember(list) abort "{{{1
+fu cmdline#remember(list) abort "{{{1
     augroup remember_overlooked_commands
         au!
         for cmd in a:list
@@ -114,7 +124,7 @@ fu! cmdline#remember(list) abort "{{{1
     augroup END
 endfu
 
-fu! cmdline#toggle_editing_commands(enable) abort "{{{1
+fu cmdline#toggle_editing_commands(enable) abort "{{{1
     try
         if a:enable
             call lg#map#restore(get(s:, 'my_editing_commands', []))

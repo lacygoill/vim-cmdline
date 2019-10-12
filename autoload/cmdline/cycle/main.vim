@@ -46,7 +46,7 @@ let s:seq_and_cmds = []
 au CmdlineEnter : ++once sil! call s:delay_cycle_install()
 
 " Interface {{{1
-fu! cmdline#cycle#main#set(seq, ...) abort "{{{2
+fu cmdline#cycle#main#set(seq, ...) abort "{{{2
     let cmds = a:000
     let pos = s:find_tabstop(a:1)
     exe 'nno  <unique>  <c-g>'.a:seq
@@ -56,7 +56,7 @@ fu! cmdline#cycle#main#set(seq, ...) abort "{{{2
     let s:seq_and_cmds += [[a:seq, cmds]]
 endfu
 
-fu! cmdline#cycle#main#move(is_fwd) abort "{{{2
+fu cmdline#cycle#main#move(is_fwd) abort "{{{2
     let cmdline = getcmdline()
 
     if getcmdtype() isnot# ':' || !s:is_valid_cycle()
@@ -89,7 +89,7 @@ fu! cmdline#cycle#main#move(is_fwd) abort "{{{2
 endfu
 " }}}1
 " Core {{{1
-fu! s:install(seq, cmds) abort "{{{2
+fu s:install(seq, cmds) abort "{{{2
     " cmds = ['cmd1', 'cmd2']
     let cmds = deepcopy(a:cmds)
 
@@ -104,14 +104,14 @@ fu! s:install(seq, cmds) abort "{{{2
     call extend(s:cycles, {a:seq: [0, cmds]})
 endfu
 
-fu! s:delay_cycle_install() abort "{{{2
+fu s:delay_cycle_install() abort "{{{2
     for [seq, cmds] in s:seq_and_cmds
         call s:install(seq, cmds)
     endfor
 endfu
 " }}}1
 " Utilities {{{1
-fu! s:find_tabstop(rhs) abort "{{{2
+fu s:find_tabstop(rhs) abort "{{{2
     " Why not simply `return stridx(a:rhs, '§')`?{{{
     "
     " The rhs may contain special sequences such as `<bar>` or `<c-r>`.
@@ -138,7 +138,7 @@ fu! s:find_tabstop(rhs) abort "{{{2
     return stridx(maparg('<plug>(cycle-find-tabstop)'), '§')
 endfu
 
-fu! s:is_valid_cycle() abort "{{{2
+fu s:is_valid_cycle() abort "{{{2
     " We test  the existence of  `s:seq` because it may  not exist, if  we press
     " `C-g` by accident, without having entered a cycle before that.
     return exists('s:seq')
@@ -147,7 +147,7 @@ fu! s:is_valid_cycle() abort "{{{2
         \ && len(s:cycles[s:seq]) == 2
 endfu
 
-fu! cmdline#cycle#main#set_seq(seq) abort "{{{2
+fu cmdline#cycle#main#set_seq(seq) abort "{{{2
     let s:seq = a:seq
     return ''
 endfu

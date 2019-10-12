@@ -9,7 +9,7 @@ augroup my_cmdline_tab
 augroup END
 
 " Interface {{{1
-fu! cmdline#tab#custom(is_fwd) abort "{{{2
+fu cmdline#tab#custom(is_fwd) abort "{{{2
     if getcmdtype() =~# '[?/]'
         return empty(getcmdline())
            \ ?     "\<up>"
@@ -56,7 +56,7 @@ fu! cmdline#tab#custom(is_fwd) abort "{{{2
     endif
 endfu
 
-fu! cmdline#tab#restore_cmdline_after_expansion() abort "{{{2
+fu cmdline#tab#restore_cmdline_after_expansion() abort "{{{2
     let cmdline = getcmdline()
     if !exists('s:cmdline_before_expansion')
         return cmdline
@@ -67,7 +67,7 @@ fu! cmdline#tab#restore_cmdline_after_expansion() abort "{{{2
 endfu
 " }}}1
 " Utility {{{1
-fu! s:save_cmdline_before_expansion() abort "{{{2
+fu s:save_cmdline_before_expansion() abort "{{{2
     " The returned key will be pressed from a mapping while in command-line mode.
     " We want Vim to start a wildcard expansion.
     " So, we need to return whatever key is stored in 'wcm'.

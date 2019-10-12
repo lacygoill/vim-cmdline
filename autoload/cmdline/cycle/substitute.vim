@@ -1,5 +1,5 @@
 " Interface {{{1
-fu! cmdline#cycle#substitute#install() abort "{{{2
+fu cmdline#cycle#substitute#install() abort "{{{2
     " What's this `let list = ...`?{{{
     "
     " Suppose you have this text:
@@ -38,7 +38,7 @@ fu! cmdline#cycle#substitute#install() abort "{{{2
 endfu
 " }}}1
 " Core {{{1
-fu! s:filetype_specific_substitute() abort "{{{2
+fu s:filetype_specific_substitute() abort "{{{2
     if &bt is# 'quickfix' && get(b:, 'qf_is_loclist', 0)
         if type(getloclist(0, {'context': 0}).context) == type({})
         \ && has_key(getloclist(0, {'context': 0}).context, 'populate')
@@ -54,7 +54,7 @@ fu! s:filetype_specific_substitute() abort "{{{2
 endfu
 " }}}1
 " Utilities {{{1
-fu! s:snr() abort "{{{2
+fu s:snr() abort "{{{2
     return matchstr(expand('<sfile>'), '.*\zs<SNR>\d\+_')
 endfu
 
