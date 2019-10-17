@@ -29,12 +29,12 @@ fu cmdline#tab#custom(is_fwd) abort "{{{2
         "
         " If we used this mapping:
         "
-        "         cno <expr>  <s-tab>  getcmdtype() =~ '[?/]' ? '<c-t>' : '<s-tab>'
+        "     cno <expr>  <s-tab>  getcmdtype() =~ '[?/]' ? '<c-t>' : '<s-tab>'
         "
-        " When we would hit <s-tab> on the command-line (:) (outside the wildmenu),
-        " it would insert the 7 characters '<s-tab>', literally.
-        " That's not what `S-Tab` does by default. It should simply open the wildmenu
-        " and select its last entry.
+        " When we would hit `S-Tab`  on the command-line (outside the wildmenu),
+        " it would insert the 7 characters `<s-tab>`, literally.
+        " That's not  what `S-Tab`  does by default. It  should simply  open the
+        " wildmenu and select its last entry.
         " We need `S-Tab` to be treated as if it wasn't coming from a mapping.
         " We need to pass the `t` flag to `feedkeys()`.
         "}}}
@@ -42,14 +42,16 @@ fu cmdline#tab#custom(is_fwd) abort "{{{2
         "
         " It breaks the  replay of a macro during which  we've pressed `Tab`
         " or `S-Tab` on the command-line.
-        " MWE:
-        "         qqq
-        "         qq : Tab Tab CR    (should execute `:#`)
-        "         q
         "
-        "         :nunmap @
-        "         @q
-        "         should print the current line; does not~
+        " MWE:
+        "
+        "     qqq
+        "     qq : Tab Tab CR    (should execute `:#`)
+        "     q
+        "
+        "     :nunmap @
+        "     @q
+        "     should print the current line; does not~
         "}}}
         call feedkeys("\<s-tab>", flags)
         return ''

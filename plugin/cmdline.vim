@@ -128,9 +128,9 @@ com -bar -nargs=1 ToggleEditingCommands call cmdline#toggle_editing_commands(<ar
 " We use  our Tab mapping  to save the command-line  prior to an  expansion, and
 " install a C-q mapping to restore it.
 "}}}
-cno  <expr>  <tab>    cmdline#tab#custom(1)
-cno  <expr>  <s-tab>  cmdline#tab#custom(0)
-cno          <c-q>    <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
+cno <expr> <tab>   cmdline#tab#custom(1)
+cno <expr> <s-tab> cmdline#tab#custom(0)
+cno        <c-q>   <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
 
 " The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
 "
@@ -146,13 +146,13 @@ cno          <c-q>    <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
 "      camel case inside parentheses, so that we can refer to them easily
 "      with backref in the replacement.
 "}}}
-cno  <expr><unique>  <c-s>  cmdline#transform#main()
+cno <expr><unique> <c-s> cmdline#transform#main()
 
 " Cycle through a set of arbitrary commands.
-cno  <unique>  <c-g>  <c-\>e cmdline#cycle#main#move(1)<cr>
-cno  <unique>  <m-g>  <c-\>e cmdline#cycle#main#move(0)<cr>
+cno <unique> <c-g> <c-\>e cmdline#cycle#main#move(1)<cr>
+cno <unique> <m-g> <c-\>e cmdline#cycle#main#move(0)<cr>
 
-xno  <unique>  <c-g>s  :s///g<left><left><left>
+xno <unique> <c-g>s :s///g<left><left><left>
 
 fu s:cycles_set() abort
     " populate the arglist with:

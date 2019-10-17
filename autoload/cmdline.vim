@@ -17,7 +17,7 @@ fu cmdline#auto_uppercase() abort "{{{1
     " make sense.
     "}}}
     let commands = map(filter(split(execute('com'), '\n')[1:],
-    \ {_,v -> v =~# '^[^b]*\u\S'}),
+    \ {_,v -> v =~# '^[^bA-Z]*\u\S'}),
     \ {_,v -> matchstr(v, '\u\S*')})
 
     let pat = '^\%%(\%%(tab\<bar>vert\%%[ical]\)\s\+\)\=%s$\<bar>^\%%(''<,''>\<bar>\*\)%s$'
@@ -48,7 +48,7 @@ fu cmdline#chain() abort "{{{1
         \ }
     for [pat, cmd] in items(pat2cmd)
         let [keys, nomore] = cmd
-        if cmdline =~# '\C^'.pat.'$'
+        if cmdline =~# '\C^'..pat..'$'
             " when I  execute `:[cl]chi`,  don't populate the  command-line with
             " `:sil [cl]ol` if the qf stack doesn't have at least two qf lists
             if pat is# 'lhi\%[story]' && get(getloclist(0, {'nr': '$'}), 'nr', 0) <= 1
@@ -72,16 +72,16 @@ fu cmdline#chain() abort "{{{1
                 " even if it takes more than one screen; don't stop after the first
                 " screen to display the message:    -- More --
                 set nomore
-                au CmdlineLeave * ++once sil! exe 'set '.(s:more_save ? '' : 'no').'more'
+                au CmdlineLeave * ++once sil! exe 'set '..(s:more_save ? '' : 'no')..'more'
                     \ | unlet! s:more_save
             endif
-            return feedkeys(':'.keys, 'in')
+            return feedkeys(':'..keys, 'in')
         endif
     endfor
     if cmdline =~# '\C^\s*\%(dli\|\il\)\%[ist]\s\+'
-        call feedkeys(':'.matchstr(cmdline, '\S').'j  '.split(cmdline, ' ')[1]."\<s-left>\<left>", 'in')
+        call feedkeys(':'..matchstr(cmdline, '\S')..'j  '..split(cmdline, ' ')[1].."\<s-left>\<left>", 'in')
     elseif cmdline =~# '\C^\s*\%(cli\|lli\)'
-        call feedkeys(':sil '.repeat(matchstr(cmdline, '\S'), 2).' ', 'in')
+        call feedkeys(':sil '..repeat(matchstr(cmdline, '\S'), 2)..' ', 'in')
     endif
 endfu
 
@@ -91,12 +91,12 @@ fu cmdline#fix_typo(label) abort "{{{1
              \   'cr': "\<bs>\<cr>",
              \   'z' : "\<bs>\<bs>()\<cr>",
              \ }[a:label]
-    "                                      ┌ do *not* replace this with `getcmdline()`:
-    "                                      │
-    "                                      │     when the callback will be processed,
-    "                                      │     the old command-line will be lost
-    "                                      │
-    call timer_start(0, {_ -> feedkeys(':'.cmdline.keys, 'in')})
+    "                                       ┌ do *not* replace this with `getcmdline()`:
+    "                                       │
+    "                                       │     when the callback will be processed,
+    "                                       │     the old command-line will be lost
+    "                                       │
+    call timer_start(0, {_ -> feedkeys(':'..cmdline..keys, 'in')})
     "    │
     "    └ we can't send the keys right now, because the command hasn't been
     "      executed yet; from `:h CmdlineLeave`:
@@ -117,8 +117,8 @@ fu cmdline#remember(list) abort "{{{1
             \ |              exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
             \ |          endif
             \          ',     cmd.regex ? '=~#' : 'is#',
-            \                 string(cmd.regex ? '^'.cmd.old.'$' : cmd.old),
-            \                 string('['.cmd.new .'] was equivalent')
+            \                 string(cmd.regex ? '^'..cmd.old..'$' : cmd.old),
+            \                 string('['..cmd.new..'] was equivalent')
             \         )
         endfor
     augroup END
@@ -134,11 +134,9 @@ fu cmdline#toggle_editing_commands(enable) abort "{{{1
             call filter(lhs_list, {_,v -> v !~# '^c\s*\S*\s*\S*@'})
             " extract lhs
             call map(lhs_list, {_,v -> matchstr(v, 'c\s\+\zs\S\+')})
-            call filter(lhs_list, {_,v -> !empty(v)})
             let s:my_editing_commands = lg#map#save('c', 0, lhs_list)
-
             for lhs in lhs_list
-                exe 'cunmap '.lhs
+                exe 'cunmap '..lhs
             endfor
         endif
     catch
