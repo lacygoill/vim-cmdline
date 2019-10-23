@@ -128,10 +128,16 @@ com -bar -nargs=1 ToggleEditingCommands call cmdline#toggle_editing_commands(<ar
 " We use  our Tab mapping  to save the command-line  prior to an  expansion, and
 " install a C-q mapping to restore it.
 "}}}
-cno <expr> <tab>   cmdline#tab#custom(1)
-cno <expr> <s-tab> cmdline#tab#custom(0)
-cno        <c-q>   <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
+cno <expr><unique> <tab>   cmdline#tab#custom(1)
+cno <expr><unique> <s-tab> cmdline#tab#custom(0)
+cno       <unique> <c-q>   <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
 
+" `C-l` works in  the pattern field of a  `:s` and `:g` command, but  not in the
+" one of a `:vim` command (`:h /^l`).
+cno <unique> <c-l> <c-r>=cmdline#c_l()<cr>
+
+" Prevent the  function from  returning anything  if we are  not in  the pattern
+" field of `:vim`.
 " The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
 "
 "    - on the search command-line, it translates the pattern so that:

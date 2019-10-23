@@ -32,6 +32,16 @@ fu cmdline#auto_uppercase() abort "{{{1
     endfor
 endfu
 
+fu cmdline#c_l() abort "{{{1
+    if getcmdline() =~# '^\m\C\s*\d*l\=vim\%[grepadd]\>'
+        let [line, col] = [getline('.'), col('.')]
+        return matchstr(line, '\%'..col..'c.')
+    else
+        call feedkeys("\<c-l>", 'in')
+        return ''
+    endif
+endfu
+
 fu cmdline#chain() abort "{{{1
     " Do NOT write empty lines in this function (`gQ` → E501, E749).
     let cmdline = getcmdline()
