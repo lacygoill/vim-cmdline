@@ -23,7 +23,7 @@ fu cmdline#transform#main() abort "{{{2
         endif
         call cmdline#util#undo#emit_add_to_undolist_c()
         return "\<c-e>\<c-u>"
-        \     .(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments())
+        \ ..(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments())
     elseif cmdtype =~# ':'
         call cmdline#util#undo#emit_add_to_undolist_c()
         let cmdline = getcmdline()
@@ -37,7 +37,7 @@ endfu
 " Core {{{1
 " Ex {{{2
 fu s:guess_what_the_cmdline_is(cmdline) abort "{{{3
-    if a:cmdline =~# '^'.s:PAT_RANGE.'s[/:]'
+    if a:cmdline =~# '^'..s:PAT_RANGE..'s[/:]'
         " a substitution command
         return ':s'
     elseif a:cmdline =~# '\C^\s*echo'
@@ -68,9 +68,9 @@ fu s:map_filter(cmdline) abort "{{{3
     "}}}
 
     if !has('nvim')
-        if a:cmdline =~# '\C^\s*echo\s*.*->\%(map\|filter\)({[i,_],v\s*->\s*})$'
+        if a:cmdline =~# '\C^\s*echo\s\+.*->\%(map\|filter\)({[i,_],v\s*->\s*})$'
             let new_cmdline = substitute(a:cmdline,
-                \ '\C^\s*echo\s*.*->\zs\%(map\|filter\)\ze({[i,_],v\s*->\s*})$',
+                \ '\C^\s*echo\s\+.*->\zs\%(map\|filter\)\ze({[i,_],v\s*->\s*})$',
                 \ '\={"map": "filter", "filter": "map"}[submatch(0)]',
                 \ '')
         else
@@ -78,19 +78,19 @@ fu s:map_filter(cmdline) abort "{{{3
         endif
     else
         " if `map()`/`filter()` is used, with an empty lambda, toggle it
-        if a:cmdline =~# '\C^\s*echo\s*\%(map\|filter\)(.*,\s*{[_i],v\s*->\s*})'
+        if a:cmdline =~# '\C^\s*echo\s\+\%(map\|filter\)(.*,\s*{[_i],v\s*->\s*})'
             let new_cmdline = substitute(a:cmdline,
-                \ '^\s*echo\s*\zs\%(map\|filter\)\ze(',
+                \ '^\s*echo\s\+\zs\%(map\|filter\)\ze(',
                 \ '\={"map": "filter", "filter": "map"}[submatch(0)]',
                 \ '')
         else
             " otherwise, add a new `map()`/`filter()`
-            let new_cmdline = substitute(a:cmdline, '^\s*echo\s*\zs', 'map(', '')
+            let new_cmdline = substitute(a:cmdline, '^\s*echo\s\+\zs', 'map(', '')
             let new_cmdline = substitute(new_cmdline, '$', ', {_,v -> })', '')
         endif
     endif
 
-    return "\<c-e>\<c-u>".new_cmdline."\<left>\<left>"
+    return "\<c-e>\<c-u>"..new_cmdline.."\<left>\<left>"
 endfu
 
 fu s:capture_subpatterns(cmdline) abort "{{{3
@@ -102,7 +102,7 @@ fu s:capture_subpatterns(cmdline) abort "{{{3
 
     " extract the range, separator and the pattern
     let range = matchstr(a:cmdline, s:PAT_RANGE)
-    let separator = matchstr(a:cmdline, '^'.s:PAT_RANGE.'s\zs.')
+    let separator = matchstr(a:cmdline, '^'..s:PAT_RANGE..'s\zs.')
     let pat = split(a:cmdline, separator)[1]
 
     " from the pattern, extract words between underscores or uppercase letters:{{{
@@ -114,15 +114,15 @@ fu s:capture_subpatterns(cmdline) abort "{{{3
 
     " return the keys to type{{{
     "
-    "                            ┌ original pattern, with the addition of parentheses around the subpatterns:
-    "                            │
-    "                            │          (One)(Two)(Three)
-    "                            │    or    (one)_(two)_(three)
-    "                            │
-    "                            ├──────────────────────────────────────────────────────────────────┐}}}
-    let new_cmdline = range.'s/'.join(map(subpatterns, {_,v -> '\('.v.'\)'}), pat =~# '_' ? '_' : '') . '//g'
+    "                              ┌ original pattern, with the addition of parentheses around the subpatterns:
+    "                              │
+    "                              │          (One)(Two)(Three)
+    "                              │    or    (one)_(two)_(three)
+    "                              │
+    "                              ├────────────────────────────────────────────────────────────────────┐}}}
+    let new_cmdline = range..'s/'..join(map(subpatterns, {_,v -> '\('..v..'\)'}), pat =~# '_' ? '_' : '')..'//g'
 
-    return "\<c-e>\<c-u>".new_cmdline."\<left>\<left>"
+    return "\<c-e>\<c-u>"..new_cmdline.."\<left>\<left>"
 endfu
 "}}}2
 " Search {{{2
@@ -136,10 +136,10 @@ fu s:search_outside_comments() abort "{{{3
     if empty(&l:cms)
         return get(s:, 'orig_cmdline', '')
     endif
-    let cml = '\V'.escape(matchstr(split(&l:cms, '%')[0], '\S*'), '\').'\m'
-    return '\%(^\%(\s*'.cml.'\)\@!.*\)\@<=\m\%('.get(s:, 'orig_cmdline', '').'\)'
-    "                                       ├─┘
-    "                                       └ Why?{{{
+    let cml = '\V'..escape(matchstr(split(&l:cms, '%')[0], '\S*'), '\')..'\m'
+    return '\%(^\%(\s*'..cml..'\)\@!.*\)\@<=\m\%('..get(s:, 'orig_cmdline', '')..'\)'
+    "                                         ├─┘
+    "                                         └ Why?{{{
     " The original pattern may contain several branches.
     " In that  case, we want the  lookbehind to be  applied to all of  them, not
     " just the first one.
