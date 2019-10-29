@@ -41,7 +41,7 @@ fu s:filetype_specific_vimgrep() abort "{{{2
         return '/usr/share/zsh/**'
     elseif &ft =~# '^\%(bash\|sh\)$'
         " TODO: Remove `~/.shrc` once we've integrated it into `~/.zshrc`.
-        return  '~/bin/**/*.sh'
+        return  '~/bin/**/*'
             \ . ' ~/.{shrc,bashrc,zshrc,zshenv}'
             \ . ' ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets'
     else
