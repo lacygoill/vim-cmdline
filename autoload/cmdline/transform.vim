@@ -67,22 +67,21 @@ fu s:map_filter(cmdline) abort "{{{3
     "     :echo map(filter([1,2,3], {_,v -> v != 2}), {_,v -> })~
     "}}}
 
-    " if `map()`/`filter()` is used, with an empty lambda, toggle it
     if !has('nvim')
-        " TODO: In Vim, use the method call operator.
-        if a:cmdline =~# '\C^\s*echo\s*\%(\[.\{-}\]\|{.\{-}}\)->.*\%(->\)\=\%(map\|filter\)({[i,_],v\s*->\s*})$'
+        if a:cmdline =~# '\C^\s*echo\s*.*->\%(map\|filter\)({[i,_],v\s*->\s*})$'
             let new_cmdline = substitute(a:cmdline,
-                \ '\C^\s*echo\s*\%(\[.\{-}\]\|{.\{-}}\)->.*\%(->\)\=\zs\%(map\|filter\)\ze({[i,_],v\s*->\s*})$',
-                \ '\={"map": "filter", "filter": "map"}[submatch(1)]',
+                \ '\C^\s*echo\s*.*->\zs\%(map\|filter\)\ze({[i,_],v\s*->\s*})$',
+                \ '\={"map": "filter", "filter": "map"}[submatch(0)]',
                 \ '')
         else
             let new_cmdline = substitute(a:cmdline, '$', '->map({_,v -> })', '')
         endif
     else
+        " if `map()`/`filter()` is used, with an empty lambda, toggle it
         if a:cmdline =~# '\C^\s*echo\s*\%(map\|filter\)(.*,\s*{[_i],v\s*->\s*})'
             let new_cmdline = substitute(a:cmdline,
-                \ '^\s*echo\s*\zs\(map\|filter\)\ze(',
-                \ '\={"map": "filter", "filter": "map"}[submatch(1)]',
+                \ '^\s*echo\s*\zs\%(map\|filter\)\ze(',
+                \ '\={"map": "filter", "filter": "map"}[submatch(0)]',
                 \ '')
         else
             " otherwise, add a new `map()`/`filter()`
