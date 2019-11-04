@@ -38,7 +38,7 @@ endfu
 " Core {{{1
 fu s:filetype_specific_vimgrep() abort "{{{2
     if &ft is# 'zsh'
-        return '/usr/share/zsh/**'
+        return '/usr/local/share/zsh/**'
     elseif &ft =~# '^\%(bash\|sh\)$'
         " TODO: Remove `~/.shrc` once we've integrated it into `~/.zshrc`.
         return  '~/bin/**/*'
