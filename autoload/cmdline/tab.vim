@@ -1,30 +1,23 @@
-if exists('g:autoloaded_cmdline#tab')
-    finish
-endif
-let g:autoloaded_cmdline#tab = 1
-
-augroup my_cmdline_tab
-    au!
-    au CmdlineLeave : unlet! s:cmdline_before_expansion
-augroup END
-
-" Interface {{{1
-fu cmdline#tab#custom(is_fwd) abort "{{{2
+fu cmdline#tab#custom(is_fwd) abort "{{{1
     if getcmdtype() =~# '[?/]'
-        return empty(getcmdline())
+        return getcmdline() is# ''
            \ ?     "\<up>"
            \ :     a:is_fwd ? "\<c-g>" : "\<c-t>"
+    endif
+    if a:is_fwd
+        " The returned key will be pressed from a mapping while in command-line mode.
+        " We want Vim to start a wildcard expansion.
+        " So, we need to return whatever key is stored in 'wcm'.
+        let key = nr2char(&wcm ? &wcm : &wc)
+        return wildmenumode() ? key : cmdline#unexpand#save_oldcmdline(key, getcmdline())
     else
-        if a:is_fwd
-            return s:save_cmdline_before_expansion()
-        endif
-        let flags = 'in'.(!wildmenumode() ? 't' : '')
-        "                                    │
-        "           handle key as if typed,  ┘
-        "           otherwise it's  handled as if  coming from a  mapping, which
-        "           matters when we  try to open the wildmenu,  or cycle through
-        "           its entries
-
+        " Why the `t` flag?{{{
+        "
+        " To handle  `S-Tab` as if  it was typed,  otherwise it's handled  as if
+        " coming from a mapping, which matters when we try to open the wildmenu,
+        " or cycle through its entries
+        "}}}
+        let flags = 'in'..(wildmenumode() ? '' : 't')
         " Why use `feedkeys()`?{{{
         "
         " If we used this mapping:
@@ -51,37 +44,18 @@ fu cmdline#tab#custom(is_fwd) abort "{{{2
         "
         "     :nunmap @
         "     @q
-        "     should print the current line; does not~
+        "     " should print the current line; does not
         "}}}
         call feedkeys("\<s-tab>", flags)
         return ''
     endif
 endfu
 
-fu cmdline#tab#restore_cmdline_after_expansion() abort "{{{2
-    let cmdline = getcmdline()
-    if !exists('s:cmdline_before_expansion')
-        return cmdline
-    endif
+fu cmdline#tab#restore_cmdline_after_expansion() abort "{{{1
+    let cmdline_before_expansion = cmdline#unexpand#get_oldcmdline()
+    if cmdline_before_expansion is# '' | return getcmdline() | endif
     redraw
-    au CmdlineChanged : ++once unlet! s:cmdline_before_expansion
-    return get(s:, 'cmdline_before_expansion', cmdline)
+    au CmdlineChanged : ++once call cmdline#unexpand#clear_oldcmdline()
+    return cmdline_before_expansion
 endfu
 " }}}1
-" Utility {{{1
-fu s:save_cmdline_before_expansion() abort "{{{2
-    " The returned key will be pressed from a mapping while in command-line mode.
-    " We want Vim to start a wildcard expansion.
-    " So, we need to return whatever key is stored in 'wcm'.
-    let key = nr2char(&wcm ? &wcm : &wc)
-    if wildmenumode()
-        return key
-    endif
-    let cmdline = getcmdline()
-    fu! s:save_if_wildmenu_is_active() abort closure
-        if wildmenumode() | let s:cmdline_before_expansion = cmdline | endif
-    endfu
-    au CmdlineChanged : ++once call s:save_if_wildmenu_is_active()
-    return key
-endfu
-

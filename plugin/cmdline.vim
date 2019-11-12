@@ -132,6 +132,18 @@ cno <expr><unique> <tab>   cmdline#tab#custom(1)
 cno <expr><unique> <s-tab> cmdline#tab#custom(0)
 cno       <unique> <c-q>   <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
 
+" In vim-readline, we remap `i_C-a` to a readline motion.
+" Here, we restore the default `C-a` command (`:h i^a`) by mapping it to `C-x C-a`.
+ino <expr><unique> <c-x><c-a> cmdline#unexpand#save_oldcmdline('<c-a>', getcmdline())
+
+" Same thing with the default `c_C-a` (`:h c^a`).
+cno <expr><unique> <c-x><c-a> cmdline#unexpand#save_oldcmdline('<c-a>', getcmdline())
+
+" `c_C-a` dumps all the matches on the command-line; let's define a custom `C-x C-d`
+" to capture all of them in the unnamed register.
+cno <expr><unique> <c-x><c-d>
+    \ '<c-a>'..timer_start(0, {_ -> setreg('"', getcmdline(), 'l') + feedkeys('<c-c>', 'in') })[-1]
+
 " Prevent the function from returning anything if we are not in the pattern field of `:vim`.
 " The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
 "
@@ -235,12 +247,11 @@ fu s:cycles_set() abort
     " Why not using `:cexpr`?{{{
     "
     " It suffers from an issue regarding a possible pipe in the shell command.
-    " You have to escape it, which is  inconsistent with how a bar is interpreted by
-    " Vim in other contexts.
-    " I don't want to remember this quirk.
+    " You have to escape it, which is inconsistent with how a bar is interpreted
+    " by Vim in other contexts; I don't want to remember this quirk.
     "}}}
     call cmdline#cycle#main#set('g',
-        \ 'sil call system(''rg 2>/dev/null --vimgrep -i -L § . >/tmp/.vim_cfile'') <bar> cgetfile /tmp/.vim_cfile')
+        \ 'sil call system("rg 2>/dev/null -LS --vimgrep ''§'' . >/tmp/.vim_cg") <bar> cg /tmp/.vim_cg')
 
     " we want a different pattern depending on the filetype
     " we want `:vimgrep` to be run asynchronously
