@@ -3,6 +3,15 @@ if exists('g:autoloaded_cmdline#cycle#vimgrep')
 endif
 let g:autoloaded_cmdline#cycle#vimgrep = 1
 
+" FIXME: It seems that `:Vim` doesn't work in Nvim atm.{{{
+"
+" MWE:
+"
+"     :Vim /foobar/gj ~/.vim/**/*.{snippets,vim} ~/.vim/template/** ~/.vim/vimrc
+"
+" The previous command finds matches in Vim, but no matches in Nvim.
+"}}}
+
 " Interface {{{1
 
 " Why a wrapper command around `:[l]vim`?{{{
