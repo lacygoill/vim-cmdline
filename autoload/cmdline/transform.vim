@@ -1,3 +1,8 @@
+if exists('g:autoloaded_cmdline#transform')
+    finish
+endif
+let g:autoloaded_cmdline#transform = 1
+
 let s:PAT_RANGE = '\s*\%([%*]\|[^,]*,[^,]*\)'
 
 " Interface {{{1
