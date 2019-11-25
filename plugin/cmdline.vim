@@ -80,12 +80,6 @@ augroup my_cmdline_chain
                   \ |     call timer_start(0, {_ -> execute('ToggleEditingCommands 1')})
                   \ | endif
 
-    " enable the  item in  the statusline  showing our  position in  the arglist
-    " after we execute an `:args` command
-    au CmdlineLeave : if getcmdline() =~# '\C^\%(tab\s\+\)\=ar\%[gs]\s+'
-                  \ |     call timer_start(0, {_ -> execute('let g:my_stl_list_position = 2 | redraw!')})
-                  \ | endif
-
     " sometimes, we type `:h functionz)` instead of `:h function()`
     au CmdlineLeave : if getcmdline() =~# '\C^h\%[elp]\s\+\S\+z)\s*$'
                   \ |     call cmdline#fix_typo('z')
@@ -173,9 +167,8 @@ fu s:cycles_set() abort
     "    - all the files in a directory
     "    - all the files in the output of a shell command
     call cmdline#cycle#main#set('a',
-        \ 'sp <bar> args `=filter(glob(''§./**/*'', 0, 1), {_,v -> filereadable(v)})`'
-        \ .  '<bar> let g:my_stl_list_position = 2',
-        \ 'sp <bar> sil args `=systemlist(''§'')` <bar> let g:my_stl_list_position = 2')
+        \ 'sp <bar> args `=filter(glob(''§./**/*'', 0, 1), {_,v -> filereadable(v)})`',
+        \ 'sp <bar> sil args `=systemlist(''§'')`')
 
     "                       ┌ definition
     "                       │
