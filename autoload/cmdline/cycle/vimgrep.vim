@@ -35,13 +35,15 @@ fu cmdline#cycle#vimgrep#install() abort
     " pattern which contains a bar.
     "}}}
     call cmdline#cycle#main#set('v',
-        \ 'Vim /§/gj ./**/*.<c-r>='.s:snr().'get_extension()<cr>',
-        \ 'Vim /§/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr>',
-        \ 'Vim /§/gj $VIMRUNTIME/**/*.vim',
-        \ 'Vim /§/gj ##',
-        \ 'Vim /§/gj `find . -type f -cmin -60`',
-        \ 'Lvim /§/gj %',
+        \ 'vim /§/gj ./**/*.<c-r>='.s:snr().'get_extension()<cr>',
+        \ 'vim /§/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr>',
+        \ 'vim /§/gj $VIMRUNTIME/**/*.vim',
+        \ 'vim /§/gj ##',
+        \ 'vim /§/gj `find . -type f -cmin -60`',
+        \ 'lvim /§/gj %',
         \ )
+    " TODO: We use the  default `:[l]vim` commands until we  review/fix the code
+    " implementing `:[L]Vim`. Once it's done, uppercase the `:[l]vim` again.
 endfu
 " }}}1
 " Core {{{1
@@ -116,7 +118,7 @@ fu s:vimgrep(args, in_loclist) abort "{{{2
     " The job is in an interruptible sleep:
     "
     "     :let job = jobstart(['/bin/bash', '-c', 'nvim +''call writefile(["test"], "/tmp/log", "s")'' +qa!'])
-    "     :exe '!ps aux | grep '.jobpid(job)
+    "     :exe '!ps aux | grep '..jobpid(job)
     "     user  1234  ... Ss  ...  nvim +call writefile(["test"], "/tmp/log") +qa!~
     "                     ^✘
     "

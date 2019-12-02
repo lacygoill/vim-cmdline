@@ -181,10 +181,10 @@ fu s:cycles_set() abort
         \ 'Verb fu {''<lambda>§''}')
 
     call cmdline#cycle#main#set('ee',
-        \ 'tabe $MYVIMRC§',
-        \ 'e $MYVIMRC§',
-        \ 'sp $MYVIMRC§',
-        \ 'vs $MYVIMRC§')
+        \ 'tabe ~/.vim/vimrc§',
+        \ 'e ~/.vim/vimrc§',
+        \ 'sp ~/.vim/vimrc§',
+        \ 'vs ~/.vim/vimrc§')
 
     call cmdline#cycle#main#set('em',
         \ 'tabe /tmp/vimrc§',
@@ -263,7 +263,7 @@ fu s:cycles_set() abort
     " Besides, the text  is formatted to not go beyond  100 characters per line,
     " which could break some long line of code.
     "}}}
-    call cmdline#cycle#main#set('r', 'exe ''r !curl -s '' . shellescape(''§'', 1)')
+    call cmdline#cycle#main#set('r', 'exe ''r !curl -s ''..shellescape(''§'', 1)')
     "                                                │
     "                                                └ don't show progress meter, nor error messages
 
