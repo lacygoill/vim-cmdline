@@ -135,6 +135,17 @@ fu cmdline#toggle_editing_commands(enable) abort "{{{1
             " extract lhs
             call map(lhs_list, {_,v -> matchstr(v, 'c\s\+\zs\S\+')})
             let s:my_editing_commands = lg#map#save('c', 0, lhs_list)
+            " TODO: We should be able to replace this `for` block with `:cmapclear`.{{{
+            "
+            " But in practice, it seems to make a slight difference.
+            " Compare the output of `:cno` before/after running:
+            "
+            "     :ToggleEditingCommands 0
+            "     :ToggleEditingCommands 1
+            "
+            " Then perform the  same comparison after replacing  the `for` block
+            " with `:cmapclear`.
+            "}}}
             for lhs in lhs_list
                 exe 'cunmap '..lhs
             endfor
