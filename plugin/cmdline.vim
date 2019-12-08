@@ -170,8 +170,8 @@ fu s:cycles_set() abort
         \ 'sp <bar> args `=filter(glob(''§./**/*'', 0, 1), {_,v -> filereadable(v)})`',
         \ 'sp <bar> sil args `=systemlist(''§'')`')
 
-    "                       ┌ definition
-    "                       │
+    "                            ┌ definition
+    "                            │
     call cmdline#cycle#main#set('d',
         \ 'Verb nno §',
         \ 'Verb com §',
@@ -237,14 +237,7 @@ fu s:cycles_set() abort
     call cmdline#cycle#filter#install()
 
     " populate the qfl with the output of a shell command
-    " Why not using `:cexpr`?{{{
-    "
-    " It suffers from an issue regarding a possible pipe in the shell command.
-    " You have to escape it, which is inconsistent with how a bar is interpreted
-    " by Vim in other contexts; I don't want to remember this quirk.
-    "}}}
-    call cmdline#cycle#main#set('g',
-        \ 'sil call system("rg 2>/dev/null -LS --vimgrep ''§'' . >/tmp/.vim_cg") <bar> cg /tmp/.vim_cg')
+    call cmdline#cycle#main#set('g', 'cgete system("rg 2>/dev/null -LS --vimgrep ''§''")')
 
     " we want a different pattern depending on the filetype
     " we want `:vimgrep` to be run asynchronously
