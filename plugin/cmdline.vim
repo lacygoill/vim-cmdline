@@ -237,7 +237,10 @@ fu s:cycles_set() abort
     call cmdline#cycle#filter#install()
 
     " populate the qfl with the output of a shell command
-    call cmdline#cycle#main#set('g', 'cgete system("rg 2>/dev/null -LS --vimgrep ''§''")')
+    call cmdline#cycle#main#set('g',
+    \ 'cgete system("rg 2>/dev/null -LS --vimgrep ''§''")',
+    \ 'lgete system("rg 2>/dev/null -LS --vimgrep ''§''")',
+    \ )
 
     " we want a different pattern depending on the filetype
     " we want `:vimgrep` to be run asynchronously
