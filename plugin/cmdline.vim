@@ -49,12 +49,13 @@ cnorea <expr>  ucs   getcmdtype() is# ':' && getcmdpos() == 4  ? 'UnicodeSearch'
 
 " Autocmds {{{1
 
-" Do NOT write a bar after a backslash  on an empty line: it would result in
-" 2 consecutive bars (empty command). This would print a line of a buffer on
+" Do *not* write  a bar after a backslash  on an empty line: it  would result in
+" two consecutive bars  (empty command). This would print a line  of a buffer on
 " the command-line, when we change the focused window for the first time.
-au CmdlineEnter : ++once sil! call cmdline#auto_uppercase()
-    \ |           sil! call cmdline#remember(s:overlooked_commands)
-    \ |           unlet! s:overlooked_commands
+au CmdlineEnter : ++once
+    \   call cmdline#auto_uppercase()
+    \ | call cmdline#remember(s:overlooked_commands)
+    \ | unlet! s:overlooked_commands
 
 augroup my_cmdline_chain
     au!
@@ -268,7 +269,7 @@ fu s:cycles_set() abort
     call cmdline#cycle#substitute#install()
 endfu
 
-sil! call s:cycles_set()
+call s:cycles_set()
 
 " Variable {{{1
 

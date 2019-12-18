@@ -33,7 +33,7 @@ fu cmdline#auto_uppercase() abort "{{{1
 endfu
 
 fu cmdline#chain() abort "{{{1
-    " Do NOT write empty lines in this function (`gQ` → E501, E749).
+    " Do *not* write empty lines in this function (`gQ` → E501, E749).
     let cmdline = getcmdline()
     let pat2cmd = {
         \ '\%(g\|v\).*\%(#\@1<!#\|nu\%[mber]\)' : [''        , 0],
@@ -72,7 +72,7 @@ fu cmdline#chain() abort "{{{1
                 " even if it takes more than one screen; don't stop after the first
                 " screen to display the message:    -- More --
                 set nomore
-                au CmdlineLeave * ++once sil! exe 'set '..(s:more_save ? '' : 'no')..'more'
+                au CmdlineLeave * ++once exe 'set '..(s:more_save ? '' : 'no')..'more'
                     \ | unlet! s:more_save
             endif
             return feedkeys(':'..keys, 'in')
