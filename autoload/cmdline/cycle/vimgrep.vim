@@ -199,8 +199,8 @@ fu s:get_extension() abort "{{{2
 endfu
 
 fu s:get_modified_args(args) abort "{{{2
-    let pat = '^\(\i\@!\&.\)\1\ze[gj]\{,2}\s\+'
-    "           ├────────────┘
+    let pat = '^\(\i\@!.\)\1\ze[gj]\{,2}\s\+'
+    "           ├──────────┘
     "           └ 2 consecutive and identical non-identifier characters
     let rep = '/'.escape(@/, '\/').'/'
     "                         │{{{
