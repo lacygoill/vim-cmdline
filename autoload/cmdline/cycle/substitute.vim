@@ -31,7 +31,7 @@ fu cmdline#cycle#substitute#install() abort "{{{2
     "     A block size  specification preceded by ‘'’ causes output  sizes to be displayed
     "}}}
     call cmdline#cycle#main#set('s',
-        \ '<c-r>='.s:snr().'filetype_specific_substitute()<cr>§',
+        \ '<c-r>='..s:snr..'filetype_specific_substitute()<cr>§',
         \ '%s/`\(.\{-}\)''/`\1`/gce <bar> %s/‘\(.\{-}\)’/`\1`/gce',
         \ 'let list = split(@", "\n") <bar> *s/§\zs/\=remove(list, 0)/'
         \ )
@@ -57,4 +57,5 @@ endfu
 fu s:snr() abort "{{{2
     return matchstr(expand('<sfile>'), '.*\zs<SNR>\d\+_')
 endfu
+let s:snr = get(s:, 'snr', s:snr())
 

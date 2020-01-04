@@ -35,8 +35,8 @@ fu cmdline#cycle#vimgrep#install() abort
     " pattern which contains a bar.
     "}}}
     call cmdline#cycle#main#set('v',
-        \ 'vim /§/gj ./**/*.<c-r>='.s:snr().'get_extension()<cr>',
-        \ 'vim /§/gj <c-r>='.s:snr().'filetype_specific_vimgrep()<cr>',
+        \ 'vim /§/gj ./**/*.<c-r>='..s:snr..'get_extension()<cr>',
+        \ 'vim /§/gj <c-r>='..s:snr..'filetype_specific_vimgrep()<cr>',
         \ 'vim /§/gj $VIMRUNTIME/**/*.vim',
         \ 'vim /§/gj ##',
         \ 'vim /§/gj `find . -type f -cmin -60`',
@@ -53,14 +53,14 @@ fu s:filetype_specific_vimgrep() abort "{{{2
     elseif &ft =~# '^\%(bash\|sh\)$'
         " TODO: Remove `~/.shrc` once we've integrated it into `~/.zshrc`.
         return  '~/bin/**/*'
-            \ . ' ~/.{shrc,bashrc,zshrc,zshenv}'
-            \ . ' ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets'
+            \ ..' ~/.{shrc,bashrc,zshrc,zshenv}'
+            \ ..' ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets'
     else
         " TODO: Once you start writing unit tests, add them.
         " For example, if you use the vader plugin, add `vader` inside `{snippets,vim}`.
         return  '~/.vim/**/*.{snippets,vim}'
-            \ . ' ~/.vim/template/**'
-            \ . ' ~/.vim/vimrc'
+            \ ..' ~/.vim/template/**'
+            \ ..' ~/.vim/vimrc'
     endif
 endfu
 
@@ -131,12 +131,12 @@ fu s:vimgrep(args, in_loclist) abort "{{{2
     let cmd = [
         \ '/bin/bash', '-c',
         \  (has('nvim') ? 'nvim' : 'vim')
-        \ . ' +' . shellescape('cd ' . getcwd())
-        \ . ' +''call cmdline#cycle#vimgrep#write_matches()'''
-        \ . ' +qa! '
-        \ . tempfile
+        \ ..' +'..shellescape('cd '..getcwd())
+        \ ..' +''call cmdline#cycle#vimgrep#write_matches()'''
+        \ ..' +qa! '
+        \ ..tempfile
         \ ]
-    let title = (a:in_loclist ? ':Lvim ' : ':Vim ').args
+    let title = (a:in_loclist ? ':Lvim ' : ':Vim ')..args
     if has('nvim')
         call jobstart(cmd,
         \ {'on_exit': function('s:callback', [a:in_loclist, tempfile, title])})
@@ -152,7 +152,7 @@ fu cmdline#cycle#vimgrep#write_matches() abort "{{{2
     if empty(args)
         return
     endif
-    exe 'noa vim '.args[0]
+    exe 'noa vim '..args[0]
     let matches = map(getqflist(),
         \ {_,v -> printf('%s:%d:%d:%s', fnamemodify(bufname(v.bufnr), ':p'), v.lnum, v.col, v.text)})
     call writefile(matches, tempfile, 's')
@@ -172,11 +172,11 @@ fu s:callback(in_loclist, tempfile, title, ...) abort "{{{2
 " See `:h job-control-usage`
 "}}}
     if a:in_loclist
-        exe 'lgetfile '.a:tempfile
+        exe 'lgetfile '..a:tempfile
         lw
         call setloclist(0, [], 'a', {'title': a:title})
     else
-        exe 'cgetfile '.a:tempfile
+        exe 'cgetfile '..a:tempfile
         cw
         call setqflist([], 'a', {'title': a:title})
     endif
@@ -192,7 +192,7 @@ fu s:get_extension() abort "{{{2
         let ext = 'md'
     elseif ext is# '' && bufname('%') isnot# ''
         let ext = split(execute('au'), '\n')
-        call filter(ext, {_,v -> v =~# 'setf\s\+'.&ft})
+        call filter(ext, {_,v -> v =~# 'setf\s\+'..&ft})
         let ext = matchstr(get(ext, 0, ''), '\*\.\zs\S\+')
     endif
     return ext
@@ -202,14 +202,14 @@ fu s:get_modified_args(args) abort "{{{2
     let pat = '^\(\i\@!.\)\1\ze[gj]\{,2}\s\+'
     "           ├──────────┘
     "           └ 2 consecutive and identical non-identifier characters
-    let rep = '/'.escape(@/, '\/').'/'
-    "                         │{{{
-    "                         └ `substitute()` will remove any backslash, because
-    "                            some sequences are special (like `\1` or `\u`);
-    "                            See: :h sub-replace-special
+    let rep = '/'..escape(@/, '\/')..'/'
+    "                          │{{{
+    "                          └ `substitute()` will remove any backslash, because
+    "                             some sequences are special (like `\1` or `\u`);
+    "                             See: :h sub-replace-special
     "
-    "                            If our pattern contains a backslash (like in `\s`),
-    "                            we need it to be preserved.
+    "                             If our pattern contains a backslash (like in `\s`),
+    "                             we need it to be preserved.
     "}}}
     let args = substitute(a:args, pat, rep, '')
 
@@ -222,4 +222,5 @@ endfu
 fu s:snr() "{{{2
     return matchstr(expand('<sfile>'), '.*\zs<SNR>\d\+_')
 endfu
+let s:snr = get(s:, 'snr', s:snr())
 
