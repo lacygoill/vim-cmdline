@@ -110,17 +110,16 @@ endfu
 fu cmdline#remember(list) abort "{{{1
     augroup remember_overlooked_commands
         au!
-        for cmd in a:list
-            exe printf('
-            \            au CmdlineLeave :
-            \            if getcmdline() %s %s
-            \ |              exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
-            \ |          endif
-            \          ',     cmd.regex ? '=~#' : 'is#',
-            \                 string(cmd.regex ? '^'..cmd.old..'$' : cmd.old),
-            \                 string('['..cmd.new..'] was equivalent')
-            \         )
-        endfor
+        let code =<< trim END
+            au CmdlineLeave : if getcmdline() %s %s
+                exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
+            endif
+        END
+        call map(deepcopy(a:list), {_,v -> execute(printf(join(code, '|'),
+        \     v.regex ? '=~#' : 'is#',
+        \     string(v.regex ? '^'..v.old..'$' : v.old),
+        \     string('['..v.new..'] was equivalent')
+        \ ))})
     augroup END
 endfu
 

@@ -54,8 +54,8 @@ cnorea <expr>  ucs   getcmdtype() is# ':' && getcmdpos() == 4  ? 'UnicodeSearch'
 " the command-line, when we change the focused window for the first time.
 au CmdlineEnter : ++once
     \   call cmdline#auto_uppercase()
-    \ | call cmdline#remember(s:overlooked_commands)
-    \ | unlet! s:overlooked_commands
+    \ | call cmdline#remember(s:OVERLOOKED_COMMANDS)
+    \ | unlet! s:OVERLOOKED_COMMANDS
 
 augroup my_cmdline_chain
     au!
@@ -275,13 +275,13 @@ call s:cycles_set()
 
 " Commented because the messages are annoying.
 " I keep it for educational purpose.
-"
-"     let s:overlooked_commands = [
+
+"     const s:OVERLOOKED_COMMANDS = [
 "         \ {'old': 'vs\%[plit]', 'new': 'C-w v', 'regex': 1},
 "         \ {'old': 'sp\%[lit]' , 'new': 'C-w s', 'regex': 1},
 "         \ {'old': 'q!'        , 'new': 'ZQ'   , 'regex': 0},
 "         \ {'old': 'x'         , 'new': 'ZZ'   , 'regex': 0},
 "         \ ]
 
-const s:overlooked_commands = []
+const s:OVERLOOKED_COMMANDS = []
 
