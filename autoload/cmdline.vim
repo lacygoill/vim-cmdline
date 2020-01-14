@@ -55,7 +55,14 @@ fu cmdline#c_l() abort "{{{1
         \ ]
     let pat = join(pat, '')
     let list = matchlist(getcmdline(), pat)
-    if len(list) == 0 | return "\<c-l>" | endif
+    " Why don't you return `"\<C-l>"`?{{{
+    "
+    " I don't like the behavior of the default `C-l`.
+    " E.g.,  if your  command-line  contains a  command  substitution, but  your
+    " cursor is not inside the pattern field, `C-l` can still insert a character.
+    " If I'm not in the pattern field, I don't want `C-l` to insert anything.
+    "}}}
+    if list == [] | return '' | endif
     let [pat, delim] = list[0:1]
     let [lnum, col] = searchpos(pat, 'n')
     if [lnum, col] == [0, 0] | return '' | endif
