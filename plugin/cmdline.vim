@@ -127,6 +127,8 @@ cno <expr><unique> <tab>   cmdline#tab#custom(1)
 cno <expr><unique> <s-tab> cmdline#tab#custom(0)
 cno       <unique> <c-q>   <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
 
+cno <expr> <c-l> cmdline#c_l()
+
 " In vim-readline, we remap `i_C-a` to a readline motion.
 " Here, we restore the default `C-a` command (`:h i^a`) by mapping it to `C-x C-a`.
 ino <expr><unique> <c-x><c-a> cmdline#unexpand#save_oldcmdline('<c-a>', getcmdline())

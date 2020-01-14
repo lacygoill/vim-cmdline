@@ -32,6 +32,62 @@ fu cmdline#auto_uppercase() abort "{{{1
     endfor
 endfu
 
+fu cmdline#c_l() abort "{{{1
+    if getcmdtype() isnot# ':' | return "\<c-l>" | endif
+    let pat = [
+        "\ `:123lvimgrepadd!`
+        \ '^\m\C[: \t]*\d*l\=vim\%[grepadd]!\=\s\+',
+        "\ opening delimiter
+        \ '\(\i\@!.\)',
+        "\ the pattern
+        \ '\zs.\{-}\ze',
+        "\ no odd number of backslashes before the closing delimiter
+        \ '\%([^\\]\\\%(\\\\\)*\)\@<!',
+        "\ closing delimiter
+        \ '\1',
+        \ ]
+    let pat = join(pat, '')
+    let list = matchlist(getcmdline(), pat)
+    if len(list) == 0 | return "\<c-l>" | endif
+    let [pat, delim] = list[0:1]
+    let [lnum, col] = searchpos(pat, 'n')
+    if [lnum, col] == [0, 0] | return '' | endif
+    let match = matchstr(getline(lnum), '.*\%'..col..'c\zs.*')
+    let suffix = substitute(match, '^'..pat, '', '')
+    if suffix is# ''
+        return ''
+    " escape the same characters as the default `C-l` in an `:s` command
+    elseif suffix[0] =~# '[$*.:[\\'..delim..'^~]'
+        return '\'..suffix[0]
+    else
+        return suffix[0]
+    endif
+endfu
+" Why don't you support `:vim pat` (without delimiters)?{{{
+"
+" It  would be  tricky because  in that case,  Vim updates  the position  of the
+" cursor after every inserted character.
+"
+" MWE:
+"
+"     $ cat <<'EOF'
+"     set is
+"     cno <expr> <c-l> C_l()
+"     fu C_l()
+"         echom getpos('.')
+"         return ''
+"     endfu
+"     EOF
+"
+"     $ vim -Nu NONE -S /tmp/vim.vim /tmp/vim.vim
+"     :vim /c/ " press C-l while the cursor is right before `c`
+"     [0, 1, 1, 0]~
+"     " the cursor didn't move
+"     :vim c C-l
+"     [0, 2, 2, 0]~
+"     " the cursor *did* move
+"}}}
+
 fu cmdline#chain() abort "{{{1
     " Do *not* write empty lines in this function (`gQ` → E501, E749).
     let cmdline = getcmdline()
