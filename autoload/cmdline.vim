@@ -40,8 +40,9 @@ fu cmdline#c_l() abort "{{{1
         \ '^\m\C[: \t]*\d*l\=vim\%[grepadd]!\=\s\+',
         "\ opening delimiter
         \ '\(\i\@!.\)',
-        "\ the pattern
-        \ '\zs.\{-}\%'..col..'c.\{-}\ze',
+        "\ the pattern; stopping at the cursor because it doesn't make sense
+        "\ to consider what comes after the cursor during a completion
+        \ '\zs.\{-}\%'..col..'c\ze.\{-}',
         "\ no odd number of backslashes before the closing delimiter
         \ '\%([^\\]\\\%(\\\\\)*\)\@<!',
         "\ closing delimiter
@@ -49,7 +50,7 @@ fu cmdline#c_l() abort "{{{1
         "\ flags
         \ '[gj]\{,2}\s',
         "\ `:%s/pat/rep/g`
-        \ '\|s\(\i\@!.\)\zs.\{-}\%'..col..'c.\{-}\ze\2.\{-}\2',
+        \ '\|s\(\i\@!.\)\zs.\{-}\%'..col..'c\ze.\{-}\2.\{-}\2',
         "\ flags
         \ '[cegn]\{,4}\%($\|\s\||\)',
         \ ]
@@ -64,6 +65,7 @@ fu cmdline#c_l() abort "{{{1
     "}}}
     if list == [] | return '' | endif
     let [pat, delim] = list[0:1]
+    " Warning: this search is sensitive to the values of `'ignorecase'` and `'smartcase'`
     let [lnum, col] = searchpos(pat, 'n')
     if [lnum, col] == [0, 0] | return '' | endif
     let match = matchstr(getline(lnum), '.*\%'..col..'c\zs.*')
