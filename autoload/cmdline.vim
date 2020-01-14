@@ -34,17 +34,24 @@ endfu
 
 fu cmdline#c_l() abort "{{{1
     if getcmdtype() isnot# ':' | return "\<c-l>" | endif
+    let col = getcmdpos()
     let pat = [
         "\ `:123lvimgrepadd!`
         \ '^\m\C[: \t]*\d*l\=vim\%[grepadd]!\=\s\+',
         "\ opening delimiter
         \ '\(\i\@!.\)',
         "\ the pattern
-        \ '\zs.\{-}\ze',
+        \ '\zs.\{-}\%'..col..'c.\{-}\ze',
         "\ no odd number of backslashes before the closing delimiter
         \ '\%([^\\]\\\%(\\\\\)*\)\@<!',
         "\ closing delimiter
         \ '\1',
+        "\ flags
+        \ '[gj]\{,2}\s',
+        "\ `:%s/pat/rep/g`
+        \ '\|s\(\i\@!.\)\zs.\{-}\%'..col..'c.\{-}\ze\2.\{-}\2',
+        "\ flags
+        \ '[cegn]\{,4}\%($\|\s\||\)',
         \ ]
     let pat = join(pat, '')
     let list = matchlist(getcmdline(), pat)
