@@ -35,26 +35,24 @@ endfu
 fu cmdline#c_l() abort "{{{1
     if getcmdtype() isnot# ':' | return "\<c-l>" | endif
     let col = getcmdpos()
-    let pat = [
+    let pat =
         "\ `:123lvimgrepadd!`
-        \ '^\m\C[: \t]*\d*l\=vim\%[grepadd]!\=\s\+',
+        \   '^\m\C[: \t]*\d*l\=vim\%[grepadd]!\=\s\+'
         "\ opening delimiter
-        \ '\(\i\@!.\)',
+        \ ..'\(\i\@!.\)'
         "\ the pattern; stopping at the cursor because it doesn't make sense
         "\ to consider what comes after the cursor during a completion
-        \ '\zs.\{-}\%'..col..'c\ze.\{-}',
+        \ ..'\zs.\{-}\%'..col..'c\ze.\{-}'
         "\ no odd number of backslashes before the closing delimiter
-        \ '\%([^\\]\\\%(\\\\\)*\)\@<!',
+        \ ..'\%([^\\]\\\%(\\\\\)*\)\@<!'
         "\ closing delimiter
-        \ '\1',
+        \ ..'\1'
         "\ flags
-        \ '[gj]\{,2}\s',
+        \ ..'[gj]\{,2}\s'
         "\ `:%s/pat/rep/g`
-        \ '\|s\(\i\@!.\)\zs.\{-}\%'..col..'c\ze.\{-}\2.\{-}\2',
+        \ ..'\|s\(\i\@!.\)\zs.\{-}\%'..col..'c\ze.\{-}\2.\{-}\2'
         "\ flags
-        \ '[cegn]\{,4}\%($\|\s\||\)',
-        \ ]
-    let pat = join(pat, '')
+        \ ..'[cegn]\{,4}\%($\|\s\||\)'
     let list = matchlist(getcmdline(), pat)
     " Why don't you return `"\<C-l>"`?{{{
     "
