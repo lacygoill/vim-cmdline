@@ -78,7 +78,7 @@ augroup my_cmdline_chain
     " We use a timer to avoid reenabling the editing commands before having left
     " the command-line completely; otherwise `E501`.
     au CmdlineLeave : if getcmdline() =~# '^\s*vi\%[sual]\s*$'
-                  \ |     call timer_start(0, {_ -> execute('ToggleEditingCommands 1')})
+                  \ |     call timer_start(0, {-> execute('ToggleEditingCommands 1')})
                   \ | endif
 
     " sometimes, we type `:h functionz)` instead of `:h function()`
@@ -139,7 +139,7 @@ cno <expr><unique> <c-x><c-a> cmdline#unexpand#save_oldcmdline('<c-a>', getcmdli
 " `c_C-a` dumps all the matches on the command-line; let's define a custom `C-x C-d`
 " to capture all of them in the unnamed register.
 cno <expr><unique> <c-x><c-d>
-    \ '<c-a>'..timer_start(0, {_ -> setreg('"', getcmdline(), 'l') + feedkeys('<c-c>', 'in') })[-1]
+    \ '<c-a>'..timer_start(0, {-> setreg('"', getcmdline(), 'l') + feedkeys('<c-c>', 'in') })[-1]
 
 " Prevent the function from returning anything if we are not in the pattern field of `:vim`.
 " The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
