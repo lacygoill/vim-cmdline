@@ -51,8 +51,10 @@ fu cmdline#c_l() abort "{{{1
         \ ..'[gj]\{,2}\s'
         "\ `:%s/pat/rep/g`
         \ ..'\|s\(\i\@!.\)\zs.\{-}\%'..col..'c\ze.\{-}\2.\{-}\2'
-        "\ flags
+        "\ `:h :s_flags`
         \ ..'[cegn]\{,4}\%($\|\s\||\)'
+        "\ `:helpg pat`
+        \ ..'\|\%(helpg\%[rep]\|l\%[helpgrep]\)\s\+\zs.*'
     let list = matchlist(getcmdline(), pat)
     " Why don't you return `"\<C-l>"`?{{{
     "
@@ -84,7 +86,7 @@ endfu
 "
 " MWE:
 "
-"     $ cat <<'EOF'
+"     $ cat <<'EOF' >/tmp/vim.vim
 "     set is
 "     cno <expr> <c-l> C_l()
 "     fu C_l()
@@ -94,11 +96,12 @@ endfu
 "     EOF
 "
 "     $ vim -Nu NONE -S /tmp/vim.vim /tmp/vim.vim
-"     :vim /c/ " press C-l while the cursor is right before `c`
-"     [0, 1, 1, 0]~
+"     :vim /c/
+"     " press C-l while the cursor is right before `c`
+"     [0, 2, 1, 0]~
 "     " the cursor didn't move
 "     :vim c C-l
-"     [0, 2, 2, 0]~
+"     [0, 2, 14, 0]~
 "     " the cursor *did* move
 "}}}
 
