@@ -11,6 +11,36 @@ let g:autoloaded_cmdline#cycle#vimgrep = 1
 "
 " The previous command finds matches in Vim, but no matches in Nvim.
 "}}}
+" TODO:{{{
+"
+" `:vimgrep` is too slow in Nvim.
+"
+"     for i in {1..10}; do nvim -es -Nu NORC -i NONE +"let time = reltime() | vim /pattern/gj /usr/local/share/nvim/runtime/**/*.vim | pu=matchstr(reltimestr(reltime(time)), '.*\..\{,3}').' seconds to run :vimgrep'" +'%p|qa!'; done
+"     average 10.8 seconds~
+"
+"     for i in {1..10}; do vim -es -Nu NORC -i NONE +"let time = reltime() | vim /pattern/gj /usr/local/share/nvim/runtime/**/*.vim | pu=matchstr(reltimestr(reltime(time)), '.*\..\{,3}').' seconds to run :vimgrep'" +'%p|qa!'; done
+"     average 0.4 seconds~
+"
+" It's a regression introduced by `98a818776`.
+" It was not that slow in `v0.3.0`:
+"
+"     avg: 1.05
+"
+" But it was still 2 to 3 times slower than current Vim's `:vimgrep`...
+"
+" Solution:
+"
+" When you adapt `:Vim` so that it  supports Nvim, make sure the Nvim job starts
+" with the filetype detection disabled:
+"
+"     filetype off
+"
+" This makes the command much faster:
+"
+"                                                      vvvvvvvvvvvv
+"     for i in {1..10}; do nvim -es -Nu NORC -i NONE +"filetype off | let time = reltime() | vim /pattern/gj /usr/local/share/nvim/runtime/**/*.vim | pu=matchstr(reltimestr(reltime(time)), '.*\..\{,3}').' seconds to run :vimgrep'" +'%p|qa!'; done
+"     average 0.3 seconds~
+"}}}
 
 " Interface {{{1
 
