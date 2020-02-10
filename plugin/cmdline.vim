@@ -184,10 +184,10 @@ fu s:cycles_set() abort
         \ 'Verb fu {''<lambda>§''}')
 
     call cmdline#cycle#main#set('ee',
-        \ 'tabe ~/.vim/vimrc§',
-        \ 'e ~/.vim/vimrc§',
-        \ 'sp ~/.vim/vimrc§',
-        \ 'vs ~/.vim/vimrc§')
+        \ 'tabe $MYVIMRC§',
+        \ 'e $MYVIMRC§',
+        \ 'sp $MYVIMRC§',
+        \ 'vs $MYVIMRC§')
 
     call cmdline#cycle#main#set('em',
         \ 'tabe /tmp/vimrc§',

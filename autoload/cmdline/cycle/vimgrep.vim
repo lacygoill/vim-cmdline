@@ -7,7 +7,7 @@ let g:autoloaded_cmdline#cycle#vimgrep = 1
 "
 " MWE:
 "
-"     :Vim /foobar/gj ~/.vim/**/*.{snippets,vim} ~/.vim/template/** ~/.vim/vimrc
+"     :Vim /foobar/gj ~/.vim/**/*.{snippets,vim} ~/.vim/template/** $MYVIMRC
 "
 " The previous command finds matches in Vim, but no matches in Nvim.
 "}}}
@@ -90,7 +90,7 @@ fu s:filetype_specific_vimgrep() abort "{{{2
         " For example, if you use the vader plugin, add `vader` inside `{snippets,vim}`.
         return  '~/.vim/**/*.{snippets,vim}'
             \ ..' ~/.vim/template/**'
-            \ ..' ~/.vim/vimrc'
+            \ ..' $MYVIMRC'
     endif
 endfu
 
