@@ -7,7 +7,7 @@ let g:autoloaded_cmdline#cycle#vimgrep = 1
 "
 " MWE:
 "
-"     :Vim /foobar/gj ~/.vim/**/*.{snippets,vim} ~/.vim/template/** $MYVIMRC
+"     :Vim /foobar/gj $MYVIMRC ~/.vim/**/*.vim ~/.vim/**/*.snippets ~/.vim/template/**
 "
 " The previous command finds matches in Vim, but no matches in Nvim.
 "}}}
@@ -87,10 +87,11 @@ fu s:filetype_specific_vimgrep() abort "{{{2
             \ ..' ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets'
     else
         " TODO: Once you start writing unit tests, add them.
-        " For example, if you use the vader plugin, add `vader` inside `{snippets,vim}`.
-        return  '~/.vim/**/*.{snippets,vim}'
+        " For example, if you use the vader plugin, add `\ ..' ~/.vim/**/*.vader'`.
+        return  ' $MYVIMRC'
+            \ ..' ~/.vim/**/*.vim'
+            \ ..' ~/.vim/**/*.snippets'
             \ ..' ~/.vim/template/**'
-            \ ..' $MYVIMRC'
     endif
 endfu
 
