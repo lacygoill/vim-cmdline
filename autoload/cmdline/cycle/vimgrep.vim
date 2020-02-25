@@ -3,45 +3,6 @@ if exists('g:autoloaded_cmdline#cycle#vimgrep')
 endif
 let g:autoloaded_cmdline#cycle#vimgrep = 1
 
-" FIXME: It seems that `:Vim` doesn't work in Nvim atm.{{{
-"
-" MWE:
-"
-"     :Vim /foobar/gj $MYVIMRC ~/.vim/**/*.vim ~/.vim/**/*.snippets ~/.vim/template/**
-"
-" The previous command finds matches in Vim, but no matches in Nvim.
-"}}}
-" TODO:{{{
-"
-" `:vimgrep` is too slow in Nvim.
-"
-"     for i in {1..10}; do nvim -es -Nu NORC -i NONE +"let time = reltime() | vim /pattern/gj /usr/local/share/nvim/runtime/**/*.vim | pu=matchstr(reltimestr(reltime(time)), '.*\..\{,3}').' seconds to run :vimgrep'" +'%p|qa!'; done
-"     average 10.8 seconds~
-"
-"     for i in {1..10}; do vim -es -Nu NORC -i NONE +"let time = reltime() | vim /pattern/gj /usr/local/share/nvim/runtime/**/*.vim | pu=matchstr(reltimestr(reltime(time)), '.*\..\{,3}').' seconds to run :vimgrep'" +'%p|qa!'; done
-"     average 0.4 seconds~
-"
-" It's a regression introduced by `98a818776`.
-" It was not that slow in `v0.3.0`:
-"
-"     avg: 1.05
-"
-" But it was still 2 to 3 times slower than current Vim's `:vimgrep`...
-"
-" Solution:
-"
-" When you adapt `:Vim` so that it  supports Nvim, make sure the Nvim job starts
-" with the filetype detection disabled:
-"
-"     filetype off
-"
-" This makes the command much faster:
-"
-"                                                      vvvvvvvvvvvv
-"     for i in {1..10}; do nvim -es -Nu NORC -i NONE +"filetype off | let time = reltime() | vim /pattern/gj /usr/local/share/nvim/runtime/**/*.vim | pu=matchstr(reltimestr(reltime(time)), '.*\..\{,3}').' seconds to run :vimgrep'" +'%p|qa!'; done
-"     average 0.3 seconds~
-"}}}
-
 " Interface {{{1
 
 " Why a wrapper command around `:[l]vim`?{{{
@@ -52,8 +13,8 @@ let g:autoloaded_cmdline#cycle#vimgrep = 1
 "
 " https://github.com/mhinz/vim-grepper/issues/5#issuecomment-260379947
 "}}}
-com -nargs=* Vim call s:vimgrep(<q-args>, 0)
-com -nargs=* Lvim call s:vimgrep(<q-args>, 1)
+com -nargs=* -complete=file Vim call s:vimgrep(<q-args>, 0)
+com -nargs=* -complete=file Lvim call s:vimgrep(<q-args>, 1)
 
 fu cmdline#cycle#vimgrep#install() abort
     " Why don't you add `<bar> cw` in your mappings?{{{
@@ -138,30 +99,15 @@ fu s:vimgrep(args, in_loclist) abort "{{{2
     " To get a  file which the callback will be able  to parse with `:cgetfile`,
     " and get back the qfl.
     "}}}
-    " TODO: We should write `has('nvim') ? 'nvim' : 'vim'` instead of `vim`.{{{
-    "
-    " We don't, because for some reason a Neovim job started from Neovim doesn't exit.
-    "
-    "     $ nvim
-    "     :call jobstart(['/bin/bash', '-c', 'nvim +''call writefile(["test"], "/tmp/log", "s")'' +qa!'])
-    "                                         ^✘
-    "
-    " The job is in an interruptible sleep:
-    "
-    "     :let job = jobstart(['/bin/bash', '-c', 'nvim +''call writefile(["test"], "/tmp/log", "s")'' +qa!'])
-    "     :exe '!ps aux | grep '..jobpid(job)
-    "     user  1234  ... Ss  ...  nvim +call writefile(["test"], "/tmp/log") +qa!~
-    "                     ^✘
-    "
-    " The issue disappears if we start a Vim job:
-    "
-    "     $ nvim
-    "     :call jobstart(['/bin/bash', '-c', 'vim +''call writefile(["test"], "/tmp/log", "s")'' +qa!'])
-    "                                         ^✔
-    "}}}
+    " Warning: Without the `-e` command-line argument, the Nvim job doesn't work.
+    " We use `-es` because I think it's even better.
     let cmd = [
         \ '/bin/bash', '-c',
         \  (has('nvim') ? 'nvim' : 'vim')
+        \ ..' -Nu NONE -i NONE'
+        \ ..' --cmd "set rtp^=~/.vim/plugged/vim-cmdline"'
+        \ ..' --cmd "set wig='..&wig..' su='..&suffixes..' ic='..&ic..' scs='..&scs..'"'
+        \ ..' -es'
         \ ..' +'..shellescape('cd '..getcwd())
         \ ..' +''call cmdline#cycle#vimgrep#write_matches()'''
         \ ..' +qa! '
