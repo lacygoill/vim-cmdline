@@ -151,7 +151,7 @@ fu cmdline#chain() abort "{{{1
             return feedkeys(':'..keys, 'in')
         endif
     endfor
-    if cmdline =~# '\C^\s*\%(dli\|\il\)\%[ist]\s\+'
+    if cmdline =~# '\C^\s*\%(dli\|il\)\%[ist]\s\+'
         call feedkeys(':'..matchstr(cmdline, '\S')..'j  '..split(cmdline, ' ')[1].."\<s-left>\<left>", 'in')
     elseif cmdline =~# '\C^\s*\%(cli\|lli\)'
         call feedkeys(':sil '..repeat(matchstr(cmdline, '\S'), 2)..' ', 'in')
