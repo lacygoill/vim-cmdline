@@ -223,7 +223,7 @@ fu cmdline#toggle_editing_commands(enable) abort "{{{1
             endfor
         endif
     catch
-        return lg#catch_error()
+        return lg#catch()
     endtry
 endfu
 
