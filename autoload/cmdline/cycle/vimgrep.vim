@@ -167,6 +167,8 @@ fu s:get_extension() abort "{{{2
     let ext = expand('%:e')
     if &ft is# 'dirvish' && expand('%:p') =~? '/wiki/'
         let ext = 'md'
+    elseif &ft is# 'dirvish' && expand('%:p') =~? '/.vim/'
+        let ext = 'vim'
     elseif ext is# '' && bufname('%') isnot# ''
         let ext = split(execute('au'), '\n')
         call filter(ext, {_,v -> v =~# 'setf\s\+'..&ft})
