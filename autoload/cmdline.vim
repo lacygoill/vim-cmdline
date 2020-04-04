@@ -206,7 +206,7 @@ fu cmdline#toggle_editing_commands(enable) abort "{{{1
             call filter(lhs_list, {_,v -> v !~# '^c\s*\S*\s*\S*@'})
             " extract lhs
             call map(lhs_list, {_,v -> matchstr(v, 'c\s\+\zs\S\+')})
-            let s:my_editing_commands = lg#map#save('c', 0, lhs_list)
+            let s:my_editing_commands = lg#map#save(lhs_list, 'c')
             " TODO: We should be able to replace this `for` block with `:cmapclear`.{{{
             "
             " But in practice, it seems to make a slight difference.
