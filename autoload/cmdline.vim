@@ -203,24 +203,11 @@ fu cmdline#toggle_editing_commands(enable) abort "{{{1
         else
             let lhs_list = split(execute('cno'), '\n')
             " ignore buffer-local mappings
-            call filter(lhs_list, {_,v -> v !~# '^c\s*\S*\s*\S*@'})
+            call filter(lhs_list, {_,v -> v !~# '^c\s\+\S\+\s\+\S*@'})
             " extract lhs
-            call map(lhs_list, {_,v -> matchstr(v, 'c\s\+\zs\S\+')})
+            call map(lhs_list, {_,v -> matchstr(v, '^c\s\+\zs\S\+')})
             let s:my_editing_commands = lg#map#save(lhs_list, 'c')
-            " TODO: We should be able to replace this `for` block with `:cmapclear`.{{{
-            "
-            " But in practice, it seems to make a slight difference.
-            " Compare the output of `:cno` before/after running:
-            "
-            "     :ToggleEditingCommands 0
-            "     :ToggleEditingCommands 1
-            "
-            " Then perform the  same comparison after replacing  the `for` block
-            " with `:cmapclear`.
-            "}}}
-            for lhs in lhs_list
-                exe 'cunmap '..lhs
-            endfor
+            cmapclear
         endif
     catch
         return lg#catch()
