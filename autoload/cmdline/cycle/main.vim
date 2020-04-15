@@ -15,8 +15,7 @@ let g:autoloaded_cmdline#cycle#main = 1
 " the removal of a word by pressing `C-w`).
 "
 " See here for inspiration:
-"
-"     https://gist.github.com/lacygoill/c8ccf30dfac6393f737e3fa4efccdf9d
+" https://gist.github.com/lacygoill/c8ccf30dfac6393f737e3fa4efccdf9d
 "
 " ---
 "
