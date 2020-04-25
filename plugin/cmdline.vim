@@ -160,7 +160,7 @@ cno <expr><unique> <c-s> cmdline#transform#main()
 
 " Cycle through a set of arbitrary commands.
 cno <unique> <c-g> <c-\>e cmdline#cycle#main#move(1)<cr>
-cno <unique> <m-g> <c-\>e cmdline#cycle#main#move(0)<cr>
+sil! call lg#map#meta('g', '<c-\>e cmdline#cycle#main#move(0)<cr>', 'c', 'u')
 
 xno <unique> <c-g>s :s///g<left><left><left>
 
