@@ -11,40 +11,60 @@ fu cmdline#tab#custom(is_fwd) abort "{{{1
         let key = nr2char(&wcm ? &wcm : &wc)
         return wildmenumode() ? key : cmdline#unexpand#save_oldcmdline(key, getcmdline())
     else
-        " Why the `t` flag?{{{
+        " Why `feedkeys()`?{{{
         "
-        " To handle  `S-Tab` as if  it was typed,  otherwise it's handled  as if
-        " coming from a mapping, which matters when we try to open the wildmenu,
-        " or cycle through its entries
-        "}}}
-        let flags = 'in'..(wildmenumode() ? '' : 't')
-        " Why use `feedkeys()`?{{{
-        "
-        " If we used this mapping:
-        "
-        "     cno <expr>  <s-tab>  getcmdtype() =~ '[?/]' ? '<c-t>' : '<s-tab>'
-        "
-        " When we would hit `S-Tab`  on the command-line (outside the wildmenu),
-        " it would insert the 7 characters `<s-tab>`, literally.
-        " That's not  what `S-Tab`  does by default. It  should simply  open the
+        " To make Vim press `S-Tab` as if it didn't come from a mapping.
+        " Without  `feedkeys()`  and  the  `t`  flag,  hitting  `S-Tab`  on  the
+        " command-line outside the  wildmenu, makes Vim insert  the 7 characters
+        " `<S-Tab>`, literally.
+        " That's not  what `S-Tab` does by  default.  It should simply  open the
         " wildmenu and select its last entry.
         " We need `S-Tab` to be treated as if it wasn't coming from a mapping.
         " We need to pass the `t` flag to `feedkeys()`.
         "}}}
-        " Why not pass the `t` flag unconditionally?{{{
+        " Why don't you pass the `t` flag unconditionally?{{{
         "
-        " It breaks the  replay of a macro during which  we've pressed `Tab`
-        " or `S-Tab` on the command-line.
+        " During a recording, `S-Tab` would be recorded twice.
         "
-        " MWE:
+        "    - once when you pressed the key interactively
+        "    - once when `feedkeys()` wrote the key in the typeahead
         "
-        "     qqq
-        "     qq : Tab Tab CR    (should execute `:#`)
-        "     q
+        " Because of that, the execution of the register would be wrong; `S-Tab`
+        " would be  pressed twice.
         "
-        "     :nunmap @
-        "     @q
-        "     " should print the current line; does not
+        " Solution: Don't use the `t` flag when a register is being executed, so
+        " that the first `S-Tab` has no effect.
+        "}}}
+        let flags = 'in'..(empty(reg_executing()) ? '' : 't')
+        " TODO: Why is the `i` flag necessary here?{{{
+        "
+        " Hint: Without,  the replay  of the  previous macro  does not  give the
+        " expected result; why?
+        "
+        " Answer: When you replay the macro, here's what happens:
+        "
+        "     typeahead       | executed
+        "     --------------------------
+        "     @q              |
+        "     :^I^I^I<80>kB^M |
+        "      ^I^I^I<80>kB^M | :
+        "        ^I^I<80>kB^M | :^I
+        "          ^I<80>kB^M | :^I^I
+        "            <80>kB^M | :^I^I^I
+        "                  ^M | :^I^I^I<80>kB
+        "                              ^^^^^^
+        "                              S-Tab typed interactively;
+        "                              it's going to feed another S-Tab via `feedkeys()`
+        "
+        " When this function is invoked, a CR is still in the typeahead.
+        " Without  the `i`  flag, `S-Tab`  is  appended, which  means that  it's
+        " executed  *after* whatever  Ex command  is currently  selected in  the
+        " wildmenu.  It  turns out that the  Ex command which is  selected after
+        " you open the wildmenu and press Tab twice is `:&`.
+        " In any  case, `S-Tab` is  executed too late;  it should have  made Vim
+        " select `:#` (which is the previous entry before `:&`).
+        "
+        " But wait.  Does this mean that we should *always* use `i`?
         "}}}
         call feedkeys("\<s-tab>", flags)
         return ''

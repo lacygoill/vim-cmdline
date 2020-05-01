@@ -24,7 +24,7 @@ fu cmdline#auto_uppercase() abort "{{{1
     for cmd in commands
         let lcmd  = tolower(cmd)
         exe printf('cnorea <expr> %s
-            \         getcmdtype() is# '':'' && getcmdline() =~# '.string(pat).'
+            \         getcmdtype() is# '':'' && getcmdline() =~# '..string(pat)..'
             \         ?     %s
             \         :     %s'
             \ , lcmd, lcmd, lcmd, string(cmd), string(tolower(cmd))

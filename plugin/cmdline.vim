@@ -249,7 +249,7 @@ fu s:cycles_set() abort
     " we want `:vimgrep` to be run asynchronously
     call cmdline#cycle#vimgrep#install()
 
-    call cmdline#cycle#main#set('p', 'put =execute(''§'')')
+    call cmdline#cycle#main#set('p', 'new<bar>0pu=execute(''§'')')
 
     " When should I prefer this over `:WebPageRead`?{{{
     "
