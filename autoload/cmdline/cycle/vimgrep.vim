@@ -143,7 +143,7 @@ fu s:callback(in_loclist, tempfile, title, ...) abort "{{{2
 " In Vim, it receives 2 arguments.
 " From `:h job-exit_cb`:
 "
-" > The arguments are the job and the exit status.
+" >     The arguments are the job and the exit status.
 "
 " In Neovim, it receives 3 arguments: `job_id`, `data` and `event`.
 " See `:h job-control-usage`

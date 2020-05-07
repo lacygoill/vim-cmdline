@@ -57,8 +57,17 @@ au CmdlineEnter : ++once
     \ | call cmdline#remember(s:OVERLOOKED_COMMANDS)
     \ | unlet! s:OVERLOOKED_COMMANDS
 
-augroup my_cmdline_chain
-    au!
+augroup hit_enter_prompt | au!
+    " Issue: Pressing `q` at the hit-enter prompt quits the latter (✔) and starts a recording (✘).
+    " Solution: Install a temporary `q` mapping which presses Escape to quit the prompt.
+    if has('nvim')
+        au CmdlineLeave : call cmdline#hit_enter_prompt_no_recording()
+    else
+        au CmdlineLeave : call timer_start(0, {-> cmdline#hit_enter_prompt_no_recording()})
+    endif
+augroup END
+
+augroup my_cmdline_chain | au!
     " Automatically execute  command B when A  has just been executed  (chain of
     " commands). Inspiration:
     " https://gist.github.com/romainl/047aca21e338df7ccf771f96858edb86

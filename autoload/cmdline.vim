@@ -180,6 +180,82 @@ fu cmdline#fix_typo(label) abort "{{{1
     "      So, we'll reexecute a new fixed command with the timer.
 endfu
 
+fu cmdline#hit_enter_prompt_no_recording() abort "{{{1
+    " Nvim is a special case.{{{
+    "
+    " The Vim implementation doesn't work for Nvim.
+    "
+    " You could replace the `SafeState` autocmd with this:
+    "
+    "     let q = {}
+    "     let q.timer = timer_start(10, {-> mode() isnot# 'r' && q.nunmap()}, {'repeat': -1})
+    "     fu q.nunmap() abort dict
+    "         call timer_stop(self.timer)
+    "         sil! nunmap q
+    "     endfu
+    "
+    " But it would still not work, because,  in Nvim, for some reason, a timer's
+    " callback can't be invoked while the hit-enter prompt is visible:
+    "
+    "     $ nvim -u NONE -S <(cat <<'EOF'
+    "         call timer_start(2000, {-> Cb()}, {'repeat': 10})
+    "         fu Cb() abort
+    "             let g:modes = get(g:, 'modes', []) + [mode(1)]
+    "         endfu
+    "         echo "a\nb"
+    "     EOF
+    "     )
+    "     " wait for 20s
+    "     " run:  :echo g:modes (type the command quickly)
+    "     " expected: 10 items in the list, a few of them being 'rm'
+    "     " actual: fewer than 10 items in the list, none of them is 'rm'
+    "
+    " Nvim blocks the  callbacks until the hit-enter prompt  disappears; at that
+    " point, it starts the remaining callbacks.
+    "
+    " From someone on the #neovim irc channel:
+    "
+    " >     the callback wants  to execute on the main thread,  which is blocked
+    " >     until you hit enter
+    " >     it's probably just an architecture  difference. I don't know how vim
+    " >     handles it but  neovim uses libuv to  run an event loop  on the main
+    " >     thread. all the io is via  libuv's async worker threadpools, and you
+    " >     can even send jobs  to other threads that way, but the  ui is all on
+    " >     the main thread the event loop runs on
+    " >     well not all the io. some of it's still blocking, like :write
+    "}}}
+    if has('nvim')
+        " Do *not* use `<nop>` in the rhs. {{{
+        "
+        " The `q`  mapping would  not be removed  immediately after  leaving the
+        " hit-enter prompt by pressing `q`.
+        " That's because the timer's callback is not executed until you interact
+        " with Nvim (move the cursor, enter insert mode, ...).
+        " `<nop>` does not interact with Nvim in any way; `<c-\><c-n>` does.
+        "}}}
+        nno q <c-\><c-n>
+        return timer_start(0, {-> execute('nunmap q', 'silent!')})
+    endif
+
+    " Don't use `mode(1)`!{{{
+    "
+    " When you've run  a command with an output longer  than the current visible
+    " screen, and `-- more --` is printed at the bottom, `mode(1)` is `rm`, *not* `r`.
+    " By using `mode()` instead of `mode(1)`,  we make sure that our `q` mapping
+    " is installed even after executing a command with a long output.
+    "}}}
+    if mode() isnot# 'r' | return | endif
+    " if we press `q`, just remove the mapping{{{
+    "
+    " No  need to  press sth  like  `Esc`; when  the mapping  is processed,  the
+    " hit-enter prompt  has already been  closed automatically.  It's  closed no
+    " matter which key you press.
+    "}}}
+    nno <expr> q execute('nunmap q', 'silent!')[-1]
+    " if we escape the prompt without pressing `q`, make sure the mapping is still removed
+    au SafeState * ++once sil! nunmap q
+endfu
+
 fu cmdline#remember(list) abort "{{{1
     augroup remember_overlooked_commands
         au!
