@@ -5,8 +5,7 @@ let g:autoloaded_cmdline#unexpand = 1
 
 let s:oldcmdline = ''
 
-augroup clear_cmdline_before_expansion
-    au!
+augroup clear_cmdline_before_expansion | au!
     au CmdlineLeave : let s:oldcmdline = ''
 augroup END
 

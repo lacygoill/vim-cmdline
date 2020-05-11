@@ -65,6 +65,9 @@ fu cmdline#tab#custom(is_fwd) abort "{{{1
         " select `:#` (which is the previous entry before `:&`).
         "
         " But wait.  Does this mean that we should *always* use `i`?
+        "
+        " Similar issue:
+        " https://github.com/tpope/vim-repeat/issues/23
         "}}}
         call feedkeys("\<s-tab>", flags)
         return ''
