@@ -141,7 +141,7 @@ fu s:is_valid_cycle() abort "{{{2
     " `C-g` by accident, without having entered a cycle before that.
     return exists('s:seq')
         \ && has_key(s:cycles, s:seq)
-        \ && type(s:cycles[s:seq]) == type([])
+        \ && type(s:cycles[s:seq]) == v:t_list
         \ && len(s:cycles[s:seq]) == 2
 endfu
 
