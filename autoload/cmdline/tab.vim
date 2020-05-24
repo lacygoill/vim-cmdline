@@ -14,63 +14,32 @@ fu cmdline#tab#custom(is_fwd) abort "{{{1
         " Why `feedkeys()`?{{{
         "
         " To make Vim press `S-Tab` as if it didn't come from a mapping.
-        " Without  `feedkeys()`  and  the  `t`  flag,  hitting  `S-Tab`  on  the
-        " command-line outside the  wildmenu, makes Vim insert  the 7 characters
+        " Without  the  `t`  flag  of   `feedkeys()`,  hitting  `S-Tab`  on  the
+        " command-line outside  the wildmenu makes  Vim insert the  7 characters
         " `<S-Tab>`, literally.
         " That's not  what `S-Tab` does by  default.  It should simply  open the
         " wildmenu and select its last entry.
-        " We need `S-Tab` to be treated as if it wasn't coming from a mapping.
-        " We need to pass the `t` flag to `feedkeys()`.
         "}}}
-        " Why don't you pass the `t` flag unconditionally?{{{
+        " Why `empty(reg_recording())`?{{{
         "
-        " During a recording, `S-Tab` would be recorded twice.
+        " Without, during a recording, `S-Tab` would be recorded twice:
         "
-        "    - once when you pressed the key interactively
-        "    - once when `feedkeys()` wrote the key in the typeahead
+        "    - once when you press the key interactively
+        "    - once when `feedkeys()` writes the key in the typeahead
         "
         " Because of that, the execution of the register would be wrong; `S-Tab`
         " would be  pressed twice.
-        "
-        " Solution: Don't use the `t` flag when a register is being executed, so
-        " that the first `S-Tab` has no effect.
         "}}}
-        let flags = 'in'..(empty(reg_executing()) ? '' : 't')
-        " TODO: Why is the `i` flag necessary here?{{{
+        "   Wait.  What if I press `S-Tab` during a recording while the wildmenu is not open?{{{
         "
-        " Hint: Without,  the replay  of the  previous macro  does not  give the
-        " expected result; why?
-        "
-        " Answer: When you replay the macro, here's what happens:
-        "
-        "     typeahead       | executed
-        "     --------------------------
-        "     @q              |
-        "     :^I^I^I<80>kB^M |
-        "      ^I^I^I<80>kB^M | :
-        "        ^I^I<80>kB^M | :^I
-        "          ^I<80>kB^M | :^I^I
-        "            <80>kB^M | :^I^I^I
-        "                  ^M | :^I^I^I<80>kB
-        "                              ^^^^^^
-        "                              S-Tab typed interactively;
-        "                              it's going to feed another S-Tab via `feedkeys()`
-        "
-        " When this function is invoked, a CR is still in the typeahead.
-        " Without  the `i`  flag, `S-Tab`  is  appended, which  means that  it's
-        " executed  *after* whatever  Ex command  is currently  selected in  the
-        " wildmenu.  It  turns out that the  Ex command which is  selected after
-        " you open the wildmenu and press Tab twice is `:&`.
-        " In any  case, `S-Tab` is  executed too late;  it should have  made Vim
-        " select `:#` (which is the previous entry before `:&`).
-        "
-        " But wait.  Does this mean that we should *always* use `i`?
-        "
-        " Similar issue:
-        " https://github.com/tpope/vim-repeat/issues/23
+        " Well, it will be broken; i.e. `<S-Tab>` will be inserted on the command-line.
+        " I don't know how to fix this, and I don't really care; it's a corner case.
         "}}}
-        call feedkeys("\<s-tab>", flags)
-        return ''
+        if !wildmenumode() && empty(reg_recording())
+            call feedkeys("\<s-tab>", 'int')
+            return ''
+        endif
+        return "\<s-tab>"
     endif
 endfu
 
