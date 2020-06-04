@@ -63,7 +63,14 @@ augroup hit_enter_prompt | au!
     if has('nvim')
         au CmdlineLeave : call cmdline#hit_enter_prompt_no_recording()
     else
-        au CmdlineLeave : call timer_start(0, {-> cmdline#hit_enter_prompt_no_recording()})
+        " Don't use `mode(1)`!{{{
+        "
+        " When you've run  a command with an output longer  than the current visible
+        " screen, and `-- more --` is printed at the bottom, `mode(1)` is `rm`, *not* `r`.
+        " By using `mode()` instead of `mode(1)`,  we make sure that our `q` mapping
+        " is installed even after executing a command with a long output.
+        "}}}
+        au CmdlineLeave : call timer_start(0, {-> mode() is# 'r' && cmdline#hit_enter_prompt_no_recording()})
     endif
 augroup END
 

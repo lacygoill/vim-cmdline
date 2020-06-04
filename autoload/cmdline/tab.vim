@@ -46,6 +46,7 @@ endfu
 fu cmdline#tab#restore_cmdline_after_expansion() abort "{{{1
     let cmdline_before_expansion = cmdline#unexpand#get_oldcmdline()
     if cmdline_before_expansion is# '' | return getcmdline() | endif
+    " clear wildmenu
     redraw
     au CmdlineChanged : ++once call cmdline#unexpand#clear_oldcmdline()
     return cmdline_before_expansion

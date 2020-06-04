@@ -250,14 +250,6 @@ fu cmdline#hit_enter_prompt_no_recording() abort "{{{1
         return timer_start(0, {-> execute('nunmap q', 'silent!')})
     endif
 
-    " Don't use `mode(1)`!{{{
-    "
-    " When you've run  a command with an output longer  than the current visible
-    " screen, and `-- more --` is printed at the bottom, `mode(1)` is `rm`, *not* `r`.
-    " By using `mode()` instead of `mode(1)`,  we make sure that our `q` mapping
-    " is installed even after executing a command with a long output.
-    "}}}
-    if mode() isnot# 'r' | return | endif
     " if we press `q`, just remove the mapping{{{
     "
     " No  need to  press sth  like  `Esc`; when  the mapping  is processed,  the

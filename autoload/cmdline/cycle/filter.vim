@@ -95,8 +95,6 @@ fu s:filter(cmd, bang) abort "{{{2
     let output = cmd is# 'args'
         \ ?     argv()
         \ :     split(execute(cmd), '\n')
-    " useful if we re-execute a second `:Filter` without leaving the command-line
-    redraw
     echo join(filter(output, {_,v -> a:bang ? v !~# pat : v =~# pat}), "\n")
 endfu
 " }}}1
