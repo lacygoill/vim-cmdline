@@ -60,18 +60,17 @@ au CmdlineEnter : ++once
 augroup hit_enter_prompt | au!
     " Issue: Pressing `q` at the hit-enter prompt quits the latter (✔) and starts a recording (✘).
     " Solution: Install a temporary `q` mapping which presses Escape to quit the prompt.
-    if has('nvim')
-        au CmdlineLeave : call cmdline#hit_enter_prompt_no_recording()
-    else
-        " Don't use `mode(1)`!{{{
-        "
-        " When you've run  a command with an output longer  than the current visible
-        " screen, and `-- more --` is printed at the bottom, `mode(1)` is `rm`, *not* `r`.
-        " By using `mode()` instead of `mode(1)`,  we make sure that our `q` mapping
-        " is installed even after executing a command with a long output.
-        "}}}
-        au CmdlineLeave : call timer_start(0, {-> mode() is# 'r' && cmdline#hit_enter_prompt_no_recording()})
-    endif
+    " the guard suppresses `E454`; https://github.com/vim/vim/issues/6209
+    " Don't use `mode(1)`!{{{
+    "
+    " When you've run  a command with an output longer  than the current visible
+    " screen, and `-- more --` is printed at the bottom, `mode(1)` is `rm`, *not* `r`.
+    " By using `mode()` instead of `mode(1)`,  we make sure that our `q` mapping
+    " is installed even after executing a command with a long output.
+    "}}}
+    au CmdlineLeave : if getcmdline() !~# '^\s*fu\%[nction]$'
+    \ |    call timer_start(0, {-> mode() is# 'r' && cmdline#hit_enter_prompt_no_recording()})
+    \ | endif
 augroup END
 
 augroup my_cmdline_chain | au!
@@ -256,9 +255,16 @@ fu s:cycles_set() abort
     call cmdline#cycle#filter#install()
 
     " populate the qfl with the output of a shell command
+    " Don't merge `-L` and `-S` into `-LS`.{{{
+    "
+    " It could trigger a bug:
+    "
+    "     \rg -LS foobar /etc
+    "     error: The argument '--follow' was provided more than once, but cannot be used multiple times~
+    "}}}
     call cmdline#cycle#main#set('g',
-    \ 'cgete system("rg 2>/dev/null -LS --vimgrep ''§''")',
-    \ 'lgete system("rg 2>/dev/null -LS --vimgrep ''§''")',
+    \ 'cgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',
+    \ 'lgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',
     \ )
 
     " we want a different pattern depending on the filetype

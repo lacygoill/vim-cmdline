@@ -71,28 +71,13 @@ fu s:map_filter(cmdline) abort "{{{3
     "     :echo filter([1,2,3], {_,v -> v != 2})
     "     :echo map(filter([1,2,3], {_,v -> v != 2}), {_,v -> })~
     "}}}
-
-    if !has('nvim')
-        if a:cmdline =~# '\C^\s*echo\s\+.*->\%(map\|filter\)({[i,_],v\s*->\s*})$'
-            let new_cmdline = substitute(a:cmdline,
-                \ '\C^\s*echo\s\+.*->\zs\%(map\|filter\)\ze({[i,_],v\s*->\s*})$',
-                \ '\={"map": "filter", "filter": "map"}[submatch(0)]',
-                \ '')
-        else
-            let new_cmdline = substitute(a:cmdline, '$', '->map({_,v -> })', '')
-        endif
+    if a:cmdline =~# '\C^\s*echo\s\+.*->\%(map\|filter\)({[i,_],v\s*->\s*})$'
+        let new_cmdline = substitute(a:cmdline,
+            \ '\C^\s*echo\s\+.*->\zs\%(map\|filter\)\ze({[i,_],v\s*->\s*})$',
+            \ '\={"map": "filter", "filter": "map"}[submatch(0)]',
+            \ '')
     else
-        " if `map()`/`filter()` is used, with an empty lambda, toggle it
-        if a:cmdline =~# '\C^\s*echo\s\+\%(map\|filter\)(.*,\s*{[_i],v\s*->\s*})'
-            let new_cmdline = substitute(a:cmdline,
-                \ '^\s*echo\s\+\zs\%(map\|filter\)\ze(',
-                \ '\={"map": "filter", "filter": "map"}[submatch(0)]',
-                \ '')
-        else
-            " otherwise, add a new `map()`/`filter()`
-            let new_cmdline = substitute(a:cmdline, '^\s*echo\s\+\zs', 'map(', '')
-            let new_cmdline = substitute(new_cmdline, '$', ', {_,v -> })', '')
-        endif
+        let new_cmdline = substitute(a:cmdline, '$', '->map({_,v -> })', '')
     endif
 
     return "\<c-e>\<c-u>"..new_cmdline.."\<left>\<left>"

@@ -99,12 +99,9 @@ fu s:vimgrep(args, in_loclist) abort "{{{2
     " To get a  file which the callback will be able  to parse with `:cgetfile`,
     " and get back the qfl.
     "}}}
-    " Warning: Without the `-e` command-line argument, the Nvim job doesn't work.
-    " We use `-es` because I think it's even better.
     let cmd = [
         \ '/bin/bash', '-c',
-        \  (has('nvim') ? 'nvim' : 'vim')
-        \ ..' -Nu NONE -i NONE'
+        \ ..'vim -Nu NONE -i NONE'
         \ ..' --cmd "set rtp^=~/.vim/plugged/vim-cmdline"'
         \ ..' --cmd "set wig='..&wig..' su='..&suffixes..' ic='..&ic..' scs='..&scs..'"'
         \ ..' -es'
@@ -114,13 +111,7 @@ fu s:vimgrep(args, in_loclist) abort "{{{2
         \ ..tempfile
         \ ]
     let title = (a:in_loclist ? ':Lvim ' : ':Vim ')..args
-    if has('nvim')
-        call jobstart(cmd,
-        \ {'on_exit': function('s:callback', [a:in_loclist, tempfile, title])})
-    else
-        call job_start(cmd,
-        \ {'exit_cb': function('s:callback', [a:in_loclist, tempfile, title])})
-    endif
+    call job_start(cmd, {'exit_cb': function('s:callback', [a:in_loclist, tempfile, title])})
 endfu
 
 fu cmdline#cycle#vimgrep#write_matches() abort "{{{2
@@ -137,16 +128,11 @@ endfu
 
 fu s:callback(in_loclist, tempfile, title, ...) abort "{{{2
 "                                          │
-"                                          └ the callback doesn't receive the same number of arguments{{{
-"                                            in Vim and Neovim
+"                                          └ the callback receives 2 arguments{{{
 "
-" In Vim, it receives 2 arguments.
 " From `:h job-exit_cb`:
 "
 " >     The arguments are the job and the exit status.
-"
-" In Neovim, it receives 3 arguments: `job_id`, `data` and `event`.
-" See `:h job-control-usage`
 "}}}
     if a:in_loclist
         exe 'lgetfile '..a:tempfile

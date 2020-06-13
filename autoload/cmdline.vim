@@ -56,14 +56,7 @@ fu cmdline#c_l() abort "{{{1
         "\ `:helpg pat`
         \ ..'\|\%(helpg\%[rep]\|l\%[helpgrep]\)\s\+\zs.*'
     let list = matchlist(getcmdline(), pat)
-    " Why don't you return `"\<C-l>"`?{{{
-    "
-    " I don't like the behavior of the default `C-l`.
-    " E.g.,  if your  command-line  contains a  command  substitution, but  your
-    " cursor is not inside the pattern field, `C-l` can still insert a character.
-    " If I'm not in the pattern field, I don't want `C-l` to insert anything.
-    "}}}
-    if list == [] | return '' | endif
+    if list == [] | return "\<c-l>" | endif
     let [pat, delim] = list[0:1]
     " Warning: this search is sensitive to the values of `'ignorecase'` and `'smartcase'`
     let [lnum, col] = searchpos(pat, 'n')
@@ -177,79 +170,25 @@ fu cmdline#fix_typo(label) abort "{{{1
              \   'cr': "\<bs>\<cr>",
              \   'z' : "\<bs>\<bs>()\<cr>",
              \ }[a:label]
-    "                                     ┌ do *not* replace this with `getcmdline()`:
-    "                                     │
-    "                                     │     when the callback will be processed,
-    "                                     │     the old command-line will be lost
-    "                                     │
-    call timer_start(0, {-> feedkeys(':'..cmdline..keys, 'in')})
-    "    │
-    "    └ we can't send the keys right now, because the command hasn't been
-    "      executed yet; from `:h CmdlineLeave`:
+    " We can't send the keys right now, because the command hasn't been executed yet.{{{
     "
-    "          “Before leaving the command-line.“
+    " From `:h CmdlineLeave`:
     "
-    "      But it seems we can't modify the command either. Maybe it's locked.
-    "      So, we'll reexecute a new fixed command with the timer.
+    " >     Before leaving the command-line.
+    "
+    " But it seems we can't modify the command either.  Maybe it's locked.
+    " So, we'll reexecute a new fixed command with a little later.
+    "}}}
+    let s:rerun_fixed_cmd ={-> feedkeys(':'..cmdline..keys, 'in')}
+    "                                        │{{{
+    "                                        └ do *not* replace this with `getcmdline()`:
+    "                                          when the callback will be processed,
+    "                                          the old command-line will be lost
+    "}}}
+    au SafeState * ++once call s:rerun_fixed_cmd()
 endfu
 
 fu cmdline#hit_enter_prompt_no_recording() abort "{{{1
-    " Nvim is a special case.{{{
-    "
-    " The Vim implementation doesn't work for Nvim.
-    "
-    " You could replace the `SafeState` autocmd with this:
-    "
-    "     let q = {}
-    "     let q.timer = timer_start(10, {-> mode() isnot# 'r' && q.nunmap()}, {'repeat': -1})
-    "     fu q.nunmap() abort dict
-    "         call timer_stop(self.timer)
-    "         sil! nunmap q
-    "     endfu
-    "
-    " But it would still not work, because,  in Nvim, for some reason, a timer's
-    " callback can't be invoked while the hit-enter prompt is visible:
-    "
-    "     $ nvim -u NONE -S <(cat <<'EOF'
-    "         call timer_start(2000, {-> Cb()}, {'repeat': 10})
-    "         fu Cb() abort
-    "             let g:modes = get(g:, 'modes', []) + [mode(1)]
-    "         endfu
-    "         echo "a\nb"
-    "     EOF
-    "     )
-    "     " wait for 20s
-    "     " run:  :echo g:modes (type the command quickly)
-    "     " expected: 10 items in the list, a few of them being 'rm'
-    "     " actual: fewer than 10 items in the list, none of them is 'rm'
-    "
-    " Nvim blocks the  callbacks until the hit-enter prompt  disappears; at that
-    " point, it starts the remaining callbacks.
-    "
-    " From someone on the #neovim irc channel:
-    "
-    " >     the callback wants  to execute on the main thread,  which is blocked
-    " >     until you hit enter
-    " >     it's probably just an architecture  difference. I don't know how vim
-    " >     handles it but  neovim uses libuv to  run an event loop  on the main
-    " >     thread. all the io is via  libuv's async worker threadpools, and you
-    " >     can even send jobs  to other threads that way, but the  ui is all on
-    " >     the main thread the event loop runs on
-    " >     well not all the io. some of it's still blocking, like :write
-    "}}}
-    if has('nvim')
-        " Do *not* use `<nop>` in the rhs. {{{
-        "
-        " The `q`  mapping would  not be removed  immediately after  leaving the
-        " hit-enter prompt by pressing `q`.
-        " That's because the timer's callback is not executed until you interact
-        " with Nvim (move the cursor, enter insert mode, ...).
-        " `<nop>` does not interact with Nvim in any way; `<c-\><c-n>` does.
-        "}}}
-        nno q <c-\><c-n>
-        return timer_start(0, {-> execute('nunmap q', 'silent!')})
-    endif
-
     " if we press `q`, just remove the mapping{{{
     "
     " No  need to  press sth  like  `Esc`; when  the mapping  is processed,  the
