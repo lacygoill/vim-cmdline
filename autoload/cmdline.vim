@@ -99,8 +99,8 @@ endfu
 "}}}
 
 fu cmdline#chain() abort "{{{1
-    " Do *not* write empty lines in this function (`gQ` → E501, E749).
     let cmdline = getcmdline()
+
     " The boolean flag controls the `'more'` option.
     let pat2cmd = {
         \ '\%(g\|v\).*\%(#\@1<!#\|nu\%[mber]\)' : [''        , v:false],
@@ -113,6 +113,7 @@ fu cmdline#chain() abort "{{{1
         \ 'changes'                             : ["norm! g;\<s-left>"     , v:true],
         \ 'ju\%[mps]'                           : ["norm! \<c-o>\<s-left>" , v:true],
         \ }
+
     for [pat, cmd] in items(pat2cmd)
         let [keys, nomore] = cmd
         if cmdline =~# '\C^'..pat..'$'
@@ -157,6 +158,7 @@ fu cmdline#chain() abort "{{{1
             return feedkeys(':'..keys, 'in')
         endif
     endfor
+
     if cmdline =~# '\C^\s*\%(dli\|il\)\%[ist]\s\+'
         call feedkeys(':'..matchstr(cmdline, '\S')..'j  '..split(cmdline, ' ')[1].."\<s-left>\<left>", 'in')
     elseif cmdline =~# '\C^\s*\%(cli\|lli\)'

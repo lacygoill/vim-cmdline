@@ -90,12 +90,6 @@ augroup my_cmdline_chain | au!
     " Refactor it, so that when it handles complex commands, the code is readable.
     " No long: `if ... | then ... | elseif ... | ... | elseif ... | ...`.
 
-    " We use a timer to avoid reenabling the editing commands before having left
-    " the command-line completely; otherwise `E501`.
-    au CmdlineLeave : if getcmdline() =~# '^\s*vi\%[sual]\s*$'
-                  \ |     call timer_start(0, {-> execute('ToggleEditingCommands 1')})
-                  \ | endif
-
     " sometimes, we type `:h functionz)` instead of `:h function()`
     au CmdlineLeave : if getcmdline() =~# '\C^h\%[elp]\s\+\S\+z)\s*$'
                   \ |     call cmdline#fix_typo('z')
@@ -114,13 +108,14 @@ augroup END
 " Purpose:{{{
 " We have several custom mappings in command-line mode.
 " Some of them are bound to custom functions.
-" They interfere / add noise / bug (`CR`) when we're in debug or Ex mode.
+" They interfere / add noise / bug (`CR`) when we're in debug mode.
 " We install this command so that it can  be used to toggle them when needed, in
 " other plugins or in our vimrc.
 "}}}
 " Usage:{{{
-"         ToggleEditingCommands 0  →  disable
-"         ToggleEditingCommands 1  →  enable
+"
+"     ToggleEditingCommands 0  →  disable
+"     ToggleEditingCommands 1  →  enable
 "}}}
 com -bar -nargs=1 ToggleEditingCommands call cmdline#toggle_editing_commands(<args>)
 
@@ -146,15 +141,13 @@ cno <expr> <c-l> cmdline#c_l()
 
 " In vim-readline, we remap `i_C-a` to a readline motion.
 " Here, we restore the default `C-a` command (`:h i^a`) by mapping it to `C-x C-a`.
-ino <expr><unique> <c-x><c-a> cmdline#unexpand#save_oldcmdline('<c-a>', getcmdline())
-
 " Same thing with the default `c_C-a` (`:h c^a`).
-cno <expr><unique> <c-x><c-a> cmdline#unexpand#save_oldcmdline('<c-a>', getcmdline())
+noremap! <expr><unique> <c-x><c-a> cmdline#unexpand#save_oldcmdline('<c-a>', getcmdline())
 
 " `c_C-a` dumps all the matches on the command-line; let's define a custom `C-x C-d`
 " to capture all of them in the unnamed register.
 cno <expr><unique> <c-x><c-d>
-    \ '<c-a>'..timer_start(0, {-> setreg('"', getcmdline(), 'l') + feedkeys('<c-c>', 'in') })[-1]
+    \ '<c-a>'..timer_start(0, {-> setreg('"', [getcmdline()], 'l') + feedkeys('<c-c>', 'in') })[-1]
 
 " Prevent the function from returning anything if we are not in the pattern field of `:vim`.
 " The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
