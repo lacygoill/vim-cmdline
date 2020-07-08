@@ -28,7 +28,7 @@ fu cmdline#transform#main() abort "{{{2
         endif
         call cmdline#util#undo#emit_add_to_undolist_c()
         return "\<c-e>\<c-u>"
-        \ ..(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments())
+        \ ..(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments(cmdtype))
     elseif cmdtype =~# ':'
         call cmdline#util#undo#emit_add_to_undolist_c()
         let cmdline = getcmdline()
@@ -120,13 +120,13 @@ fu s:replace_with_equiv_class() abort "{{{3
     return substitute(get(s:, 'orig_cmdline', ''), '\a', '[[=\0=]]', 'g')
 endfu
 
-fu s:search_outside_comments() abort "{{{3
+fu s:search_outside_comments(cmdtype) abort "{{{3
     " we should probably save `cmdline` in  a script-local variable if we want
     " to cycle between several transformations
     if empty(&l:cms)
         return get(s:, 'orig_cmdline', '')
     endif
-    let cml = '\V'..escape(matchstr(&l:cms, '\S*\ze\s*%s'), '\')..'\m'
+    let cml = '\V'..matchstr(&l:cms, '\S*\ze\s*%s')->escape('\'..a:cmdtype)..'\m'
     return '\%(^\%(\s*'..cml..'\)\@!.*\)\@<=\m\%('..get(s:, 'orig_cmdline', '')..'\)'
     "                                         ├─┘
     "                                         └ Why?{{{
