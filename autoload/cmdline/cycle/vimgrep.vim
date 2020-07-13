@@ -26,8 +26,8 @@ fu cmdline#cycle#vimgrep#install() abort
     " pattern which contains a bar.
     "}}}
     call cmdline#cycle#main#set('v',
-        \ 'vim /§/gj ./**/*.<c-r>='..s:snr..'get_extension()<cr>',
-        \ 'vim /§/gj <c-r>='..s:snr..'filetype_specific_vimgrep()<cr>',
+        \ 'vim /§/gj ./**/*.<c-r>=' .. function('s:get_extension')->string() .. '()<cr>',
+        \ 'vim /§/gj <c-r>=' .. function('s:filetype_specific_vimgrep')->string() .. '()<cr>',
         \ 'vim /§/gj $VIMRUNTIME/**/*.vim',
         \ 'vim /§/gj ##',
         \ 'vim /§/gj `find . -type f -cmin -60`',
@@ -183,9 +183,4 @@ fu s:get_modified_args(args) abort "{{{2
         \ {_,v -> fnameescape(fnamemodify(v,':p'))})), '')
     return args
 endfu
-
-fu s:snr() "{{{2
-    return matchstr(expand('<sfile>'), '.*\zs<SNR>\d\+_')
-endfu
-let s:snr = get(s:, 'snr', s:snr())
 
