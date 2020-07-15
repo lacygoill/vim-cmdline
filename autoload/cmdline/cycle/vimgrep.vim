@@ -49,7 +49,7 @@ fu s:filetype_specific_vimgrep() abort "{{{2
     else
         " TODO: Once you start writing unit tests, add them.
         " For example, if you use the vader plugin, add `\ ..' ~/.vim/**/*.vader'`.
-        return  ' $MYVIMRC'
+        return  '$MYVIMRC'
             \ ..' ~/.vim/**/*.vim'
             \ ..' ~/.vim/**/*.snippets'
             \ ..' ~/.vim/template/**'

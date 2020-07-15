@@ -80,12 +80,12 @@ endfu
 " MWE:
 "
 "     $ cat <<'EOF' >/tmp/vim.vim
-"     set is
-"     cno <expr> <c-l> C_l()
-"     fu C_l()
-"         echom getpos('.')
-"         return ''
-"     endfu
+"         set is
+"         cno <expr> <c-l> C_l()
+"         fu C_l()
+"             echom getpos('.')
+"             return ''
+"         endfu
 "     EOF
 "
 "     $ vim -Nu NONE -S /tmp/vim.vim /tmp/vim.vim
