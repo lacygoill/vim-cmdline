@@ -71,13 +71,13 @@ fu s:map_filter(cmdline) abort "{{{3
     "     :echo filter([1,2,3], {_,v -> v != 2})
     "     :echo map(filter([1,2,3], {_,v -> v != 2}), {_,v -> })~
     "}}}
-    if a:cmdline =~# '\C^\s*echo\s\+.*->\%(map\|filter\)({[i,_],v\s*->\s*})$'
+    if a:cmdline =~# '\C^\s*echo\s\+.*->\%(map\|filter\)({[i,_],\s*v\s*->\s*})$'
         let new_cmdline = substitute(a:cmdline,
-            \ '\C^\s*echo\s\+.*->\zs\%(map\|filter\)\ze({[i,_],v\s*->\s*})$',
+            \ '\C^\s*echo\s\+.*->\zs\%(map\|filter\)\ze({[i,_],\s*v\s*->\s*})$',
             \ '\={"map": "filter", "filter": "map"}[submatch(0)]',
             \ '')
     else
-        let new_cmdline = substitute(a:cmdline, '$', '->map({_,v -> })', '')
+        let new_cmdline = substitute(a:cmdline, '$', '->map({_, v -> })', '')
     endif
 
     return "\<c-e>\<c-u>"..new_cmdline.."\<left>\<left>"
