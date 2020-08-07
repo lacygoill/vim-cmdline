@@ -3,6 +3,8 @@ if exists('g:loaded_cmdline')
 endif
 let g:loaded_cmdline = 1
 
+import MapMeta from 'lg/map.vim'
+
 " Abbreviations {{{1
 " Unused_code:{{{
 "
@@ -23,11 +25,11 @@ let g:loaded_cmdline = 1
 " fix some typos
 cnorea <expr>  \`    getcmdtype() =~# '[/?]'  ? '\t' : '\`'
 
-cnorea <expr>  soù   getcmdtype() =~# ':' && getcmdpos() == 4 ? 'so%' : 'soù'
-cnorea <expr>  sl    getcmdtype() is# ':' && getcmdpos() == 3  ? 'ls'             : 'sl'
-cnorea <expr>  hg    getcmdtype() is# ':' && getcmdpos() == 3  ? 'helpgrep'       : 'hg'
-cnorea <expr>  dig   getcmdtype() is# ':' && getcmdpos() == 4  ? 'verb Digraphs!' : 'dig'
-cnorea <expr>  ecoh  getcmdtype() is# ':' && getcmdpos() == 5  ? 'echo'           : 'ecoh'
+cnorea <expr> soù getcmdtype() =~# ':' && getcmdpos() == 4 ? 'so%' : 'soù'
+cnorea <expr> sl getcmdtype() is# ':' && getcmdpos() == 3 ? 'ls' : 'sl'
+cnorea <expr> hg getcmdtype() is# ':' && getcmdpos() == 3 ? 'helpgrep' : 'hg'
+cnorea <expr> dig getcmdtype() is# ':' && getcmdpos() == 4 ? 'verb Digraphs!' : 'dig'
+cnorea <expr> ecoh getcmdtype() is# ':' && getcmdpos() == 5 ? 'echo' : 'ecoh'
 
 "         :fbl
 "         :FzBLines~
@@ -37,20 +39,20 @@ cnorea <expr>  ecoh  getcmdtype() is# ':' && getcmdpos() == 5  ? 'echo'         
 "         :FzLines~
 "         :fs
 "         :FzLocate~
-cnorea <expr>  fbl   getcmdtype() is# ':'  && getcmdpos() == 4  ?  'FzBLines'      : 'fbl'
-cnorea <expr>  fc    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzCommands'    : 'fc'
-cnorea <expr>  fl    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzLines'       : 'fl'
-cnorea <expr>  fs    getcmdtype() is# ':'  && getcmdpos() == 3  ?  'FzLocate'      : 'fs'
-"              │
-"              └ `fl` is already taken for `:FzLines`
-"                besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
+cnorea <expr> fbl getcmdtype() is# ':' && getcmdpos() == 4 ? 'FzBLines' : 'fbl'
+cnorea <expr> fc getcmdtype() is# ':' && getcmdpos() == 3 ? 'FzCommands' : 'fc'
+cnorea <expr> fl getcmdtype() is# ':' && getcmdpos() == 3 ? 'FzLines' : 'fl'
+cnorea <expr> fs getcmdtype() is# ':' && getcmdpos() == 3 ? 'FzLocate' : 'fs'
+"             │
+"             └ `fl` is already taken for `:FzLines`
+"               besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
 
-cnorea <expr>  ucs   getcmdtype() is# ':' && getcmdpos() == 4  ? 'UnicodeSearch'  : 'ucs'
+cnorea <expr> ucs getcmdtype() is# ':' && getcmdpos() == 4 ? 'UnicodeSearch' : 'ucs'
 
 " Autocmds {{{1
 
 " Do *not* write  a bar after a backslash  on an empty line: it  would result in
-" two consecutive bars  (empty command). This would print a line  of a buffer on
+" two consecutive bars (empty command).  This would  print a line of a buffer on
 " the command-line, when we change the focused window for the first time.
 au CmdlineEnter : ++once
     \   call cmdline#auto_uppercase()
@@ -69,13 +71,13 @@ augroup hit_enter_prompt | au!
     " is installed even after executing a command with a long output.
     "}}}
     au CmdlineLeave : if getcmdline() !~# '^\s*fu\%[nction]$'
-    \ |    call timer_start(0, {-> mode() is# 'r' && cmdline#hit_enter_prompt_no_recording()})
-    \ | endif
+        \ |    call timer_start(0, {-> mode() is# 'r' && cmdline#hit_enter_prompt_no_recording()})
+        \ | endif
 augroup END
 
 augroup my_cmdline_chain | au!
     " Automatically execute  command B when A  has just been executed  (chain of
-    " commands). Inspiration:
+    " commands).  Inspiration:
     " https://gist.github.com/romainl/047aca21e338df7ccf771f96858edb86
     au CmdlineLeave : call cmdline#chain()
 
@@ -92,15 +94,15 @@ augroup my_cmdline_chain | au!
 
     " sometimes, we type `:h functionz)` instead of `:h function()`
     au CmdlineLeave : if getcmdline() =~# '\C^h\%[elp]\s\+\S\+z)\s*$'
-                  \ |     call cmdline#fix_typo('z')
-                  \ | endif
+        \ |     call cmdline#fix_typo('z')
+        \ | endif
 
     " when we copy a line of vimscript and paste it on the command-line,
     " sometimes the newline gets copied and translated into a literal CR,
     " which raises an error; remove it.
     au CmdlineLeave : if getcmdline() =~# '\r$'
-                  \ |     call cmdline#fix_typo('cr')
-                  \ | endif
+        \ |     call cmdline#fix_typo('cr')
+        \ | endif
 augroup END
 
 " Command {{{1
@@ -147,7 +149,7 @@ noremap! <expr><unique> <c-x><c-a> cmdline#unexpand#save_oldcmdline('<c-a>', get
 " `c_C-a` dumps all the matches on the command-line; let's define a custom `C-x C-d`
 " to capture all of them in the unnamed register.
 cno <expr><unique> <c-x><c-d>
-    \ '<c-a>'..timer_start(0, {-> setreg('"', [getcmdline()], 'l') + feedkeys('<c-c>', 'in') })[-1]
+    \ '<c-a>' .. timer_start(0, {-> setreg('"', [getcmdline()], 'l') + feedkeys('<c-c>', 'in') })[-1]
 
 " Prevent the function from returning anything if we are not in the pattern field of `:vim`.
 " The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
@@ -168,7 +170,7 @@ cno <expr><unique> <c-s> cmdline#transform#main()
 
 " Cycle through a set of arbitrary commands.
 cno <unique> <c-g> <c-\>e cmdline#cycle#main#move(1)<cr>
-sil! call lg#map#meta('g', '<c-\>e cmdline#cycle#main#move(0)<cr>', 'c', 'u')
+sil! call s:MapMeta('g', '<c-\>e cmdline#cycle#main#move(0)<cr>', 'c', 'u')
 
 xno <unique> <c-g>s :s///g<left><left><left>
 
@@ -178,7 +180,7 @@ fu s:cycles_set() abort
     "    - all the files in a directory
     "    - all the files in the output of a shell command
     call cmdline#cycle#main#set('a',
-        \ 'sp <bar> args `=filter(glob(''§./**/*'', 0, 1), {_,v -> filereadable(v)})`',
+        \ 'sp <bar> args `=glob(''§./**/*'', 0, 1)->filter({_, v -> filereadable(v)})`',
         \ 'sp <bar> sil args `=systemlist(''§'')`')
 
     "                            ┌ definition
@@ -219,14 +221,14 @@ fu s:cycles_set() abort
     "
     " 2. If we used `fin **/*§`, the path of the matches would be relative to
     "    the working directory.
-    "    It's too verbose. We just need their name.
+    "    It's too verbose.  We just need their name.
     "
     "     Btw, you may wonder what happens when we type `:fin *bar` and press Tab or
     "    C-d,  while  there  are two  files  with  the  same  name `foobar`  in  two
     "    directories in the working directory.
     "
     "     The answer is  simple: for each match, Vim prepends  the previous path
-    "    component to  remove the ambiguity. If it's  not enough, it goes  on adding
+    "    component to  remove the ambiguity.  If it's  not enough, it goes  on adding
     "    path components until it's not needed anymore.
     "}}}
     call cmdline#cycle#main#set('es',
@@ -256,9 +258,9 @@ fu s:cycles_set() abort
     "     error: The argument '--follow' was provided more than once, but cannot be used multiple times~
     "}}}
     call cmdline#cycle#main#set('g',
-    \ 'cgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',
-    \ 'lgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',
-    \ )
+        \ 'cgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',
+        \ 'lgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',
+        \ )
 
     " we want a different pattern depending on the filetype
     " we want `:vimgrep` to be run asynchronously
@@ -277,7 +279,7 @@ fu s:cycles_set() abort
     " Besides, the text  is formatted to not go beyond  100 characters per line,
     " which could break some long line of code.
     "}}}
-    call cmdline#cycle#main#set('r', 'exe ''r !curl -s ''..shellescape(''§'', 1)')
+    call cmdline#cycle#main#set('r', 'exe ''r !curl -s '' .. shellescape(''§'', 1)')
     "                                                │
     "                                                └ don't show progress meter, nor error messages
 
@@ -327,9 +329,9 @@ call s:cycles_set()
 
 "     const s:OVERLOOKED_COMMANDS = [
 "         \ {'old': 'vs\%[plit]', 'new': 'C-w v', 'regex': 1},
-"         \ {'old': 'sp\%[lit]' , 'new': 'C-w s', 'regex': 1},
-"         \ {'old': 'q!'        , 'new': 'ZQ'   , 'regex': 0},
-"         \ {'old': 'x'         , 'new': 'ZZ'   , 'regex': 0},
+"         \ {'old': 'sp\%[lit]', 'new': 'C-w s', 'regex': 1},
+"         \ {'old': 'q!', 'new': 'ZQ', 'regex': 0},
+"         \ {'old': 'x', 'new': 'ZZ', 'regex': 0},
 "         \ ]
 
 const s:OVERLOOKED_COMMANDS = []

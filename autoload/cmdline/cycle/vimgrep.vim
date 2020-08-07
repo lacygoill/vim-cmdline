@@ -26,15 +26,15 @@ fu cmdline#cycle#vimgrep#install() abort
     " pattern which contains a bar.
     "}}}
     call cmdline#cycle#main#set('v',
-        \ 'vim /§/gj ./**/*.<c-r>=' .. function('s:get_extension')->string() .. '()<cr>',
-        \ 'vim /§/gj <c-r>=' .. function('s:filetype_specific_vimgrep')->string() .. '()<cr>',
+        \ 'vim /§/gj ./**/*.<c-r>=' .. expand('<SID>') .. 'get_extension()<cr>',
+        \ 'vim /§/gj <c-r>=' .. expand('<SID>') .. 'filetype_specific_vimgrep()<cr>',
         \ 'vim /§/gj $VIMRUNTIME/**/*.vim',
         \ 'vim /§/gj ##',
         \ 'vim /§/gj `find . -type f -cmin -60`',
         \ 'lvim /§/gj %',
         \ )
     " TODO: We use the  default `:[l]vim` commands until we  review/fix the code
-    " implementing `:[L]Vim`. Once it's done, uppercase the `:[l]vim` again.
+    " implementing `:[L]Vim`.  Once it's done, uppercase the `:[l]vim` again.
 endfu
 " }}}1
 " Core {{{1
@@ -44,15 +44,15 @@ fu s:filetype_specific_vimgrep() abort "{{{2
     elseif &ft =~# '^\%(bash\|sh\)$'
         " TODO: Remove `~/.shrc` once we've integrated it into `~/.zshrc`.
         return  '~/bin/**/*'
-            \ ..' ~/.{shrc,bashrc,zshrc,zshenv}'
-            \ ..' ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets'
+            \ .. ' ~/.{shrc,bashrc,zshrc,zshenv}'
+            \ .. ' ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets'
     else
         " TODO: Once you start writing unit tests, add them.
-        " For example, if you use the vader plugin, add `\ ..' ~/.vim/**/*.vader'`.
+        " For example, if you use the vader plugin, add `\ .. ' ~/.vim/**/*.vader'`.
         return  '$MYVIMRC'
-            \ ..' ~/.vim/**/*.vim'
-            \ ..' ~/.vim/**/*.snippets'
-            \ ..' ~/.vim/template/**'
+            \ .. ' ~/.vim/**/*.vim'
+            \ .. ' ~/.vim/**/*.snippets'
+            \ .. ' ~/.vim/template/**'
     endif
 endfu
 
@@ -101,16 +101,16 @@ fu s:vimgrep(args, in_loclist) abort "{{{2
     "}}}
     let cmd = [
         \ '/bin/bash', '-c',
-        \ ..'vim -Nu NONE -i NONE'
-        \ ..' --cmd "set rtp^=~/.vim/plugged/vim-cmdline"'
-        \ ..' --cmd "set wig='..&wig..' su='..&suffixes..' ic='..&ic..' scs='..&scs..'"'
-        \ ..' -es'
-        \ ..' +'..shellescape('cd '..getcwd())
-        \ ..' +''call cmdline#cycle#vimgrep#write_matches()'''
-        \ ..' +qa! '
-        \ ..tempfile
+        \ .. 'vim -Nu NONE -i NONE'
+        \ .. ' --cmd "set rtp^=~/.vim/plugged/vim-cmdline"'
+        \ .. ' --cmd "set wig=' .. &wig .. ' su=' .. &suffixes .. ' ic=' .. &ic .. ' scs=' .. &scs .. '"'
+        \ .. ' -es'
+        \ .. ' +' .. shellescape('cd ' .. getcwd())
+        \ .. ' +''call cmdline#cycle#vimgrep#write_matches()'''
+        \ .. ' +qa! '
+        \ .. tempfile
         \ ]
-    let title = (a:in_loclist ? ':Lvim ' : ':Vim ')..args
+    let title = (a:in_loclist ? ':Lvim ' : ':Vim ') .. args
     call job_start(cmd, {'exit_cb': function('s:callback', [a:in_loclist, tempfile, title])})
 endfu
 
@@ -120,9 +120,10 @@ fu cmdline#cycle#vimgrep#write_matches() abort "{{{2
     if empty(args)
         return
     endif
-    exe 'noa vim '..args[0]
-    let matches = map(getqflist(),
-        \ {_,v -> printf('%s:%d:%d:%s', fnamemodify(bufname(v.bufnr), ':p'), v.lnum, v.col, v.text)})
+    exe 'noa vim ' .. args[0]
+    let matches = getqflist()
+        \ ->map({_, v -> printf('%s:%d:%d:%s',
+        \     bufname(v.bufnr)->fnamemodify(':p'), v.lnum, v.col, v.text)})
     call writefile(matches, tempfile, 's')
 endfu
 
@@ -135,11 +136,11 @@ fu s:callback(in_loclist, tempfile, title, ...) abort "{{{2
 " >     The arguments are the job and the exit status.
 "}}}
     if a:in_loclist
-        exe 'lgetfile '..a:tempfile
+        exe 'lgetfile ' .. a:tempfile
         lw
         call setloclist(0, [], 'a', {'title': a:title})
     else
-        exe 'cgetfile '..a:tempfile
+        exe 'cgetfile ' .. a:tempfile
         cw
         call setqflist([], 'a', {'title': a:title})
     endif
@@ -155,10 +156,10 @@ fu s:get_extension() abort "{{{2
         let ext = 'md'
     elseif &ft is# 'dirvish' && expand('%:p') =~? '/.vim/'
         let ext = 'vim'
-    elseif ext is# '' && bufname('%') isnot# ''
-        let ext = split(execute('au'), '\n')
-        call filter(ext, {_,v -> v =~# 'setf\s\+'..&ft})
-        let ext = matchstr(get(ext, 0, ''), '\*\.\zs\S\+')
+    elseif ext == '' && bufname('%') != ''
+        let ext = execute('au')->split('\n')
+        call filter(ext, {_, v -> v =~# 'setf\s\+' .. &ft})
+        let ext = get(ext, 0, '')->matchstr('\*\.\zs\S\+')
     endif
     return ext
 endfu
@@ -167,20 +168,22 @@ fu s:get_modified_args(args) abort "{{{2
     let pat = '^\(\i\@!.\)\1\ze[gj]\{,2}\s\+'
     "           ├──────────┘
     "           └ 2 consecutive and identical non-identifier characters
-    let rep = '/'..escape(@/, '\/')..'/'
-    "                          │{{{
-    "                          └ `substitute()` will remove any backslash, because
-    "                             some sequences are special (like `\1` or `\u`);
-    "                             See: :h sub-replace-special
+    let rep = '/' .. escape(@/, '\/') .. '/'
+    "                            │{{{
+    "                            └ `substitute()` will remove any backslash, because
+    "                               some sequences are special (like `\1` or `\u`);
+    "                               See: :h sub-replace-special
     "
-    "                             If our pattern contains a backslash (like in `\s`),
-    "                             we need it to be preserved.
+    "                               If our pattern contains a backslash (like in `\s`),
+    "                               we need it to be preserved.
     "}}}
     let args = substitute(a:args, pat, rep, '')
 
-    let args = substitute(args, '\s\+\zs%\s*$', fnameescape(expand('%:p')), '')
-    let args = substitute(args, '\s\+\zs##\s*$', join(map(argv(),
-        \ {_,v -> fnameescape(fnamemodify(v,':p'))})), '')
+    let args = substitute(args, '\s\+\zs%\s*$', expand('%:p')->fnameescape(), '')
+    let args = substitute(args, '\s\+\zs##\s*$', argv()
+        \ ->map({_, v -> fnamemodify(v,':p')
+        \ ->fnameescape()})
+        \ ->join(), '')
     return args
 endfu
 

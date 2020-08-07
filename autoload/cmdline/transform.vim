@@ -28,7 +28,7 @@ fu cmdline#transform#main() abort "{{{2
         endif
         call cmdline#util#undo#emit_add_to_undolist_c()
         return "\<c-e>\<c-u>"
-        \ ..(s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments(cmdtype))
+        \ .. (s:did_transform % 2 ? s:replace_with_equiv_class() : s:search_outside_comments(cmdtype))
     elseif cmdtype =~# ':'
         call cmdline#util#undo#emit_add_to_undolist_c()
         let cmdline = getcmdline()
@@ -42,7 +42,7 @@ endfu
 " Core {{{1
 " Ex {{{2
 fu s:guess_what_the_cmdline_is(cmdline) abort "{{{3
-    if a:cmdline =~# '^'..s:PAT_RANGE..'s[/:]'
+    if a:cmdline =~# '^' .. s:PAT_RANGE .. 's[/:]'
         " a substitution command
         return ':s'
     elseif a:cmdline =~# '\C^\s*echo'
@@ -62,14 +62,14 @@ endfu
 fu s:map_filter(cmdline) abort "{{{3
     " Purpose:{{{
     "
-    "     :echo [1,2,3]
-    "     :echo map([1,2,3], {_,v -> })~
+    "     :echo [1, 2, 3]
+    "     :echo [1, 2, 3]->map({_, v -> })~
     "
-    "     :echo map([1,2,3], {_,v -> })
-    "     :echo filter([1,2,3], {_,v -> })~
+    "     :echo [1, 2, 3]->map({_, v -> })
+    "     :echo [1, 2, 3]->filter({_, v -> })~
     "
-    "     :echo filter([1,2,3], {_,v -> v != 2})
-    "     :echo map(filter([1,2,3], {_,v -> v != 2}), {_,v -> })~
+    "     :echo [1, 2, 3]->filter({_, v -> v != 2})
+    "     :echo [1, 2, 3]->filter({_, v -> v != 2})->map({_, v -> })~
     "}}}
     if a:cmdline =~# '\C^\s*echo\s\+.*->\%(map\|filter\)({[i,_],\s*v\s*->\s*})$'
         let new_cmdline = substitute(a:cmdline,
@@ -80,7 +80,7 @@ fu s:map_filter(cmdline) abort "{{{3
         let new_cmdline = substitute(a:cmdline, '$', '->map({_, v -> })', '')
     endif
 
-    return "\<c-e>\<c-u>"..new_cmdline.."\<left>\<left>"
+    return "\<c-e>\<c-u>" .. new_cmdline .. "\<left>\<left>"
 endfu
 
 fu s:capture_subpatterns(cmdline) abort "{{{3
@@ -92,7 +92,7 @@ fu s:capture_subpatterns(cmdline) abort "{{{3
 
     " extract the range, separator and the pattern
     let range = matchstr(a:cmdline, s:PAT_RANGE)
-    let separator = matchstr(a:cmdline, '^'..s:PAT_RANGE..'s\zs.')
+    let separator = matchstr(a:cmdline, '^' .. s:PAT_RANGE .. 's\zs.')
     let pat = split(a:cmdline, separator)[1]
 
     " from the pattern, extract words between underscores or uppercase letters:{{{
@@ -110,14 +110,15 @@ fu s:capture_subpatterns(cmdline) abort "{{{3
     "                              │    or    (one)_(two)_(three)
     "                              │
     "                              ├────────────────────────────────────────────────────────────────────┐}}}
-    let new_cmdline = range..'s/'..join(map(subpatterns, {_,v -> '\('..v..'\)'}), pat =~# '_' ? '_' : '')..'//g'
+    let new_cmdline = range .. 's/' .. map(subpatterns, {_, v -> '\(' .. v .. '\)'})
+        \ ->join(pat =~# '_' ? '_' : '') .. '//g'
 
-    return "\<c-e>\<c-u>"..new_cmdline.."\<left>\<left>"
+    return "\<c-e>\<c-u>" .. new_cmdline .. "\<left>\<left>"
 endfu
 "}}}2
 " Search {{{2
 fu s:replace_with_equiv_class() abort "{{{3
-    return substitute(get(s:, 'orig_cmdline', ''), '\a', '[[=\0=]]', 'g')
+    return get(s:, 'orig_cmdline', '')->substitute('\a', '[[=\0=]]', 'g')
 endfu
 
 fu s:search_outside_comments(cmdtype) abort "{{{3
@@ -126,10 +127,10 @@ fu s:search_outside_comments(cmdtype) abort "{{{3
     if empty(&l:cms)
         return get(s:, 'orig_cmdline', '')
     endif
-    let cml = '\V'..matchstr(&l:cms, '\S*\ze\s*%s')->escape('\'..a:cmdtype)..'\m'
-    return '\%(^\%(\s*'..cml..'\)\@!.*\)\@<=\m\%('..get(s:, 'orig_cmdline', '')..'\)'
-    "                                         ├─┘
-    "                                         └ Why?{{{
+    let cml = '\V' .. matchstr(&l:cms, '\S*\ze\s*%s')->escape('\' .. a:cmdtype) .. '\m'
+    return '\%(^\%(\s*' .. cml .. '\)\@!.*\)\@<=\m\%(' .. get(s:, 'orig_cmdline', '') .. '\)'
+    "                                             ├─┘
+    "                                             └ Why?{{{
     " The original pattern may contain several branches.
     " In that  case, we want the  lookbehind to be  applied to all of  them, not
     " just the first one.

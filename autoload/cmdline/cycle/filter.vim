@@ -84,24 +84,24 @@ fu s:filter(cmd, bang) abort "{{{2
     let cmd = matchstr(a:cmd, '/.\{-}/\s*\zs.*')
     let first_word = matchstr(cmd, '\a*\|#')
     if s:is_filterable(first_word)
-        if pat is# ''
-            exe 'filter'..(a:bang ? '!': '')..' '..substitute(a:cmd, '/\zs.\{-}\ze/', @/, '')
+        if pat == ''
+            exe 'filter' .. (a:bang ? '!': '') .. ' ' .. substitute(a:cmd, '/\zs.\{-}\ze/', @/, '')
         else
-            exe 'filter'..(a:bang ? '!': '')..' '..a:cmd
+            exe 'filter' .. (a:bang ? '!': '') .. ' ' .. a:cmd
         endif
         return
     endif
 
     let output = cmd is# 'args'
         \ ?     argv()
-        \ :     split(execute(cmd), '\n')
-    echo join(filter(output, {_,v -> a:bang ? v !~# pat : v =~# pat}), "\n")
+        \ :     execute(cmd)->split('\n')
+    echo filter(output, {_, v -> a:bang ? v !~# pat : v =~# pat})->join("\n")
 endfu
 " }}}1
 " Utilities {{{1
 fu s:is_filterable(first_word) abort "{{{2
     for cmd in s:FILTERABLE_COMMANDS
-        if a:first_word =~# '^\C'..cmd..'$'
+        if a:first_word =~# '^\C' .. cmd .. '$'
             return 1
         endif
     endfor

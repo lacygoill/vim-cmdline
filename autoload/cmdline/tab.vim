@@ -1,8 +1,8 @@
 fu cmdline#tab#custom(is_fwd) abort "{{{1
     if getcmdtype() =~# '[?/]'
-        return getcmdline() is# ''
-           \ ?     "\<up>"
-           \ :     a:is_fwd ? "\<c-g>" : "\<c-t>"
+        return getcmdline() == ''
+            \ ?     "\<up>"
+            \ :     a:is_fwd ? "\<c-g>" : "\<c-t>"
     endif
     if a:is_fwd
         " The returned key will be pressed from a mapping while in command-line mode.
@@ -20,7 +20,7 @@ fu cmdline#tab#custom(is_fwd) abort "{{{1
         " That's not  what `S-Tab` does by  default.  It should simply  open the
         " wildmenu and select its last entry.
         "}}}
-        " Why `empty(reg_recording())`?{{{
+        " Why `reg_recording()->empty()`?{{{
         "
         " Without, during a recording, `S-Tab` would be recorded twice:
         "
@@ -35,7 +35,7 @@ fu cmdline#tab#custom(is_fwd) abort "{{{1
         " Well, it will be broken; i.e. `<S-Tab>` will be inserted on the command-line.
         " I don't know how to fix this, and I don't really care; it's a corner case.
         "}}}
-        if !wildmenumode() && empty(reg_recording())
+        if !wildmenumode() && reg_recording()->empty()
             call feedkeys("\<s-tab>", 'int')
             return ''
         endif
@@ -45,7 +45,7 @@ endfu
 
 fu cmdline#tab#restore_cmdline_after_expansion() abort "{{{1
     let cmdline_before_expansion = cmdline#unexpand#get_oldcmdline()
-    if cmdline_before_expansion is# '' | return getcmdline() | endif
+    if cmdline_before_expansion == '' | return getcmdline() | endif
     " clear wildmenu
     redraw
     au CmdlineChanged : ++once call cmdline#unexpand#clear_oldcmdline()
