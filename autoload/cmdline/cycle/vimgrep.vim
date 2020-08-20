@@ -133,7 +133,7 @@ fu s:callback(in_loclist, tempfile, title, ...) abort "{{{2
 "
 " From `:h job-exit_cb`:
 "
-" >     The arguments are the job and the exit status.
+"    > The arguments are the job and the exit status.
 "}}}
     if a:in_loclist
         exe 'lgetfile ' .. a:tempfile

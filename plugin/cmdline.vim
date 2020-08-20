@@ -60,7 +60,7 @@ au CmdlineEnter : ++once
     \ | unlet! s:OVERLOOKED_COMMANDS
 
 augroup hit_enter_prompt | au!
-    " Issue: Pressing `q` at the hit-enter prompt quits the latter (✔) and starts a recording (✘).
+    " Problem: Pressing `q` at the hit-enter prompt quits the latter (✔) and starts a recording (✘).
     " Solution: Install a temporary `q` mapping which presses Escape to quit the prompt.
     " the guard suppresses `E454`; https://github.com/vim/vim/issues/6209
     " Don't use `mode(1)`!{{{
@@ -305,7 +305,7 @@ fu s:cycles_set() abort
     "    2. visually select the `pat1`, `pat2`, `pat3` block,
     "       then leave to get back to normal mode
     "
-    "    3. invoke the substitution command after writing the pattern `pat\d`
+    "    3. invoke the substitution command, write `pat\d` at the start of the pattern field, and validate
     "}}}
     " If you think you can merge the two backticks substitutions, try your solution against these texts:{{{
     "

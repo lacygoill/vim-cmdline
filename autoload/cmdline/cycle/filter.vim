@@ -56,7 +56,7 @@ call cmdline#cycle#main#set('f', 'Verb Filter /\c§/ ')
 " }}}1
 " Interface {{{1
 fu cmdline#cycle#filter#install() abort "{{{2
-    com -bang -complete=custom,s:filter_completion -nargs=+ Filter call s:filter(<q-args>, <bang>0)
+    com -bang -nargs=+ -complete=custom,s:filter_completion Filter call s:filter(<q-args>, <bang>0)
 endfu
 
 fu s:filter_completion(_a, _l, _p) abort "{{{2

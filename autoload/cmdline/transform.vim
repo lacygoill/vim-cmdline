@@ -127,7 +127,11 @@ fu s:search_outside_comments(cmdtype) abort "{{{3
     if empty(&l:cms)
         return get(s:, 'orig_cmdline', '')
     endif
-    let cml = '\V' .. matchstr(&l:cms, '\S*\ze\s*%s')->escape('\' .. a:cmdtype) .. '\m'
+    if &ft is# 'vim'
+        let cml = '["#]'
+    else
+        let cml = '\V' .. matchstr(&l:cms, '\S*\ze\s*%s')->escape('\' .. a:cmdtype) .. '\m'
+    endif
     return '\%(^\%(\s*' .. cml .. '\)\@!.*\)\@<=\m\%(' .. get(s:, 'orig_cmdline', '') .. '\)'
     "                                             ├─┘
     "                                             └ Why?{{{
