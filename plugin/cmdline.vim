@@ -158,7 +158,7 @@ cno <expr><unique> <c-x><c-d>
 "
 "        - it's searched outside comments
 "
-"        - all alphabetical characters are replaced with their corresponding
+"        - all alphabetical characters are replaced by their corresponding
 "        equivalence class
 "
 "    - on the Ex command-line, if the latter contains a substitution command,
