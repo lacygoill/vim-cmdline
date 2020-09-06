@@ -48,7 +48,7 @@ au CmdlineEnter : ++once call s:delay_cycle_install()
 fu cmdline#cycle#main#set(seq, ...) abort "{{{2
     let cmds = a:000
     let pos = s:find_tabstop(a:1)
-    exe 'nno  <unique>  <c-g>' .. a:seq
+    exe 'nno <unique> <c-g>' .. a:seq
         \ .. ' :<c-u><c-r>=cmdline#cycle#main#set_seq(' .. string(a:seq) .. ')<cr>'
         \ .. substitute(a:1, '§', '', '')
         \ .. '<c-r>=setcmdpos(' .. pos .. ')[-1]<cr>'

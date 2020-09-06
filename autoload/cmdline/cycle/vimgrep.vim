@@ -31,7 +31,7 @@ g:autoloaded_cmdline#cycle#vimgrep = 1
 #     a%b
 #}}}
 com -nargs=* Vim Vimgrep(<q-args>)
-com -nargs=* Lvim Vimgrep(<q-args>, v:true)
+com -nargs=* Lvim Vimgrep(<q-args>, true)
 
 def cmdline#cycle#vimgrep#install()
     # Why don't you add `<bar> cw` in your mappings?{{{
@@ -54,7 +54,9 @@ enddef
 # }}}1
 # Core {{{1
 def Filetype_specific_vimgrep(): string #{{{2
-    if &ft == 'zsh'
+    if &ft == 'dirvish'
+        return expand('%:p') .. '**'
+    elseif &ft == 'zsh'
         return '/usr/local/share/zsh/**'
     elseif &ft =~ '^\%(bash\|sh\)$'
         # TODO: Remove `~/.shrc` once we've integrated it into `~/.zshrc`.
@@ -71,10 +73,16 @@ def Filetype_specific_vimgrep(): string #{{{2
     endif
 enddef
 
-def Vimgrep(args: string, loclist = v:false) #{{{2
+def Vimgrep(args: string, loclist = false) #{{{2
     let tempvimrc = tempname()
     let tempqfl = tempname()
 
+    let get_tempfile =<< trim END
+        let tempqfl = expand('%:p')
+        if tempqfl !~ '^/tmp/'
+            finish
+        endif
+    END
     # Why do you write the arguments in a file?  Why not passing them as arguments to `vim(1)`?{{{
     #
     # They could contain some quotes.
@@ -103,18 +111,37 @@ def Vimgrep(args: string, loclist = v:false) #{{{2
     #}}}
     let _args = Expandargs(args)
     let vimgrepcmd = 'noa vim ' .. _args
-    let lines =<< trim END
-        let tempqfl = expand('%:p')
-        if tempqfl !~ '^/tmp/'
-            finish
-        endif
+    # Why `strtrans()`?{{{
+    #
+    # If the text contains NULs, it could mess up the parsing of `:cgetfile`.
+    # Maybe other control characters could cause similar issues.
+    #
+    # Let's play it  safe; we don't need special characters  to be preserved; we
+    # just need to be able to read  them; anything which is not printable should
+    # be made printable.
+    #}}}
+    let getqfl =<< trim END
         getqflist()
            ->map({_, v -> printf('%s:%d:%d:%s',
-               bufname(v.bufnr)->fnamemodify(':p'), v.lnum, v.col, v.text)})
+               bufname(v.bufnr)->fnamemodify(':p'),
+               v.lnum,
+               v.col,
+               substitute(v.text, '[^[:print:]]', {m -> strtrans(m[0])}, 'g')
+           )})
            ->writefile(tempqfl, 's')
         qa!
     END
-    writefile(['vim9script', cdcmd, setcmd, vimgrepcmd] + lines, tempvimrc, 's')
+    # Make sure that the code contained in `get_tempfile` is run before `vimgrepcmd`{{{
+    #
+    # `:vimgrep` could  change the current file;  you could also try  to use the
+    # `j` flag  unconditionally in the  second Vim instance where  `:vimgrep` is
+    # run, but better be safe.
+    #}}}
+    writefile(['vim9script']
+        + get_tempfile
+        + [cdcmd, setcmd, vimgrepcmd]
+        + getqfl,
+        tempvimrc, 's')
 
     # Why don't you start Vim directly?  Why start a new shell?{{{
     #
@@ -135,7 +162,7 @@ def Vimgrep(args: string, loclist = v:false) #{{{2
     #
     #     :let job = job_start(['/bin/bash', '-c', 'vim +''call writefile(["test"], "/tmp/log")'' +qa!'])
     #}}}
-    let vimcmd = printf('vim -es -Nu NONE -i NONE -S %s %s', tempvimrc, tempqfl)
+    let vimcmd = printf('vim -es -Nu NONE -U NONE -i NONE -S %s %s', tempvimrc, tempqfl)
 
     let title = (loclist ? ':Lvim ' : ':Vim ') .. _args
     let arglist = [loclist, tempqfl, title]
@@ -151,15 +178,22 @@ def Callback(loclist: bool, tempqfl: string, title: string, _j: job, _e: number)
 #
 #    > The arguments are the job and the exit status.
 #}}}
-    if loclist
-        exe 'lgetfile ' .. tempqfl
-        lw
-        setloclist(0, [], 'a', #{title: title})
-    else
-        exe 'cgetfile ' .. tempqfl
-        cw
-        setqflist([], 'a', #{title: title})
-    endif
+    let efm_save = &l:efm
+    let bufnr = bufnr('%')
+    try
+        setl efm=%f:%l:%c:%m
+        if loclist
+            exe 'lgetfile ' .. tempqfl
+            lw
+            setloclist(0, [], 'a', #{title: title})
+        else
+            exe 'cgetfile ' .. tempqfl
+            cw
+            setqflist([], 'a', #{title: title})
+        endif
+    finally
+        setbufvar(bufnr, '&efm', efm_save)
+    endtry
     # If you were moving in a buffer  while the callback is invoked and open the
     # qf window, some stray characters might be printed in the status line.
     redraw!
