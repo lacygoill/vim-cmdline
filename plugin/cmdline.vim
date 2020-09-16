@@ -139,7 +139,12 @@ cno <expr><unique> <tab>   cmdline#tab#custom(v:true)
 cno <expr><unique> <s-tab> cmdline#tab#custom(v:false)
 cno       <unique> <c-q>   <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
 
-cno <expr> <c-l> cmdline#c_l()
+" Purpose:{{{
+"
+" - extend `:h c^l` to `:vimgrep` and `:s`
+" - capture all paths (files or urls) displayed on the screen in an interactive popup window
+"}}}
+cno <expr> <c-l> cmdline#c_l#main()
 
 " In vim-readline, we remap `i_C-a` to a readline motion.
 " Here, we restore the default `C-a` command (`:h i^a`) by mapping it to `C-x C-a`.

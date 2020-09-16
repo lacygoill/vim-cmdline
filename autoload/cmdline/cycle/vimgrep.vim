@@ -127,7 +127,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
                v.lnum,
                v.col,
                substitute(v.text, '[^[:print:]]', {m -> strtrans(m[0])}, 'g')
-           )})
+               )})
            ->writefile(tempqfl, 's')
         qa!
     END
@@ -170,8 +170,8 @@ def Vimgrep(args: string, loclist = false) #{{{2
     job_start(['/bin/bash', '-c', vimcmd], opts)
 enddef
 
-def Callback(loclist: bool, tempqfl: string, title: string, _j: job, _e: number) #{{{2
-#                                                           ├─────────────────┘
+def Callback(loclist: bool, tempqfl: string, title: string, _j: any, _e: any) #{{{2
+#                                                           ├──────────────┘
 #                                                           └ the callback receives 2 arguments{{{
 #
 # From `:h job-exit_cb`:
