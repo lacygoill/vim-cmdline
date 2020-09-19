@@ -167,7 +167,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     let title = (loclist ? ':Lvim ' : ':Vim ') .. _args
     let arglist = [loclist, tempqfl, title]
     let opts = #{exit_cb: function('s:Callback', arglist)}
-    job_start(['/bin/bash', '-c', vimcmd], opts)
+    split(vimcmd)->job_start(opts)
 enddef
 
 def Callback(loclist: bool, tempqfl: string, title: string, _j: any, _e: any) #{{{2
