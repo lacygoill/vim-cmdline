@@ -47,13 +47,15 @@ fu s:guess_what_the_cmdline_is(cmdline) abort "{{{3
         return ':s'
     elseif a:cmdline =~# '\C^\s*echo'
         return ':echo'
+    elseif a:cmdline =~# '\C^\s*eval'
+        return ':eval'
     endif
 endfu
 
 fu s:transform(cmd, cmdline) abort "{{{3
     if a:cmd is# ':s'
         return s:capture_subpatterns(a:cmdline)
-    elseif a:cmd is# ':echo'
+    elseif a:cmd =~# '^:\%(echo\|eval\)$'
         return s:map_filter(a:cmdline)
     endif
     return ''
@@ -71,9 +73,9 @@ fu s:map_filter(cmdline) abort "{{{3
     "     :echo [1, 2, 3]->filter({_, v -> v != 2})
     "     :echo [1, 2, 3]->filter({_, v -> v != 2})->map({_, v -> })~
     "}}}
-    if a:cmdline =~# '\C^\s*echo\s\+.*->\%(map\|filter\)({[i,_],\s*v\s*->\s*})$'
+    if a:cmdline =~# '\C^\s*\%(echo\|eval\)\s\+.*->\%(map\|filter\)({[i,_],\s*v\s*->\s*})$'
         let new_cmdline = substitute(a:cmdline,
-            \ '\C^\s*echo\s\+.*->\zs\%(map\|filter\)\ze({[i,_],\s*v\s*->\s*})$',
+            \ '\C^\s*\%(echo\|eval\)\s\+.*->\zs\%(map\|filter\)\ze({[i,_],\s*v\s*->\s*})$',
             \ '\={"map": "filter", "filter": "map"}[submatch(0)]',
             \ '')
     else

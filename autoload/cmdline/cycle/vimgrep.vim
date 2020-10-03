@@ -74,11 +74,11 @@ def Filetype_specific_vimgrep(): string #{{{2
 enddef
 
 def Vimgrep(args: string, loclist = false) #{{{2
-    let tempvimrc = tempname()
-    let tempqfl = tempname()
+    var tempvimrc = tempname()
+    var tempqfl = tempname()
 
-    let get_tempfile =<< trim END
-        let tempqfl = expand('%:p')
+    var get_tempfile =<< trim END
+        var tempqfl = expand('%:p')
         if tempqfl !~ '^/tmp/'
             finish
         endif
@@ -88,7 +88,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     # They could contain some quotes.
     # When that happens, I have no idea how to protect them.
     #}}}
-    let cdcmd = 'cd ' .. getcwd()->fnameescape()
+    var cdcmd = 'cd ' .. getcwd()->fnameescape()
     # Don't we need to also pass `$MYVIMRC`?{{{
     #
     # No.  Apparently, a Vim job inherits the environment of the current Vim instance.
@@ -98,7 +98,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     #     :echo readfile('/tmp/somefile')
     #     ['some environment variable']~
     #}}}
-    let setcmd = printf('set wildignore=%s suffixes=%s %signorecase %ssmartcase',
+    var setcmd = printf('set wildignore=%s suffixes=%s %signorecase %ssmartcase',
         &wildignore, &suffixes, &ignorecase ? '' : 'no', &smartcase ? '' : 'no')
     # Why do you expand the arguments?{{{
     #
@@ -109,8 +109,8 @@ def Vimgrep(args: string, loclist = false) #{{{2
     #
     # Same thing for `%` and `##`.
     #}}}
-    let _args = Expandargs(args)
-    let vimgrepcmd = 'noa vim ' .. _args
+    var _args = Expandargs(args)
+    var vimgrepcmd = 'noa vim ' .. _args
     # Why `strtrans()`?{{{
     #
     # If the text contains NULs, it could mess up the parsing of `:cgetfile`.
@@ -120,7 +120,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     # just need to be able to read  them; anything which is not printable should
     # be made printable.
     #}}}
-    let getqfl =<< trim END
+    var getqfl =<< trim END
         getqflist()
            ->map({_, v -> printf('%s:%d:%d:%s',
                bufname(v.bufnr)->fnamemodify(':p'),
@@ -143,30 +143,10 @@ def Vimgrep(args: string, loclist = false) #{{{2
         + getqfl,
         tempvimrc, 's')
 
-    # Why don't you start Vim directly?  Why start a new shell?{{{
-    #
-    # A Vim job started directly from a Vim instance doesn't work as expected:
-    #
-    #     $ vim
-    #     :let job = job_start('vim +''call writefile(["test"], "/tmp/log")'' +qa!')
-    #
-    #     " wait a few seconds
-    #     :echo job
-    #     process 1234 dead~
-    #
-    #     :!cat /tmp/log
-    #     cat: /tmp/log: No such file or directory~
-    #     shell returned 1~
-    #
-    # If we start Vim from a shell, the issue disappears.
-    #
-    #     :let job = job_start(['/bin/bash', '-c', 'vim +''call writefile(["test"], "/tmp/log")'' +qa!'])
-    #}}}
-    let vimcmd = printf('vim -es -Nu NONE -U NONE -i NONE -S %s %s', tempvimrc, tempqfl)
-
-    let title = (loclist ? ':Lvim ' : ':Vim ') .. _args
-    let arglist = [loclist, tempqfl, title]
-    let opts = #{exit_cb: function('s:Callback', arglist)}
+    var vimcmd = printf('vim -es -Nu NONE -U NONE -i NONE -S %s %s', tempvimrc, tempqfl)
+    var title = (loclist ? ':Lvim ' : ':Vim ') .. _args
+    var arglist = [loclist, tempqfl, title]
+    var opts = #{exit_cb: function(Callback, arglist)}
     split(vimcmd)->job_start(opts)
 enddef
 
@@ -178,8 +158,8 @@ def Callback(loclist: bool, tempqfl: string, title: string, _j: any, _e: any) #{
 #
 #    > The arguments are the job and the exit status.
 #}}}
-    let efm_save = &l:efm
-    let bufnr = bufnr('%')
+    var efm_save = &l:efm
+    var bufnr = bufnr('%')
     try
         setl efm=%f:%l:%c:%m
         if loclist
@@ -201,13 +181,13 @@ enddef
 # }}}1
 # Utilities {{{1
 def Get_extension(): string #{{{2
-    let ext = expand('%:e')
+    var ext = expand('%:e')
     if &ft == 'dirvish' && expand('%:p') =~? '/wiki/'
         ext = 'md'
     elseif &ft == 'dirvish' && expand('%:p') =~? '/.vim/'
         ext = 'vim'
     elseif ext == '' && bufname() != ''
-        let _ext = execute('au')->split('\n')
+        var _ext = execute('au')->split('\n')
         filter(_ext, {_, v -> v =~ 'setf\s\+' .. &ft})
         ext = get(_ext, 0, '')->matchstr('\*\.\zs\S\+')
     endif
@@ -215,10 +195,10 @@ def Get_extension(): string #{{{2
 enddef
 
 def Expandargs(args: string): string #{{{2
-    let pat = '^\(\i\@!.\)\1\ze[gj]\{,2}\s\+'
+    var pat = '^\(\i\@!.\)\1\ze[gj]\{,2}\s\+'
     #           ├──────────┘
     #           └ 2 consecutive and identical non-identifier characters
-    let rep = '/' .. escape(@/, '\/') .. '/'
+    var rep = '/' .. escape(@/, '\/') .. '/'
     #                            │{{{
     #                            └ `substitute()` will remove any backslash, because
     #                               some sequences are special (like `\1` or `\u`);
