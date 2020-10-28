@@ -101,7 +101,7 @@ def InteractivePaths(): string #{{{2
     if empty(what)
         return ''
     endif
-    var Popup = {-> popup_menu(what, #{
+    Popup = {-> popup_menu(what, #{
         highlight: 'Normal',
         borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
         maxwidth: maxwidth,
@@ -112,13 +112,21 @@ def InteractivePaths(): string #{{{2
     if !empty(paths)
         if mode() =~ 'c'
             redraw
-            timer_start(0, Popup)
+            # Don't use a timer.{{{
+            #
+            # It would cause too many  weird issues, triggered by mappings which
+            # should be ignored, but are not.
+            # https://github.com/vim/vim/issues/7011#issuecomment-700981791
+            #}}}
+            au SafeState * ++once Popup()
         else
             Popup()
         endif
     endif
     return "\<c-\>\<c-n>"
 enddef
+
+var Popup: func(): number
 
 def Getlines(): string #{{{2
     var lines: list<string>
@@ -172,6 +180,12 @@ def Filter(winid: number, key: string): bool #{{{2
     if key == "\e" || key == 'q'
         popup_close(winid, -1)
         return true
+    elseif key == "\<c-n>"
+        win_execute(winid, 'norm! j')
+        return true
+    elseif key == "\<c-p>"
+        win_execute(winid, 'norm! k')
+        return true
     endif
     return popup_filter_menu(winid, key)
 enddef
@@ -188,33 +202,14 @@ def Callback(paths: list<string>, _w: any, choice: number) #{{{2
     if chosen =~ '^' .. URL .. '$'
         system('xdg-open ' .. chosen)
     else
-        exe 'sp ' .. fpath
-        # Do *not* try to jump to the desired line immediately!{{{
+        # Alternative:{{{
         #
-        # For example, don't do this:
-        #
-        #     exe printf('sp +exe\ "keepj\ norm!\ %szvzz" %s',
-        #         !empty(lnum) ? lnum .. 'G' : '', fpath)
-        #
-        # If you  press Enter before `&updatetime`,  you'll end up 1  line below
-        # the  desired one.   That's because  an extra  `<CR>` is  fed into  the
-        # typeahead buffer.  Somehow, it's caused by:
-        #
-        #    - our `<CR>` normal mode mapping
-        #
-        #    - the `<expr>` argument of the triggering mapping,
-        #      and/or the timer creating the popup
-        #
-        # For more info, see:
-        # https://github.com/vim/vim/issues/7011#issuecomment-700738601
-        #
-        # ---
-        #
-        # Delaying the jump fixes the issue.  The extra `<CR>` is probably still
-        # executed, but `:norm` fixes the cursor position right after.
+        #     exe 'sp ' .. fpath
+        #     exe printf('au SafeState * ++once keepj norm! %szvzz',
+        #         empty(lnum) ? '' : lnum .. 'G')
         #}}}
-        exe printf('au SafeState * ++once keepj norm! %szvzz',
-            empty(lnum) ? '' : lnum .. 'G')
+        exe printf('sp +exe\ "keepj\ norm!\ %szvzz" %s',
+            !empty(lnum) ? lnum .. 'G' : '', fpath)
     endif
 enddef
 
