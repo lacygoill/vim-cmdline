@@ -73,10 +73,10 @@ enddef
 #     $ vim -Nu NONE -S /tmp/vim.vim /tmp/vim.vim
 #     :vim /c/
 #     " press C-l while the cursor is right before `c`
-#     [0, 2, 1, 0]~
+#     [0, 1, 1, 0]~
 #     " the cursor didn't move
 #     :vim c C-l
-#     [0, 2, 14, 0]~
+#     [0, 2, 6, 0]~
 #     " the cursor *did* move
 #}}}
 #}}}1
@@ -101,7 +101,7 @@ def InteractivePaths(): string #{{{2
     if empty(what)
         return ''
     endif
-    Popup = {-> popup_menu(what, #{
+    Popup = {-> popup_menu(what, {
         highlight: 'Normal',
         borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
         maxwidth: maxwidth,

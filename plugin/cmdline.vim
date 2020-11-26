@@ -153,8 +153,7 @@ noremap! <expr><unique> <c-x><c-a> cmdline#unexpand#save_oldcmdline('<c-a>', get
 
 " `c_C-a` dumps all the matches on the command-line; let's define a custom `C-x C-d`
 " to capture all of them in the unnamed register.
-cno <expr><unique> <c-x><c-d>
-    \ '<c-a>' .. timer_start(0, {-> setreg('"', [getcmdline()], 'l') + feedkeys('<c-c>', 'in') })[-1]
+cno <unique> <c-x><c-d> <c-a><cmd>call setreg('"', [getcmdline()], 'l')<cr><c-c>
 
 " Prevent the function from returning anything if we are not in the pattern field of `:vim`.
 " The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{

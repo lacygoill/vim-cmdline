@@ -135,7 +135,7 @@ fu cmdline#hit_enter_prompt_no_recording() abort "{{{1
     " hit-enter prompt  has already been  closed automatically.  It's  closed no
     " matter which key you press.
     "}}}
-    nno <expr> q execute('nunmap q', 'silent!')[-1]
+    nno q <cmd>sil! nunmap q<cr>
     " if we escape the prompt without pressing `q`, make sure the mapping is still removed
     au SafeState * ++once sil! nunmap q
 endfu
