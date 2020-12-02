@@ -1,4 +1,4 @@
-fu cmdline#tab#custom(is_fwd) abort "{{{1
+fu cmdline#tab#custom(is_fwd = v:true) abort "{{{1
     if getcmdtype() =~# '[?/]'
         return getcmdline() == ''
             \ ?     "\<up>"

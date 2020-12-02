@@ -43,8 +43,8 @@ def cmdline#cycle#vimgrep#install()
     # pattern which contains a bar.
     #}}}
     cmdline#cycle#main#set('v',
-        'Vim /§/gj ./**/*.<c-r><c-r>=' .. expand('<SID>') .. 'Get_extension()<cr>',
-        'Vim /§/gj <c-r><c-r>=' .. expand('<SID>') .. 'Filetype_specific_vimgrep()<cr>',
+        'Vim /§/gj ./**/*.<c-r>=' .. expand('<SID>') .. 'Get_extension()<cr>',
+        'Vim /§/gj <c-r>=' .. expand('<SID>') .. 'Filetype_specific_vimgrep()<cr>',
         'Vim /§/gj $VIMRUNTIME/**/*.vim',
         'Vim /§/gj ##',
         'Vim /§/gj `find . -type f -cmin -60`',
@@ -180,7 +180,7 @@ def Callback(loclist: bool, tempqfl: string, title: string, _j: any, _e: any) #{
     redraw!
     if loclist && getloclist(0, {size: 0}).size == 0 || getqflist({size: 0}).size == 0
         echohl ErrorMsg
-        var pat = matchstr(title, '\(\i\@!\S\)\zs.\{-}\ze\1')
+        var pat = matchstr(title[1:], '\(\i\@!\S\)\zs.\{-}\ze\1')
         echom 'E480: No match: ' .. pat
         echohl NONE
     endif

@@ -135,7 +135,7 @@ com -bar -nargs=1 ToggleEditingCommands call cmdline#toggle_editing_commands(<ar
 " We use  our Tab mapping  to save the command-line  prior to an  expansion, and
 " install a C-q mapping to restore it.
 "}}}
-cno <expr><unique> <tab>   cmdline#tab#custom(v:true)
+cno <expr><unique> <tab>   cmdline#tab#custom()
 cno <expr><unique> <s-tab> cmdline#tab#custom(v:false)
 cno       <unique> <c-q>   <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
 

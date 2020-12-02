@@ -147,7 +147,7 @@ fu cmdline#remember(list) abort "{{{1
                 exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
             endif
         END
-        call deepcopy(a:list)->map({_, v -> printf(join(code, '|'),
+        call mapnew(a:list, {_, v -> printf(join(code, '|'),
             \     v.regex ? '=~#' : 'is#',
             \     string(v.regex ? '^' .. v.old .. '$' : v.old),
             \     string('[' .. v.new .. '] was equivalent')

@@ -160,11 +160,11 @@ def Extract_paths(lines: string): list<string> #{{{2
 enddef
 
 def Align_fields(paths: list<string>) #{{{2
-    var path_width = copy(paths)
-        ->map({_, v -> strchars(v, 1)})
+    var path_width = mapnew(paths,
+            {_, v -> strchars(v, 1)})
         ->max()
-    var lnum_width = copy(paths)
-        ->map({_, v -> matchstr(v, '\s\+line\s\+\zs\d\+$')->strchars(1)})
+    var lnum_width = mapnew(paths,
+            {_, v -> matchstr(v, '\s\+line\s\+\zs\d\+$')->strchars(1)})
         ->max()
     map(paths, {_, v -> Aligned(v, path_width, lnum_width)})
 enddef

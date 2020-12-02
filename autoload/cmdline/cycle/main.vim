@@ -51,7 +51,7 @@ fu cmdline#cycle#main#set(seq, ...) abort "{{{2
     exe 'nno <unique> <c-g>' .. a:seq
         \ .. ' <cmd>call cmdline#cycle#main#set_seq(' .. string(a:seq) .. ')<cr>'
         \ .. ':' .. substitute(a:1, '§', '', '')
-        \ .. '<c-r><c-r>=setcmdpos(' .. pos .. ')[-1]<cr>'
+        \ .. '<c-r>=setcmdpos(' .. pos .. ')[-1]<cr>'
     let s:seq_and_cmds += [[a:seq, cmds]]
 endfu
 
@@ -76,7 +76,7 @@ fu cmdline#cycle#main#move(is_fwd) abort "{{{2
         au CmdlineLeave : let s:cycles[s:seq][0] = 0
     augroup END
 
-    exe 'cno <plug>(cycle-new-cmd) ' .. new_cmd .. '<c-r><c-r>=setcmdpos(' .. pos .. ')[-1]<cr>'
+    exe 'cno <plug>(cycle-new-cmd) ' .. new_cmd .. '<c-r>=setcmdpos(' .. pos .. ')[-1]<cr>'
 
     " If we press `C-g` by accident on  the command-line, and we move forward in
     " the cycle, we should be able to undo and recover the previous command with
@@ -88,14 +88,12 @@ endfu
 " }}}1
 " Core {{{1
 fu s:install(seq, cmds) abort "{{{2
-    " cmds = ['cmd1', 'cmd2']
-    let cmds = deepcopy(a:cmds)
+" a:cmds = ['cmd1', 'cmd2']
+    let positions = mapnew(a:cmds, {_, v -> s:find_tabstop(v)})
 
-    let positions = deepcopy(cmds)->map({_, v -> s:find_tabstop(v)})
-
-    call map(cmds, {i, v -> {
-        \     'cmd': substitute(v, '§', '', ''),
-        \     'pos': positions[i],
+    let cmds = mapnew(a:cmds, {i, v -> #{
+        \ cmd: substitute(v, '§', '', ''),
+        \ pos: positions[i],
         \ }})
     " cmds = [{'cmd': 'cmd1', 'pos': 12}, {'cmd': 'cmd2', 'pos': 34}]
 
