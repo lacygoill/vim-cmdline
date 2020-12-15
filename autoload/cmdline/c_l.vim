@@ -83,14 +83,14 @@ enddef
 # Core {{{1
 def InteractivePaths(): string #{{{2
     var lines = Getlines()
-    var paths = Extract_paths(lines)
+    var paths = ExtractPaths(lines)
     var urls = copy(paths)
         ->filter({_, v -> v =~ URL})
     var paths_with_lnum = copy(paths)
         ->filter({_, v -> v !~ URL && v =~ '\s\+line\s\+\d\+$'})
     var paths_without_lnum = copy(paths)
         ->filter({_, v -> v !~ URL && v =~ '\%\(\s\+line\s\+\d\+\)\@<!$'})
-    Align_fields(paths_with_lnum)
+    AlignFields(paths_with_lnum)
     var maxwidth = map(urls + paths_with_lnum + paths_without_lnum,
         {_, v -> strchars(v, 1)})->max()
     var what = urls
@@ -141,7 +141,7 @@ def Getlines(): string #{{{2
     return join(lines, "\n")
 enddef
 
-def Extract_paths(lines: string): list<string> #{{{2
+def ExtractPaths(lines: string): list<string> #{{{2
     var paths: list<string>
     var pat = URL .. '\|\f\+\%(\s\+line\s\+\d\+\)\='
     var Rep = {m -> add(paths, m[0])->string()}
@@ -159,7 +159,7 @@ def Extract_paths(lines: string): list<string> #{{{2
     return paths
 enddef
 
-def Align_fields(paths: list<string>) #{{{2
+def AlignFields(paths: list<string>) #{{{2
     var path_width = mapnew(paths,
             {_, v -> strchars(v, 1)})
         ->max()

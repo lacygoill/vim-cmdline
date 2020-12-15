@@ -43,8 +43,8 @@ def cmdline#cycle#vimgrep#install()
     # pattern which contains a bar.
     #}}}
     cmdline#cycle#main#set('v',
-        'Vim /§/gj ./**/*.<c-r>=' .. expand('<SID>') .. 'Get_extension()<cr>',
-        'Vim /§/gj <c-r>=' .. expand('<SID>') .. 'Filetype_specific_vimgrep()<cr>',
+        'Vim /§/gj ./**/*.<c-r>=' .. expand('<SID>') .. 'GetExtension()<cr>',
+        'Vim /§/gj <c-r>=' .. expand('<SID>') .. 'FiletypeSpecificVimgrep()<cr>',
         'Vim /§/gj $VIMRUNTIME/**/*.vim',
         'Vim /§/gj ##',
         'Vim /§/gj `find . -type f -cmin -60`',
@@ -53,7 +53,7 @@ def cmdline#cycle#vimgrep#install()
 enddef
 # }}}1
 # Core {{{1
-def Filetype_specific_vimgrep(): string #{{{2
+def FiletypeSpecificVimgrep(): string #{{{2
     if &ft == 'dirvish'
         return expand('%:p') .. '**'
     elseif &ft == 'zsh'
@@ -187,7 +187,7 @@ def Callback(loclist: bool, tempqfl: string, title: string, _j: any, _e: any) #{
 enddef
 # }}}1
 # Utilities {{{1
-def Get_extension(): string #{{{2
+def GetExtension(): string #{{{2
     var ext = expand('%:e')
     if &ft == 'dirvish' && expand('%:p') =~? '/wiki/'
         ext = 'md'
