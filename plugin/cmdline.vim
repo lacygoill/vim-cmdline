@@ -59,7 +59,7 @@ au CmdlineEnter : ++once
     \ | call cmdline#remember(s:OVERLOOKED_COMMANDS)
     \ | unlet! s:OVERLOOKED_COMMANDS
 
-augroup hit_enter_prompt | au!
+augroup HitEnterPrompt | au!
     " Problem: Pressing `q` at the hit-enter prompt quits the latter (✔) and starts a recording (✘).
     " Solution: Install a temporary `q` mapping which presses Escape to quit the prompt.
     " the guard suppresses `E454`; https://github.com/vim/vim/issues/6209
@@ -75,7 +75,7 @@ augroup hit_enter_prompt | au!
         \ | endif
 augroup END
 
-augroup my_cmdline_chain | au!
+augroup MyCmdlineChain | au!
     " Automatically execute  command B when A  has just been executed  (chain of
     " commands).  Inspiration:
     " https://gist.github.com/romainl/047aca21e338df7ccf771f96858edb86

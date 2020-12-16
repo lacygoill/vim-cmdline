@@ -72,7 +72,7 @@ fu cmdline#cycle#main#move(is_fwd) abort "{{{2
     " update the new index position
     let s:cycles[s:seq][0] = idx
 
-    augroup reset_cycle_index | au!
+    augroup ResetCycleIndex | au!
         au CmdlineLeave : let s:cycles[s:seq][0] = 0
     augroup END
 

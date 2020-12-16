@@ -141,7 +141,7 @@ fu cmdline#hit_enter_prompt_no_recording() abort "{{{1
 endfu
 
 fu cmdline#remember(list) abort "{{{1
-    augroup remember_overlooked_commands | au!
+    augroup RememberOverlookedCommands | au!
         let code =<< trim END
             au CmdlineLeave : if getcmdline() %s %s
                 exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
