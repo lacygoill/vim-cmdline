@@ -1,4 +1,7 @@
-vim9script
+vim9script noclear
+
+if exists('loaded') | finish | endif
+var loaded = true
 
 # TEST:
 #
@@ -85,14 +88,14 @@ def InteractivePaths(): string #{{{2
     var lines = Getlines()
     var paths = ExtractPaths(lines)
     var urls = copy(paths)
-        ->filter({_, v -> v =~ URL})
+        ->filter((_, v) => v =~ URL)
     var paths_with_lnum = copy(paths)
-        ->filter({_, v -> v !~ URL && v =~ '\s\+line\s\+\d\+$'})
+        ->filter((_, v) => v !~ URL && v =~ '\s\+line\s\+\d\+$')
     var paths_without_lnum = copy(paths)
-        ->filter({_, v -> v !~ URL && v =~ '\%\(\s\+line\s\+\d\+\)\@<!$'})
+        ->filter((_, v) => v !~ URL && v =~ '\%\(\s\+line\s\+\d\+\)\@<!$')
     AlignFields(paths_with_lnum)
     var maxwidth = map(urls + paths_with_lnum + paths_without_lnum,
-        {_, v -> strchars(v, 1)})->max()
+        (_, v) => strchars(v, 1))->max()
     var what = urls
         + (!empty(urls) && !empty(paths_with_lnum) ? [repeat('─', maxwidth)] : [])
         + paths_with_lnum
@@ -101,14 +104,14 @@ def InteractivePaths(): string #{{{2
     if empty(what)
         return ''
     endif
-    Popup = {-> popup_menu(what, {
+    Popup = () => popup_menu(what, {
         highlight: 'Normal',
         borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
         maxwidth: maxwidth,
         maxheight: &lines / 2,
         filter: Filter,
         callback: function(Callback, [what]),
-        })}
+        })
     if !empty(paths)
         if mode() =~ 'c'
             redraw
@@ -144,9 +147,9 @@ enddef
 def ExtractPaths(lines: string): list<string> #{{{2
     var paths: list<string>
     var pat = URL .. '\|\f\+\%(\s\+line\s\+\d\+\)\='
-    var Rep = {m -> add(paths, m[0])->string()}
+    var Rep = (m) => add(paths, m[0])->string()
     substitute(lines, pat, Rep, 'g')
-    filter(paths, {_, v ->
+    filter(paths, (_, v) =>
             v =~ '^' .. URL .. '$'
         ||
             v =~ '/'
@@ -154,19 +157,19 @@ def ExtractPaths(lines: string): list<string> #{{{2
             substitute(v, '\s\+line\s\+\d\+$', '', '')
             ->expand()
             ->filereadable()
-        })
+        )
         ->uniq()
     return paths
 enddef
 
 def AlignFields(paths: list<string>) #{{{2
     var path_width = mapnew(paths,
-            {_, v -> strchars(v, 1)})
+            (_, v) => strchars(v, 1))
         ->max()
     var lnum_width = mapnew(paths,
-            {_, v -> matchstr(v, '\s\+line\s\+\zs\d\+$')->strchars(1)})
+            (_, v) => matchstr(v, '\s\+line\s\+\zs\d\+$')->strchars(1))
         ->max()
-    map(paths, {_, v -> Aligned(v, path_width, lnum_width)})
+    map(paths, (_, v) => Aligned(v, path_width, lnum_width))
 enddef
 
 def Aligned(path: string, path_width: number, lnum_width: number): string #{{{2

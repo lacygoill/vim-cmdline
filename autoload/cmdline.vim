@@ -20,7 +20,7 @@ fu cmdline#auto_uppercase() abort "{{{1
     " make sense.
     "}}}
     let commands = execute('com')
-        \ ->split('\n')[1:]
+        \ ->split('\n')[1 :]
         \ ->filter({_, v -> v =~# '^[^bA-Z]*\u\S'})
         \ ->map({_, v -> matchstr(v, '\u\S*')})
 

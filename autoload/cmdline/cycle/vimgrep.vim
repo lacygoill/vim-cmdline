@@ -1,9 +1,7 @@
-vim9script
+vim9script noclear
 
-if exists('g:autoloaded_cmdline#cycle#vimgrep')
-    finish
-endif
-g:autoloaded_cmdline#cycle#vimgrep = 1
+if exists('loaded') | finish | endif
+var loaded = true
 
 # Interface {{{1
 
@@ -122,12 +120,12 @@ def Vimgrep(args: string, loclist = false) #{{{2
     #}}}
     var getqfl =<< trim END
         getqflist()
-           ->map({_, v -> printf('%s:%d:%d:%s',
+           ->map((_, v) => printf('%s:%d:%d:%s',
                bufname(v.bufnr)->fnamemodify(':p'),
                v.lnum,
                v.col,
-               substitute(v.text, '[^[:print:]]', {m -> strtrans(m[0])}, 'g')
-               )})
+               substitute(v.text, '[^[:print:]]', (m) => strtrans(m[0]), 'g')
+               ))
            ->writefile(tempqfl, 's')
         qa!
     END
@@ -137,7 +135,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     # `j` flag  unconditionally in the  second Vim instance where  `:vimgrep` is
     # run, but better be safe.
     #}}}
-    writefile(['vim9script']
+    writefile(['vim9script noclear']
         + get_tempfile
         + [cdcmd, setcmd, vimgrepcmd]
         + getqfl,
@@ -180,7 +178,7 @@ def Callback(loclist: bool, tempqfl: string, title: string, _j: any, _e: any) #{
     redraw!
     if loclist && getloclist(0, {size: 0}).size == 0 || getqflist({size: 0}).size == 0
         echohl ErrorMsg
-        var pat = matchstr(title[1:], '\(\i\@!\S\)\zs.\{-}\ze\1')
+        var pat = matchstr(title[1 :], '\(\i\@!\S\)\zs.\{-}\ze\1')
         echom 'E480: No match: ' .. pat
         echohl NONE
     endif
@@ -195,7 +193,7 @@ def GetExtension(): string #{{{2
         ext = 'vim'
     elseif ext == '' && bufname() != ''
         var _ext = execute('au')->split('\n')
-        filter(_ext, {_, v -> v =~ 'setf\s\+' .. &ft})
+        filter(_ext, (_, v) => v =~ 'setf\s\+' .. &ft)
         ext = get(_ext, 0, '')->matchstr('\*\.\zs\S\+')
     endif
     return ext
@@ -221,7 +219,7 @@ def Expandargs(args: string): string #{{{2
         ->substitute('\s\+\zs%\s*$', expand('%:p')->fnameescape(), '')
         # expand `##` into `files_in_arglist`
         ->substitute('\s\+\zs##\s*$', argv()
-        ->map({_, v -> fnamemodify(v, ':p')->fnameescape()})
+        ->map((_, v) => fnamemodify(v, ':p')->fnameescape())
         ->join(), '')
 enddef
 
