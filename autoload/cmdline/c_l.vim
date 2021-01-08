@@ -1,4 +1,4 @@
-vim9script noclear
+vim9 noclear
 
 if exists('loaded') | finish | endif
 var loaded = true
@@ -180,14 +180,8 @@ def Aligned(path: string, path_width: number, lnum_width: number): string #{{{2
 enddef
 
 def Filter(winid: number, key: string): bool #{{{2
-    if key == "\e" || key == 'q'
+    if key == 'q'
         popup_close(winid, -1)
-        return true
-    elseif key == "\<c-n>"
-        win_execute(winid, 'norm! j')
-        return true
-    elseif key == "\<c-p>"
-        win_execute(winid, 'norm! k')
         return true
     endif
     return popup_filter_menu(winid, key)
