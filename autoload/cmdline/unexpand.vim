@@ -1,15 +1,15 @@
-if exists('g:autoloaded_cmdline#unexpand')
-    finish
-endif
-let g:autoloaded_cmdline#unexpand = 1
+vim9 noclear
 
-let s:oldcmdline = ''
+if exists('loaded') | finish | endif
+var loaded = true
+
+var oldcmdline: string
 
 augroup ClearCmdlineBeforeExpansion | au!
-    au CmdlineLeave : let s:oldcmdline = ''
+    au CmdlineLeave : oldcmdline = ''
 augroup END
 
-" Interface {{{1
+# Interface {{{1
 fu cmdline#unexpand#save_oldcmdline(key, cmdline) abort "{{{2
     fu! s:save() abort closure
         if a:key is# "\<c-a>" || a:key is# nr2char(&wcm ? &wcm : &wc)

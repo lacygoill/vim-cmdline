@@ -55,7 +55,7 @@ fu cmdline#cycle#main#set(seq, ...) abort "{{{2
     let s:seq_and_cmds += [[a:seq, cmds]]
 endfu
 
-fu cmdline#cycle#main#move(is_fwd) abort "{{{2
+fu cmdline#cycle#main#move(is_fwd = v:true) abort "{{{2
     let cmdline = getcmdline()
 
     if getcmdtype() isnot# ':' || !s:is_valid_cycle()

@@ -1,175 +1,180 @@
-if exists('g:autoloaded_cmdline')
-    finish
-endif
-let g:autoloaded_cmdline = 1
+vim9 noclear
+
+if exists('loaded') | finish | endif
+var loaded = true
 
 import Catch from 'lg.vim'
 import {MapSave, MapRestore} from 'lg/map.vim'
 
-fu cmdline#auto_uppercase() abort "{{{1
-    " We define  abbreviations in command-line  mode to automatically  replace a
-    " custom command name written in lowercase with uppercase characters.
+def cmdline#autoUppercase() #{{{1
+    # We define  abbreviations in command-line  mode to automatically  replace a
+    # custom command name written in lowercase with uppercase characters.
 
-    " Do *not* use `getcompletion()`.{{{
-    "
-    "     let commands = getcompletion('[A-Z]?*', 'command')
-    "
-    " You would get the names of the global commands (✔) *and* the ones local to
-    " the current buffer (✘); we don't want the latter.
-    " Installing  a *global* abbreviation  for a *buffer-local*  command doesn't
-    " make sense.
-    "}}}
-    let commands = execute('com')
-        \ ->split('\n')[1 :]
-        \ ->filter({_, v -> v =~# '^[^bA-Z]*\u\S'})
-        \ ->map({_, v -> matchstr(v, '\u\S*')})
+    # Do *not* use `getcompletion()`.{{{
+    #
+    #     let commands = getcompletion('[A-Z]?*', 'command')
+    #
+    # You would get the names of the global commands (✔) *and* the ones local to
+    # the current buffer (✘); we don't want the latter.
+    # Installing  a *global* abbreviation  for a *buffer-local*  command doesn't
+    # make sense.
+    #}}}
+    var commands = execute('com')
+        ->split('\n')[1 :]
+        ->filter((_, v) => v =~ '^[^bA-Z]*\u\S')
+        ->map((_, v) => matchstr(v, '\u\S*'))
 
-    let pat = '^\%%(\%%(tab\<bar>vert\%%[ical]\)\s\+\)\=%s$\<bar>^\%%(''<,''>\<bar>\*\)%s$'
+    var pat = '^\%%(\%%(tab\<bar>vert\%%[ical]\)\s\+\)\=%s$\<bar>^\%%(''<,''>\<bar>\*\)%s$'
     for cmd in commands
-        let lcmd = tolower(cmd)
-        exe printf('cnorea <expr> %s
-            \         getcmdtype() == '':'' && getcmdline() =~# ' .. string(pat) .. '
-            \         ?     %s
-            \         :     %s'
-            \ , lcmd, lcmd, lcmd, string(cmd), tolower(cmd)->string()
-            \ )
+        var lcmd = tolower(cmd)
+        exe printf('cnorea <expr> %s getcmdtype() == '':'' && getcmdline() =~ '
+                    .. string(pat) .. ' ? %s : %s',
+            lcmd, lcmd, lcmd, string(cmd), tolower(cmd)->string()
+            )
     endfor
-endfu
+enddef
 
-fu cmdline#chain() abort "{{{1
-    let cmdline = getcmdline()
+def cmdline#chain() #{{{1
+    var cmdline = getcmdline()
 
-    " The boolean flag controls the `'more'` option.
-    let pat2cmd = {
-        \ '\%(g\|v\).*\%(#\@1<!#\|nu\%[mber]\)': ['', v:false],
-        \ '\%(ls\|files\|buffers\)!\=': ['b ', v:false],
-        \ 'chi\%[story]': ['CC ', v:true],
-        \ 'lhi\%[story]': ['LL ', v:true],
-        \ 'marks':        ['norm! `', v:true],
-        \ 'old\%[files]': ['e #<', v:true],
-        \ 'undol\%[ist]': ['u ', v:true],
-        \ 'changes':      ["norm! g;\<s-left>", v:true],
-        \ 'ju\%[mps]':    ["norm! \<c-o>\<s-left>", v:true],
-        \ }
+    # The boolean flag controls the `'more'` option.
+    var pat2cmd = {
+        '\%(g\|v\).*\%(#\@1<!#\|nu\%[mber]\)': ['', false],
+        '\%(ls\|files\|buffers\)!\=': ['b ', false],
+        'chi\%[story]': ['CC ', true],
+        'lhi\%[story]': ['LL ', true],
+        'marks':        ['norm! `', true],
+        'old\%[files]': ['e #<', true],
+        'undol\%[ist]': ['u ', true],
+        'changes':      ["norm! g;\<s-left>", true],
+        'ju\%[mps]':    ["norm! \<c-o>\<s-left>", true],
+        }
 
     for [pat, cmd] in items(pat2cmd)
-        let [keys, nomore] = cmd
-        if cmdline =~# '\C^' .. pat .. '$'
-            " when I  execute `:[cl]chi`,  don't populate the  command-line with
-            " `:sil [cl]ol` if the qf stack doesn't have at least two qf lists
-            if pat is# 'lhi\%[story]' && getloclist(0, {'nr': '$'})->get('nr', 0) <= 1
-            \ || pat is# 'chi\%[story]' && getqflist({'nr': '$'})->get('nr', 0) <= 1
+        var keys: string
+        var nomore: bool
+        [keys, nomore] = cmd
+        if cmdline =~ '\C^' .. pat .. '$'
+            # when I  execute `:[cl]chi`,  don't populate the  command-line with
+            # `:sil [cl]ol` if the qf stack doesn't have at least two qf lists
+            if pat == 'lhi\%[story]' && getloclist(0, {nr: '$'})->get('nr', 0) <= 1
+            || pat == 'chi\%[story]' && getqflist({nr: '$'})->get('nr', 0) <= 1
                 return
             endif
-            if pat is# 'chi\%[story]'
-                let pfx = 'c'
-            elseif pat is# 'lhi\%[story]'
-                let pfx = 'l'
+            var pfx: string
+            if pat == 'chi\%[story]'
+                pfx = 'c'
+            elseif pat == 'lhi\%[story]'
+                pfx = 'l'
             endif
-            if exists('pfx')
-                if pfx is# 'c' && getqflist({'nr': '$'})->get('nr', 0) <= 1
-                \ || pfx is# 'l' && getloclist(0, {'nr': '$'})->get('nr', 0) <= 1
+            if pfx != ''
+                if pfx == 'c' && getqflist({nr: '$'})->get('nr', 0) <= 1
+                || pfx == 'l' && getloclist(0, {nr: '$'})->get('nr', 0) <= 1
                     return
                 endif
             endif
-            " Why disabling `'more'` for some commands?{{{
-            "
-            "    > The lists generated by :#, :ls, :ilist, :dlist, :clist, :llist, or
-            "    > :marks  are  relatively  short  but  those  generated  by  :jumps,
-            "    > :oldfiles,  or  :changes  can  be   100  lines  long  and  require
-            "    > paging. This can be really cumbersome, especially considering that
-            "    > the  most recent  items are  near the  end of  the list. For  this
-            "    > reason,  I chose  to  temporarily  :set nomore  in  order to  jump
-            "    > directly to the end  of the list.
-            "
-            " Source: https://gist.github.com/romainl/047aca21e338df7ccf771f96858edb86#generalizing
-            "}}}
+            # Why disabling `'more'` for some commands?{{{
+            #
+            #    > The lists generated by :#, :ls, :ilist, :dlist, :clist, :llist, or
+            #    > :marks  are  relatively  short  but  those  generated  by  :jumps,
+            #    > :oldfiles,  or  :changes  can  be   100  lines  long  and  require
+            #    > paging. This can be really cumbersome, especially considering that
+            #    > the  most recent  items are  near the  end of  the list. For  this
+            #    > reason,  I chose  to  temporarily  :set nomore  in  order to  jump
+            #    > directly to the end  of the list.
+            #
+            # Source: https://gist.github.com/romainl/047aca21e338df7ccf771f96858edb86#generalizing
+            #}}}
             if nomore
-                let s:more_save = &more
-                " allow Vim's pager to display the full contents of any command,
-                " even if it takes more than one screen; don't stop after the first
-                " screen to display the message:    -- More --
+                more_save = &more
+                # allow Vim's pager to display the full contents of any command,
+                # even if it takes more than one screen; don't stop after the first
+                # screen to display the message:    -- More --
                 set nomore
-                au CmdlineLeave * ++once exe 'set ' .. (s:more_save ? '' : 'no') .. 'more'
-                    \ | unlet! s:more_save
+                au CmdlineLeave * ++once exe 'set ' .. (more_save ? '' : 'no') .. 'more'
             endif
-            return feedkeys(':' .. keys, 'in')
+            feedkeys(':' .. keys, 'in')
+            return
         endif
     endfor
 
-    if cmdline =~# '\C^\s*\%(dli\|il\)\%[ist]\s\+'
-        call feedkeys(':' .. matchstr(cmdline, '\S') .. 'j  ' .. split(cmdline, ' ')[1] .. "\<s-left>\<left>", 'in')
-    elseif cmdline =~# '\C^\s*\%(cli\|lli\)'
-        call feedkeys(':sil ' .. matchstr(cmdline, '\S')->repeat(2) .. ' ', 'in')
+    if cmdline =~ '\C^\s*\%(dli\|il\)\%[ist]\s\+'
+        feedkeys(':' .. matchstr(cmdline, '\S') .. 'j  '
+            .. split(cmdline, ' ')[1] .. "\<s-left>\<left>", 'in')
+    elseif cmdline =~ '\C^\s*\%(cli\|lli\)'
+        feedkeys(':sil ' .. matchstr(cmdline, '\S')->repeat(2) .. ' ', 'in')
     endif
-endfu
+enddef
+var more_save: bool
 
-fu cmdline#fix_typo(label) abort "{{{1
-    let cmdline = getcmdline()
-    let keys = {
-        \   'cr': "\<bs>\<cr>",
-        \   'z' : "\<bs>\<bs>()\<cr>",
-        \ }[a:label]
-    " We can't send the keys right now, because the command hasn't been executed yet.{{{
-    "
-    " From `:h CmdlineLeave`:
-    "
-    "    > Before leaving the command-line.
-    "
-    " But it seems we can't modify the command either.  Maybe it's locked.
-    " So, we'll reexecute a new fixed command with a little later.
-    "}}}
-    let s:rerun_fixed_cmd ={-> feedkeys(':' .. cmdline .. keys, 'in')}
-    "                                          │{{{
-    "                                          └ do *not* replace this with `getcmdline()`:
-    "                                            when the callback will be processed,
-    "                                            the old command-line will be lost
-    "}}}
-    au SafeState * ++once call s:rerun_fixed_cmd()
-endfu
+def cmdline#fix_typo(label: string) #{{{1
+    var cmdline = getcmdline()
+    var keys = {
+          cr: "\<bs>\<cr>",
+          z: "\<bs>\<bs>()\<cr>",
+        }[label]
+    # We can't send the keys right now, because the command hasn't been executed yet.{{{
+    #
+    # From `:h CmdlineLeave`:
+    #
+    #    > Before leaving the command-line.
+    #
+    # But it seems we can't modify the command either.  Maybe it's locked.
+    # So, we'll reexecute a new fixed command with a little later.
+    #}}}
+    RerunFixedCmd = () => feedkeys(':' .. cmdline .. keys, 'in')
+    #                                     │{{{
+    #                                     └ do *not* replace this with `getcmdline()`:
+    #                                       when the callback will be processed,
+    #                                       the old command-line will be lost
+    #}}}
+    au SafeState * ++once RerunFixedCmd()
+enddef
+var RerunFixedCmd: func
 
-fu cmdline#hit_enter_prompt_no_recording() abort "{{{1
-    " if we press `q`, just remove the mapping{{{
-    "
-    " No  need to  press sth  like  `Esc`; when  the mapping  is processed,  the
-    " hit-enter prompt  has already been  closed automatically.  It's  closed no
-    " matter which key you press.
-    "}}}
+def cmdline#hitEnterPromptNoRecording() #{{{1
+    # if we press `q`, just remove the mapping{{{
+    #
+    # No  need to  press sth  like  `Esc`; when  the mapping  is processed,  the
+    # hit-enter prompt  has already been  closed automatically.  It's  closed no
+    # matter which key you press.
+    #}}}
     nno q <cmd>sil! nunmap q<cr>
-    " if we escape the prompt without pressing `q`, make sure the mapping is still removed
+    # if we escape the prompt without pressing `q`, make sure the mapping is still removed
     au SafeState * ++once sil! nunmap q
-endfu
+enddef
 
-fu cmdline#remember(list) abort "{{{1
+def cmdline#remember(list: list<dict<any>>) #{{{1
     augroup RememberOverlookedCommands | au!
-        let code =<< trim END
+        var code =<< trim END
             au CmdlineLeave : if getcmdline() %s %s
                 exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
             endif
         END
-        call mapnew(a:list, {_, v -> printf(join(code, '|'),
-            \     v.regex ? '=~#' : 'is#',
-            \     string(v.regex ? '^' .. v.old .. '$' : v.old),
-            \     string('[' .. v.new .. '] was equivalent')
-            \ )->execute()})
+        mapnew(list, (_, v) => printf(join(code, '|'),
+                v.regex ? '=~' : '==',
+                string(v.regex ? '^' .. v.old .. '$' : v.old),
+                string('[' .. v.new .. '] was equivalent')
+            )->execute())
     augroup END
-endfu
+enddef
 
-fu cmdline#toggle_editing_commands(enable) abort "{{{1
+def cmdline#toggleEditingCommands(enable: bool) #{{{1
     try
-        if a:enable
-            call get(s:, 'my_editing_commands', [])->s:MapRestore()
+        if enable
+            MapRestore(my_editing_commands)
         else
-            let lhs_list = execute('cno')->split('\n')
-            " ignore buffer-local mappings
-            call filter(lhs_list, {_, v -> v !~# '^[c!]\s\+\S\+\s\+\S*@'})
-            " extract lhs
-            call map(lhs_list, {_, v -> matchstr(v, '^[c!]\s\+\zs\S\+')})
-            let s:my_editing_commands = s:MapSave(lhs_list, 'c')
+            var lhs_list = execute('cno')->split('\n')
+            # ignore buffer-local mappings
+            filter(lhs_list, (_, v) => v !~ '^[c!]\s\+\S\+\s\+\S*@')
+            # extract lhs
+            map(lhs_list, (_, v) => matchstr(v, '^[c!]\s\+\zs\S\+'))
+            my_editing_commands = MapSave(lhs_list, 'c')
             cmapclear
         endif
     catch
-        return s:Catch()
+        Catch()
     endtry
-endfu
+enddef
+var my_editing_commands: list<dict<any>>
 
