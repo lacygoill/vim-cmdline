@@ -1,13 +1,13 @@
-if exists('g:autoloaded_cmdline#cycle#filter')
-    finish
-endif
-let g:autoloaded_cmdline#cycle#filter = 1
+vim9 noclear
 
-" Init {{{1
+if exists('loaded') | finish | endif
+var loaded = true
 
-" `:Filter /pat/ cmd` should just run the built-in `:filter` if it can filter `:cmd`.
-" We need to teach `:Filter` which commands should not be tampered with.
-const s:FILTERABLE_COMMANDS =<< trim END
+# Init {{{1
+
+# `:Filter /pat/ cmd` should just run the built-in `:filter` if it can filter `:cmd`.
+# We need to teach `:Filter` which commands should not be tampered with.
+const FILTERABLE_COMMANDS =<< trim END
     #
     l\%[ist]
     nu\%[mber]
@@ -52,15 +52,15 @@ const s:FILTERABLE_COMMANDS =<< trim END
     sig\%[n]
 END
 
-call cmdline#cycle#main#set('f', 'Verb Filter /\c§/ ')
-" }}}1
-" Interface {{{1
-fu cmdline#cycle#filter#install() abort "{{{2
-    com -bang -nargs=+ -complete=custom,s:filter_completion Filter call s:filter(<q-args>, <bang>0)
-endfu
+cmdline#cycle#main#set('f', 'Verb Filter /\c§/ ')
+# }}}1
+# Interface {{{1
+def cmdline#cycle#filter#install() #{{{2
+    com -bang -nargs=+ -complete=custom,FilterCompletion Filter Filter(<q-args>, <bang>0)
+enddef
 
-fu s:filter_completion(_a, _l, _p) abort "{{{2
-    let matches =<< trim END
+def FilterCompletion(...l: any): string #{{{2
+    var matches =<< trim END
         %#
         ab
         chi
@@ -75,36 +75,37 @@ fu s:filter_completion(_a, _l, _p) abort "{{{2
         set
     END
     return join(matches, "\n")
-endfu
-" }}}1
-" Core {{{1
-fu s:filter(cmd, bang) abort "{{{2
-    let pat = matchstr(a:cmd, '/\zs.\{-}\ze/')
+enddef
+# }}}1
+# Core {{{1
+def Filter(arg_cmd: string, bang: bool) #{{{2
+    var pat = matchstr(arg_cmd, '/\zs.\{-}\ze/')
 
-    let cmd = matchstr(a:cmd, '/.\{-}/\s*\zs.*')
-    let first_word = matchstr(cmd, '\a*\|#')
-    if s:is_filterable(first_word)
+    var cmd = matchstr(arg_cmd, '/.\{-}/\s*\zs.*')
+    var first_word = matchstr(cmd, '\a*\|#')
+    if IsFilterable(first_word)
         if pat == ''
-            exe 'filter' .. (a:bang ? '!': '') .. ' ' .. substitute(a:cmd, '/\zs.\{-}\ze/', @/, '')
+            exe 'filter' .. (bang ? '!' : '') .. ' '
+                .. substitute(arg_cmd, '/\zs.\{-}\ze/', @/, '')
         else
-            exe 'filter' .. (a:bang ? '!': '') .. ' ' .. a:cmd
+            exe 'filter' .. (bang ? '!' : '') .. ' ' .. arg_cmd
         endif
         return
     endif
 
-    let output = cmd is# 'args'
-        \ ?     argv()
-        \ :     execute(cmd)->split('\n')
-    echo filter(output, {_, v -> a:bang ? v !~# pat : v =~# pat})->join("\n")
-endfu
-" }}}1
-" Utilities {{{1
-fu s:is_filterable(first_word) abort "{{{2
-    for cmd in s:FILTERABLE_COMMANDS
-        if a:first_word =~# '^\C' .. cmd .. '$'
-            return 1
+    var output = cmd == 'args'
+        ?     argv()
+        :     execute(cmd)->split('\n')
+    echo filter(output, (_, v) => bang ? v !~ pat : v =~ pat)->join("\n")
+enddef
+# }}}1
+# Utilities {{{1
+def IsFilterable(first_word: string): bool #{{{2
+    for cmd in FILTERABLE_COMMANDS
+        if first_word =~ '^\C' .. cmd .. '$'
+            return true
         endif
     endfor
-    return 0
-endfu
+    return false
+enddef
 

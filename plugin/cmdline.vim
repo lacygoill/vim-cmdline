@@ -136,7 +136,7 @@ com -bar -nargs=1 ToggleEditingCommands cmdline#toggleEditingCommands(<args>)
 #}}}
 cno <expr><unique> <tab>   cmdline#tab#custom()
 cno <expr><unique> <s-tab> cmdline#tab#custom(v:false)
-cno       <unique> <c-q>   <c-\>e cmdline#tab#restore_cmdline_after_expansion()<cr>
+cno       <unique> <c-q>   <c-\>e cmdline#tab#restoreCmdlineAfterExpansion()<cr>
 
 # Purpose:{{{
 #
@@ -148,7 +148,7 @@ cno <expr> <c-l> cmdline#c_l#main()
 # In vim-readline, we remap `i_C-a` to a readline motion.
 # Here, we restore the default `C-a` command (`:h i^a`) by mapping it to `C-x C-a`.
 # Same thing with the default `c_C-a` (`:h c^a`).
-noremap! <expr><unique> <c-x><c-a> cmdline#unexpand#save_oldcmdline('<c-a>', getcmdline())
+noremap! <expr><unique> <c-x><c-a> getcmdline()->cmdline#unexpand#saveOldcmdline('<c-a>')
 
 # `c_C-a` dumps all the matches on the command-line; let's define a custom `C-x C-d`
 # to capture all of them in the unnamed register.
@@ -330,12 +330,12 @@ CyclesSet()
 # Commented because the messages are annoying.
 # I keep it for educational purpose.
 
-#     const OVERLOOKED_COMMANDS = [
+#     const OVERLOOKED_COMMANDS: list<any> = [
 #         {old: 'vs\%[plit]', new: 'C-w v', regex: true},
 #         {old: 'sp\%[lit]', new: 'C-w s', regex: true},
 #         {old: 'q!', new: 'ZQ', regex: false},
 #         {old: 'x', new: 'ZZ', regex: false},
 #         ]
 
-const OVERLOOKED_COMMANDS = []
+const OVERLOOKED_COMMANDS: list<any> = []
 

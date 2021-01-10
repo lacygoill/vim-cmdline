@@ -10,21 +10,24 @@ augroup ClearCmdlineBeforeExpansion | au!
 augroup END
 
 # Interface {{{1
-fu cmdline#unexpand#save_oldcmdline(key, cmdline) abort "{{{2
-    fu! s:save() abort closure
-        if a:key is# "\<c-a>" || a:key is# nr2char(&wcm ? &wcm : &wc)
-            let s:oldcmdline = a:cmdline
-        endif
-    endfu
-    au CmdlineChanged : ++once call s:save()
-    return a:key
-endfu
+def cmdline#unexpand#saveOldcmdline(cmdline: string, key: string): string #{{{2
+    SaveRef = function(Save, [key, cmdline])
+    au CmdlineChanged : ++once SaveRef()
+    return key
+enddef
+var SaveRef: func(string, string)
 
-fu cmdline#unexpand#get_oldcmdline() abort "{{{2
-    return get(s:, 'oldcmdline', '')
-endfu
+def Save(key: string, cmdline: string)
+    if key == "\<c-a>" || key == nr2char(&wcm != 0 ? &wcm : &wc)
+        oldcmdline = cmdline
+    endif
+enddef
 
-fu cmdline#unexpand#clear_oldcmdline() abort "{{{2
-    let s:oldcmdline = ''
-endfu
+def cmdline#unexpand#getOldcmdline(): string #{{{2
+    return oldcmdline
+enddef
+
+def cmdline#unexpand#clearOldcmdline() #{{{2
+    oldcmdline = ''
+enddef
 
