@@ -94,7 +94,7 @@ def InteractivePaths(): string #{{{2
     var paths_without_lnum = copy(paths)
         ->filter((_, v) => v !~ URL && v =~ '\%\(\s\+line\s\+\d\+\)\@<!$')
     AlignFields(paths_with_lnum)
-    var maxwidth = map(urls + paths_with_lnum + paths_without_lnum,
+    var maxwidth = mapnew(urls + paths_with_lnum + paths_without_lnum,
         (_, v) => strchars(v, true))->max()
     var what = urls
         + (!empty(urls) && !empty(paths_with_lnum) ? [repeat('─', maxwidth)] : [])

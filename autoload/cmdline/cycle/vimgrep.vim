@@ -120,7 +120,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     #}}}
     var getqfl =<< trim END
         getqflist()
-           ->map((_, v) => printf('%s:%d:%d:%s',
+           ->mapnew((_, v) => printf('%s:%d:%d:%s',
                bufname(v.bufnr)->fnamemodify(':p'),
                v.lnum,
                v.col,
@@ -218,8 +218,10 @@ def Expandargs(args: string): string #{{{2
         # expand `%` into `current_file`
         ->substitute('\s\+\zs%\s*$', expand('%:p')->fnameescape(), '')
         # expand `##` into `files_in_arglist`
-        ->substitute('\s\+\zs##\s*$', argv()
-        ->map((_, v) => fnamemodify(v, ':p')->fnameescape())
-        ->join(), '')
+        ->substitute('\s\+\zs##\s*$',
+            argv()
+                ->map((_, v) => fnamemodify(v, ':p')->fnameescape())
+                ->join(),
+            '')
 enddef
 

@@ -12,7 +12,7 @@ var orig_cmdline: string
 # Interface {{{1
 def cmdline#transform#main(): string #{{{2
     transformed += 1
-    au CmdlineLeave /,\?,: ++once transformed = 0 | orig_cmdline = ''
+    au CmdlineLeave /,\?,: ++once transformed = -1 | orig_cmdline = ''
 
     var cmdtype = getcmdtype()
     var cmdline = getcmdline()
@@ -140,7 +140,7 @@ def SearchOutsideComments(cmdtype: string): string #{{{3
     else
         cml = '\V' .. matchstr(&l:cms, '\S*\ze\s*%s')->escape('\' .. cmdtype) .. '\m'
     endif
-    return '\%(^\%(\s*' .. cml .. '\)\@!.*\)\@<=\m\%(' .. 'orig_cmdline' .. '\)'
+    return '\%(^\%(\s*' .. cml .. '\)\@!.*\)\@<=\m\%(' .. orig_cmdline .. '\)'
     #                                             ├─┘
     #                                             └ Why?{{{
     # The original pattern may contain several branches.
