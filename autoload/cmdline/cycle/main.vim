@@ -98,7 +98,7 @@ def Install(seq: string, arg_cmds: list<string>) #{{{2
         cmd: substitute(v, '§', '', ''),
         pos: positions[i],
         }))
-    # cmds = [{'cmd': 'cmd1', 'pos': 12}, {'cmd': 'cmd2', 'pos': 34}]
+    # cmds = [{cmd: 'cmd1', pos: 12}, {cmd: 'cmd2', pos: 34}]
 
     extend(cycles, {[seq]: [0, cmds]})
 enddef
