@@ -19,14 +19,14 @@ def cmdline#autoUppercase() #{{{1
     # Installing  a *global* abbreviation  for a *buffer-local*  command doesn't
     # make sense.
     #}}}
-    var commands = execute('com')
+    var commands: list<string> = execute('com')
         ->split('\n')[1 :]
         ->filter((_, v) => v =~ '^[^bA-Z]*\u\S')
         ->map((_, v) => matchstr(v, '\u\S*'))
 
-    var pat = '^\%%(\%%(tab\<bar>vert\%%[ical]\)\s\+\)\=%s$\<bar>^\%%(''<,''>\<bar>\*\)%s$'
+    var pat: string = '^\%%(\%%(tab\<bar>vert\%%[ical]\)\s\+\)\=%s$\<bar>^\%%(''<,''>\<bar>\*\)%s$'
     for cmd in commands
-        var lcmd = tolower(cmd)
+        var lcmd: string = tolower(cmd)
         exe printf('cnorea <expr> %s getcmdtype() == '':'' && getcmdline() =~ '
                     .. string(pat) .. ' ? %s : %s',
             lcmd, lcmd, lcmd, string(cmd), tolower(cmd)->string()
@@ -35,10 +35,10 @@ def cmdline#autoUppercase() #{{{1
 enddef
 
 def cmdline#chain() #{{{1
-    var cmdline = getcmdline()
+    var cmdline: string = getcmdline()
 
     # The boolean flag controls the `'more'` option.
-    var pat2cmd = {
+    var pat2cmd: dict<list<any>> = {
         '\%(g\|v\).*\%(#\@1<!#\|nu\%[mber]\)': ['', false],
         '\%(ls\|files\|buffers\)!\=': ['b ', false],
         'chi\%[story]': ['CC ', true],
@@ -108,8 +108,8 @@ enddef
 var more_save: bool
 
 def cmdline#fix_typo(label: string) #{{{1
-    var cmdline = getcmdline()
-    var keys = {
+    var cmdline: string = getcmdline()
+    var keys: string = {
           cr: "\<bs>\<cr>",
           z: "\<bs>\<bs>()\<cr>",
         }[label]
@@ -146,7 +146,7 @@ enddef
 
 def cmdline#remember(list: list<dict<any>>) #{{{1
     augroup RememberOverlookedCommands | au!
-        var code =<< trim END
+        var code: list<string> =<< trim END
             au CmdlineLeave : if getcmdline() %s %s
                 exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
             endif
@@ -164,7 +164,7 @@ def cmdline#toggleEditingCommands(enable: bool) #{{{1
         if enable
             MapRestore(my_editing_commands)
         else
-            var lhs_list = execute('cno')->split('\n')
+            var lhs_list: list<string> = execute('cno')->split('\n')
             # ignore buffer-local mappings
             filter(lhs_list, (_, v) => v !~ '^[c!]\s\+\S\+\s\+\S*@')
             # extract lhs
@@ -174,6 +174,7 @@ def cmdline#toggleEditingCommands(enable: bool) #{{{1
         endif
     catch
         Catch()
+        return
     endtry
 enddef
 var my_editing_commands: list<dict<any>>

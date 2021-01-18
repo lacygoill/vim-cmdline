@@ -7,7 +7,7 @@ var loaded = true
 
 # `:Filter /pat/ cmd` should just run the built-in `:filter` if it can filter `:cmd`.
 # We need to teach `:Filter` which commands should not be tampered with.
-const FILTERABLE_COMMANDS =<< trim END
+const FILTERABLE_COMMANDS: list<string> =<< trim END
     #
     l\%[ist]
     nu\%[mber]
@@ -60,7 +60,7 @@ def cmdline#cycle#filter#install() #{{{2
 enddef
 
 def FilterCompletion(...l: any): string #{{{2
-    var matches =<< trim END
+    var matches: list<string> =<< trim END
         %#
         ab
         chi
@@ -79,10 +79,10 @@ enddef
 # }}}1
 # Core {{{1
 def Filter(arg_cmd: string, bang: bool) #{{{2
-    var pat = matchstr(arg_cmd, '/\zs.\{-}\ze/')
+    var pat: string = matchstr(arg_cmd, '/\zs.\{-}\ze/')
 
-    var cmd = matchstr(arg_cmd, '/.\{-}/\s*\zs.*')
-    var first_word = matchstr(cmd, '\a*\|#')
+    var cmd: string = matchstr(arg_cmd, '/.\{-}/\s*\zs.*')
+    var first_word: string = matchstr(cmd, '\a*\|#')
     if IsFilterable(first_word)
         if pat == ''
             exe 'filter' .. (bang ? '!' : '') .. ' '
@@ -93,7 +93,7 @@ def Filter(arg_cmd: string, bang: bool) #{{{2
         return
     endif
 
-    var output = cmd == 'args'
+    var output: list<string> = cmd == 'args'
         ?     argv()
         :     execute(cmd)->split('\n')
     echo filter(output, (_, v) => bang ? v !~ pat : v =~ pat)->join("\n")

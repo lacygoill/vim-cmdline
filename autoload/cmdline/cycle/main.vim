@@ -47,8 +47,8 @@ au CmdlineEnter : ++once DelayCycleInstall()
 
 # Interface {{{1
 def cmdline#cycle#main#set(seq: string, ...cmds: list<string>) #{{{2
-    var first_cmd = cmds[0]
-    var pos = FindTabstop(first_cmd)
+    var first_cmd: string = cmds[0]
+    var pos: number = FindTabstop(first_cmd)
     exe 'nno <unique> <c-g>' .. seq
         .. ' <cmd>call cmdline#cycle#main#setSeq(' .. string(seq) .. ')<cr>'
         .. ':' .. substitute(first_cmd, '§', '', '')
@@ -57,7 +57,7 @@ def cmdline#cycle#main#set(seq: string, ...cmds: list<string>) #{{{2
 enddef
 
 def cmdline#cycle#main#move(is_fwd = true): string #{{{2
-    var cmdline = getcmdline()
+    var cmdline: string = getcmdline()
 
     if getcmdtype() != ':' || !IsValidCycle()
         return cmdline
@@ -70,8 +70,8 @@ def cmdline#cycle#main#move(is_fwd = true): string #{{{2
     # get the new index position
     idx = (idx + (is_fwd ? 1 : -1)) % len(cmds)
     # get the new command, and our initial position on the latter
-    var new_cmd = cmds[idx].cmd
-    var pos = cmds[idx].pos
+    var new_cmd: string = cmds[idx].cmd
+    var pos: number = cmds[idx].pos
     # update the new index position
     cycles[seq][0] = idx
 
@@ -92,9 +92,9 @@ enddef
 # Core {{{1
 def Install(seq: string, arg_cmds: list<string>) #{{{2
 # cmds = ['cmd1', 'cmd2']
-    var positions = mapnew(arg_cmds, (_, v) => FindTabstop(v))
+    var positions: list<number> = mapnew(arg_cmds, (_, v) => FindTabstop(v))
 
-    var cmds = mapnew(arg_cmds, (i, v) => ({
+    var cmds: list<dict<any>> = mapnew(arg_cmds, (i, v) => ({
         cmd: substitute(v, '§', '', ''),
         pos: positions[i],
         }))

@@ -72,11 +72,11 @@ def FiletypeSpecificVimgrep(): string #{{{2
 enddef
 
 def Vimgrep(args: string, loclist = false) #{{{2
-    var tempvimrc = tempname()
-    var tempqfl = tempname()
+    var tempvimrc: string = tempname()
+    var tempqfl: string = tempname()
 
-    var get_tempfile =<< trim END
-        var tempqfl = expand('%:p')
+    var get_tempfile: list<string> =<< trim END
+        var tempqfl: string = expand('%:p')
         if tempqfl !~ '^/tmp/'
             finish
         endif
@@ -86,7 +86,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     # They could contain some quotes.
     # When that happens, I have no idea how to protect them.
     #}}}
-    var cdcmd = 'cd ' .. getcwd()->fnameescape()
+    var cdcmd: string = 'cd ' .. getcwd()->fnameescape()
     # Don't we need to also pass `$MYVIMRC`?{{{
     #
     # No.  Apparently, a Vim job inherits the environment of the current Vim instance.
@@ -96,7 +96,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     #     :echo readfile('/tmp/somefile')
     #     ['some environment variable']~
     #}}}
-    var setcmd = printf('set wildignore=%s suffixes=%s %signorecase %ssmartcase',
+    var setcmd: string = printf('set wildignore=%s suffixes=%s %signorecase %ssmartcase',
         &wildignore, &suffixes, &ignorecase ? '' : 'no', &smartcase ? '' : 'no')
     # Why do you expand the arguments?{{{
     #
@@ -107,8 +107,8 @@ def Vimgrep(args: string, loclist = false) #{{{2
     #
     # Same thing for `%` and `##`.
     #}}}
-    var _args = Expandargs(args)
-    var vimgrepcmd = 'noa vim ' .. _args
+    var _args: string = Expandargs(args)
+    var vimgrepcmd: string = 'noa vim ' .. _args
     # Why `strtrans()`?{{{
     #
     # If the text contains NULs, it could mess up the parsing of `:cgetfile`.
@@ -118,7 +118,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     # just need to be able to read  them; anything which is not printable should
     # be made printable.
     #}}}
-    var getqfl =<< trim END
+    var getqfl: list<string> =<< trim END
         getqflist()
            ->mapnew((_, v) => printf('%s:%d:%d:%s',
                bufname(v.bufnr)->fnamemodify(':p'),
@@ -141,10 +141,10 @@ def Vimgrep(args: string, loclist = false) #{{{2
         + getqfl,
         tempvimrc, 's')
 
-    var vimcmd = printf('vim -es -Nu NONE -U NONE -i NONE -S %s %s', tempvimrc, tempqfl)
-    var title = (loclist ? ':Lvim ' : ':Vim ') .. _args
-    var arglist = [loclist, tempqfl, title]
-    var opts = {exit_cb: function(Callback, arglist)}
+    var vimcmd: string = printf('vim -es -Nu NONE -U NONE -i NONE -S %s %s', tempvimrc, tempqfl)
+    var title: string = (loclist ? ':Lvim ' : ':Vim ') .. _args
+    var arglist: list<any> = [loclist, tempqfl, title]
+    var opts: dict<func> = {exit_cb: function(Callback, arglist)}
     split(vimcmd)->job_start(opts)
 enddef
 
@@ -157,8 +157,8 @@ def Callback(loclist: bool, tempqfl: string, title: string, _j: any, _e: any) #{
 #    > The arguments are the job and the exit status.
 #}}}
 
-    var efm_save = &l:efm
-    var bufnr = bufnr('%')
+    var efm_save: string = &l:efm
+    var bufnr: number = bufnr('%')
     try
         setl efm=%f:%l:%c:%m
         if loclist
@@ -178,7 +178,7 @@ def Callback(loclist: bool, tempqfl: string, title: string, _j: any, _e: any) #{
     redraw!
     if loclist && getloclist(0, {size: 0}).size == 0 || getqflist({size: 0}).size == 0
         echohl ErrorMsg
-        var pat = matchstr(title[1 :], '\(\i\@!\S\)\zs.\{-}\ze\1')
+        var pat: string = matchstr(title[1 :], '\(\i\@!\S\)\zs.\{-}\ze\1')
         echom 'E480: No match: ' .. pat
         echohl NONE
     endif
@@ -186,13 +186,13 @@ enddef
 # }}}1
 # Utilities {{{1
 def GetExtension(): string #{{{2
-    var ext = expand('%:e')
+    var ext: string = expand('%:e')
     if &ft == 'dirvish' && expand('%:p') =~? '/wiki/'
         ext = 'md'
     elseif &ft == 'dirvish' && expand('%:p') =~? '/.vim/'
         ext = 'vim'
     elseif ext == '' && bufname() != ''
-        var _ext = execute('au')->split('\n')
+        var _ext: list<string> = execute('au')->split('\n')
         filter(_ext, (_, v) => v =~ 'setf\s\+' .. &ft)
         ext = get(_ext, 0, '')->matchstr('\*\.\zs\S\+')
     endif
@@ -200,17 +200,17 @@ def GetExtension(): string #{{{2
 enddef
 
 def Expandargs(args: string): string #{{{2
-    var pat = '^\(\i\@!.\)\1\ze[gj]\{,2}\s\+'
-    #           ├──────────┘
-    #           └ 2 consecutive and identical non-identifier characters
-    var rep = '/' .. escape(@/, '\/') .. '/'
-    #                            │{{{
-    #                            └ `substitute()` will remove any backslash, because
-    #                               some sequences are special (like `\1` or `\u`);
-    #                               See: :h sub-replace-special
+    var pat: string = '^\(\i\@!.\)\1\ze[gj]\{,2}\s\+'
+    #                   ├──────────┘
+    #                   └ 2 consecutive and identical non-identifier characters
+    var rep: string = '/' .. escape(@/, '\/') .. '/'
+    #                                    │{{{
+    #                                    └ `substitute()` will remove any backslash, because
+    #                                       some sequences are special (like `\1` or `\u`);
+    #                                       See: :h sub-replace-special
     #
-    #                               If our pattern contains a backslash (like in `\s`),
-    #                               we need it to be preserved.
+    #                                       If our pattern contains a backslash (like in `\s`),
+    #                                       we need it to be preserved.
     #}}}
 
     # expand `//` into `/last search/`

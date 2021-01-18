@@ -3,10 +3,10 @@ vim9 noclear
 if exists('loaded') | finish | endif
 var loaded = true
 
-const PAT_RANGE = '\s*\%([%*]\|[^,]*,[^,]*\)'
+const PAT_RANGE: string = '\s*\%([%*]\|[^,]*,[^,]*\)'
 
 # number of times we've transformed the command-line
-var transformed = -1
+var transformed: number = -1
 var orig_cmdline: string
 
 # Interface {{{1
@@ -14,8 +14,8 @@ def cmdline#transform#main(): string #{{{2
     transformed += 1
     au CmdlineLeave /,\?,: ++once transformed = -1 | orig_cmdline = ''
 
-    var cmdtype = getcmdtype()
-    var cmdline = getcmdline()
+    var cmdtype: string = getcmdtype()
+    var cmdline: string = getcmdline()
     # Don't write a guard to prevent multiple transformations on the Ex command-line!{{{
     #
     #     if transformed >= 1 && cmdtype == ':'
@@ -35,7 +35,7 @@ def cmdline#transform#main(): string #{{{2
     elseif cmdtype =~ ':'
         cmdline#util#undo#emitAddToUndolistC()
         cmdline = getcmdline()
-        var cmd = GuessWhatTheCmdlineIs(cmdline)
+        var cmd: string = GuessWhatTheCmdlineIs(cmdline)
         return Transform(cmd, cmdline)
     else
         return ''
@@ -98,16 +98,16 @@ def CaptureSubpatterns(cmdline: string): string #{{{3
 #}}}
 
     # extract the range, separator and the pattern
-    var range = matchstr(cmdline, PAT_RANGE)
-    var separator = matchstr(cmdline, '^' .. PAT_RANGE .. 's\zs.')
-    var pat = split(cmdline, separator)[1]
+    var range: string = matchstr(cmdline, PAT_RANGE)
+    var separator: string = matchstr(cmdline, '^' .. PAT_RANGE .. 's\zs.')
+    var pat: list<string> = split(cmdline, separator)[1]
 
     # from the pattern, extract words between underscores or uppercase letters:{{{
     #
     #         'OneTwoThree'   → ['One', 'Two', 'Three']
     #         'one_two_three' → ['one', 'two', 'three']
     #}}}
-    var subpatterns = split(pat, pat =~ '_' ? '_' : '\ze\u')
+    var subpatterns: list<string> = split(pat, pat =~ '_' ? '_' : '\ze\u')
 
     # return the keys to type{{{
     #
@@ -117,8 +117,11 @@ def CaptureSubpatterns(cmdline: string): string #{{{3
     #                              │    or    (one)_(two)_(three)
     #                              │
     #                              ├────────────────────────────────────────────────────────────────────┐}}}
-    var new_cmdline = range .. 's/' .. map(subpatterns, (_, v) => '\(' .. v .. '\)')
-        ->join(pat =~ '_' ? '_' : '') .. '//g'
+    var new_cmdline: string =
+        range .. 's/'
+        .. map(subpatterns, (_, v) => '\(' .. v .. '\)')
+            ->join(pat =~ '_' ? '_' : '')
+        .. '//g'
 
     return "\<c-e>\<c-u>" .. new_cmdline .. "\<left>\<left>"
 enddef

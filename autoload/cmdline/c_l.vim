@@ -9,17 +9,19 @@ var loaded = true
 # ~/.vim/vimrc
 # ~/.vim/vimrc line 123
 
-const URL = '\%(https\=\|ftps\=\|www\)://\S\+'
+const URL: string = '\%(https\=\|ftps\=\|www\)://\S\+'
 
 # Interface {{{1
 def cmdline#c_l#main(): string #{{{2
-    if getcmdtype() != ':' | return "\<c-l>" | endif
+    if getcmdtype() != ':'
+        return "\<c-l>"
+    endif
     if getcmdline()->empty()
         return InteractivePaths()
     endif
-    var col = getcmdpos()
+    var col: number = getcmdpos()
     # `:123lvimgrepadd!`
-    var pat = '^\m\C[: \t]*\d*l\=vim\%[grepadd]!\=\s\+'
+    var pat: string = '^\m\C[: \t]*\d*l\=vim\%[grepadd]!\=\s\+'
         # opening delimiter
         .. '\(\i\@!.\)'
         # the pattern; stopping at the cursor because it doesn't make sense
@@ -37,17 +39,21 @@ def cmdline#c_l#main(): string #{{{2
         .. '[cegn]\{,4}\%($\|\s\||\)'
         # `:helpg pat`
         .. '\|\%(helpg\%[rep]\|l\%[helpgrep]\)\s\+\zs.*'
-    var list = getcmdline()->matchlist(pat)
-    if list == [] | return "\<c-l>" | endif
+    var list: list<string> = getcmdline()->matchlist(pat)
+    if list == []
+        return "\<c-l>"
+    endif
     pat = list[0]
-    var delim = list[1]
+    var delim: string = list[1]
     # Warning: this search is sensitive to the values of `'ignorecase'` and `'smartcase'`
-    var pos = searchpos(pat, 'n')
-    var lnum = pos[0]
+    var pos: list<number> = searchpos(pat, 'n')
+    var lnum: number = pos[0]
     col = pos[1]
-    if [lnum, col] == [0, 0] | return '' | endif
-    var match = getline(lnum)->matchstr('.*\%' .. col .. 'c\zs.*')
-    var suffix = substitute(match, '^' .. pat, '', '')
+    if [lnum, col] == [0, 0]
+        return ''
+    endif
+    var match: string = getline(lnum)->matchstr('.*\%' .. col .. 'c\zs.*')
+    var suffix: string = substitute(match, '^' .. pat, '', '')
     if suffix == ''
         return ''
     # escape the same characters as the default `C-l` in an `:s` command
@@ -85,18 +91,18 @@ enddef
 #}}}1
 # Core {{{1
 def InteractivePaths(): string #{{{2
-    var lines = Getlines()
-    var paths = ExtractPaths(lines)
-    var urls = copy(paths)
+    var lines: string = Getlines()
+    var paths: list<string> = ExtractPaths(lines)
+    var urls: list<string> = copy(paths)
         ->filter((_, v) => v =~ URL)
-    var paths_with_lnum = copy(paths)
+    var paths_with_lnum: list<string> = copy(paths)
         ->filter((_, v) => v !~ URL && v =~ '\s\+line\s\+\d\+$')
-    var paths_without_lnum = copy(paths)
+    var paths_without_lnum: list<string> = copy(paths)
         ->filter((_, v) => v !~ URL && v =~ '\%\(\s\+line\s\+\d\+\)\@<!$')
     AlignFields(paths_with_lnum)
-    var maxwidth = mapnew(urls + paths_with_lnum + paths_without_lnum,
+    var maxwidth: number = mapnew(urls + paths_with_lnum + paths_without_lnum,
         (_, v) => strchars(v, true))->max()
-    var what = urls
+    var what: list<string> = urls
         + (!empty(urls) && !empty(paths_with_lnum) ? [repeat('─', maxwidth)] : [])
         + paths_with_lnum
         + (!empty(paths_with_lnum) && !empty(paths_without_lnum) ? [repeat('─', maxwidth)] : [])
@@ -146,8 +152,10 @@ enddef
 
 def ExtractPaths(lines: string): list<string> #{{{2
     var paths: list<string>
-    var pat = URL .. '\|\f\+\%(\s\+line\s\+\d\+\)\='
-    var Rep = (m) => add(paths, m[0])->string()
+    var pat: string = URL .. '\|\f\+\%(\s\+line\s\+\d\+\)\='
+    var Rep: func = (m: list<string>): string =>
+        add(paths, m[0])->string()
+    # a side-effect of this substitution is to invoke `add()` to populate `paths`
     substitute(lines, pat, Rep, 'g')
     filter(paths, (_, v) =>
             v =~ '^' .. URL .. '$'
@@ -163,19 +171,19 @@ def ExtractPaths(lines: string): list<string> #{{{2
 enddef
 
 def AlignFields(paths: list<string>) #{{{2
-    var path_width = mapnew(paths,
+    var path_width: number = mapnew(paths,
             (_, v) => strchars(v, true))
         ->max()
-    var lnum_width = mapnew(paths,
+    var lnum_width: number = mapnew(paths,
             (_, v) => matchstr(v, '\s\+line\s\+\zs\d\+$')->strchars(true))
         ->max()
     map(paths, (_, v) => Aligned(v, path_width, lnum_width))
 enddef
 
 def Aligned(path: string, path_width: number, lnum_width: number): string #{{{2
-    var matchlist = matchlist(path, '\(.*\)\s\+line\s\+\(\d\+\)$')
-    var actualpath = matchlist[1]
-    var lnum = matchlist[2]->str2nr()
+    var matchlist: list<string> = matchlist(path, '\(.*\)\s\+line\s\+\(\d\+\)$')
+    var actualpath: string = matchlist[1]
+    var lnum: number = matchlist[2]->str2nr()
     return printf('%-*s line %*d', path_width, actualpath, lnum_width, lnum)
 enddef
 
@@ -191,11 +199,11 @@ def Callback(paths: list<string>, _w: any, choice: number) #{{{2
     if choice == -1 || paths[choice - 1] =~ '^[-─]\+$'
         return
     endif
-    var chosen = paths[choice - 1]
-    var pat = '\(.\{-}\)\%(\s\+line\s\+\(\d\+\)\)\=$'
-    var matchlist = matchlist(chosen, pat)
-    var fpath = matchlist[1]
-    var lnum = matchlist[2]
+    var chosen: string = paths[choice - 1]
+    var pat: string = '\(.\{-}\)\%(\s\+line\s\+\(\d\+\)\)\=$'
+    var matchlist: list<string> = matchlist(chosen, pat)
+    var fpath: string = matchlist[1]
+    var lnum: string = matchlist[2]
     if chosen =~ '^' .. URL .. '$'
         system('xdg-open ' .. chosen)
     else
