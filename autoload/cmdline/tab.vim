@@ -4,7 +4,7 @@ if exists('loaded') | finish | endif
 var loaded = true
 
 def cmdline#tab#custom(is_fwd = true): string #{{{1
-    if getcmdtype() =~# '[?/]'
+    if getcmdtype() =~ '[?/]'
         return getcmdline() == ''
             ?     "\<up>"
             :     is_fwd ? "\<c-g>" : "\<c-t>"
