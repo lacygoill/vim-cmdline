@@ -282,7 +282,7 @@ def CyclesSet()
     # Besides, the text  is formatted to not go beyond  100 characters per line,
     # which could break some long line of code.
     #}}}
-    cmdline#cycle#main#set('r', 'exe ''r !curl -s '' .. shellescape(''§'', 1)')
+    cmdline#cycle#main#set('r', 'exe ''r !curl -s '' .. shellescape(''§'', v:true)')
     #                                           │
     #                                           └ don't show progress meter, nor error messages
 

@@ -139,7 +139,7 @@ enddef
 
 def IsValidCycle(): bool #{{{2
     return has_key(cycles, seq)
-        && type(cycles[seq]) == v:t_list
+        && typename(cycles[seq]) =~ '^list'
         && len(cycles[seq]) == 2
 enddef
 
