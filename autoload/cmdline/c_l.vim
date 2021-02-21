@@ -94,14 +94,15 @@ def InteractivePaths(): string #{{{2
     var lines: string = Getlines()
     var paths: list<string> = ExtractPaths(lines)
     var urls: list<string> = copy(paths)
-        ->filter((_, v) => v =~ URL)
+        ->filter((_, v: string): bool => v =~ URL)
     var paths_with_lnum: list<string> = copy(paths)
-        ->filter((_, v) => v !~ URL && v =~ '\s\+line\s\+\d\+$')
+        ->filter((_, v: string): bool => v !~ URL && v =~ '\s\+line\s\+\d\+$')
     var paths_without_lnum: list<string> = copy(paths)
-        ->filter((_, v) => v !~ URL && v =~ '\%\(\s\+line\s\+\d\+\)\@<!$')
+        ->filter((_, v: string): bool => v !~ URL && v =~ '\%\(\s\+line\s\+\d\+\)\@<!$')
     AlignFields(paths_with_lnum)
     var maxwidth: number = mapnew(urls + paths_with_lnum + paths_without_lnum,
-        (_, v) => strchars(v, true))->max()
+            (_, v: string): number => strchars(v, true)
+        )->max()
     var what: list<string> = urls
         + (!empty(urls) && !empty(paths_with_lnum) ? [repeat('─', maxwidth)] : [])
         + paths_with_lnum
@@ -135,7 +136,7 @@ def InteractivePaths(): string #{{{2
     return "\<c-\>\<c-n>"
 enddef
 
-var Popup: func(): number
+var Popup: func
 
 def Getlines(): string #{{{2
     var lines: list<string>
@@ -157,7 +158,7 @@ def ExtractPaths(lines: string): list<string> #{{{2
         add(paths, m[0])->string()
     # a side-effect of this substitution is to invoke `add()` to populate `paths`
     substitute(lines, pat, Rep, 'g')
-    filter(paths, (_, v) =>
+    filter(paths, (_, v: string): bool =>
             v =~ '^' .. URL .. '$'
         ||
             v =~ '/'
@@ -172,12 +173,12 @@ enddef
 
 def AlignFields(paths: list<string>) #{{{2
     var path_width: number = mapnew(paths,
-            (_, v) => strchars(v, true))
-        ->max()
+            (_, v: string): number => strchars(v, true)
+        )->max()
     var lnum_width: number = mapnew(paths,
-            (_, v) => matchstr(v, '\s\+line\s\+\zs\d\+$')->strchars(true))
-        ->max()
-    map(paths, (_, v) => Aligned(v, path_width, lnum_width))
+            (_, v: string): number => matchstr(v, '\s\+line\s\+\zs\d\+$')->strchars(true)
+        )->max()
+    map(paths, (_, v): string => Aligned(v, path_width, lnum_width))
 enddef
 
 def Aligned(path: string, path_width: number, lnum_width: number): string #{{{2

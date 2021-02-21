@@ -4,7 +4,10 @@ if exists('loaded') | finish | endif
 var loaded = true
 
 import Catch from 'lg.vim'
-import {MapSave, MapRestore} from 'lg/map.vim'
+import {
+    MapSave,
+    MapRestore,
+    } from 'lg/map.vim'
 
 def cmdline#autoUppercase() #{{{1
     # We define  abbreviations in command-line  mode to automatically  replace a
@@ -21,8 +24,8 @@ def cmdline#autoUppercase() #{{{1
     #}}}
     var commands: list<string> = execute('com')
         ->split('\n')[1 :]
-        ->filter((_, v) => v =~ '^[^bA-Z]*\u\S')
-        ->map((_, v) => matchstr(v, '\u\S*'))
+        ->filter((_, v: string): bool => v =~ '^[^bA-Z]*\u\S')
+        ->map((_, v: string): string => matchstr(v, '\u\S*'))
 
     var pat: string = '^\%%(\%%(tab\<bar>vert\%%[ical]\)\s\+\)\=%s$\<bar>^\%%(''<,''>\<bar>\*\)%s$'
     for cmd in commands
@@ -151,7 +154,7 @@ def cmdline#remember(list: list<dict<any>>) #{{{1
                 exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
             endif
         END
-        mapnew(list, (_, v) => printf(join(code, '|'),
+        mapnew(list, (_, v: dict<any>): string => printf(join(code, '|'),
                 v.regex ? '=~' : '==',
                 string(v.regex ? '^' .. v.old .. '$' : v.old),
                 string('[' .. v.new .. '] was equivalent')
@@ -164,11 +167,12 @@ def cmdline#toggleEditingCommands(enable: bool) #{{{1
         if enable
             MapRestore(my_editing_commands)
         else
-            var lhs_list: list<string> = execute('cno')->split('\n')
-            # ignore buffer-local mappings
-            filter(lhs_list, (_, v) => v !~ '^[c!]\s\+\S\+\s\+\S*@')
-            # extract lhs
-            map(lhs_list, (_, v) => matchstr(v, '^[c!]\s\+\zs\S\+'))
+            var lhs_list: list<string> = execute('cno')
+                ->split('\n')
+                # ignore buffer-local mappings
+                ->filter((_, v: string): bool => v !~ '^[c!]\s\+\S\+\s\+\S*@')
+                # extract lhs
+                ->map((_, v: string): string => matchstr(v, '^[c!]\s\+\zs\S\+'))
             my_editing_commands = MapSave(lhs_list, 'c')
             cmapclear
         endif

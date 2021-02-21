@@ -92,12 +92,14 @@ enddef
 # Core {{{1
 def Install(seq: string, arg_cmds: list<string>) #{{{2
 # cmds = ['cmd1', 'cmd2']
-    var positions: list<number> = mapnew(arg_cmds, (_, v) => FindTabstop(v))
+    var positions: list<number> = arg_cmds
+        ->mapnew((_, v: string): number => FindTabstop(v))
 
-    var cmds: list<dict<any>> = mapnew(arg_cmds, (i, v) => ({
-        cmd: substitute(v, '§', '', ''),
-        pos: positions[i],
-        }))
+    var cmds: list<dict<any>> = arg_cmds
+        ->mapnew((i: number, v: string) => ({
+            cmd: substitute(v, '§', '', ''),
+            pos: positions[i],
+            }))
     # cmds = [{cmd: 'cmd1', pos: 12}, {cmd: 'cmd2', pos: 34}]
 
     extend(cycles, {[seq]: [0, cmds]})

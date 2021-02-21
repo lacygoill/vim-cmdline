@@ -119,7 +119,7 @@ def CaptureSubpatterns(cmdline: string): string #{{{3
     #                              ├────────────────────────────────────────────────────────────────────┐}}}
     var new_cmdline: string =
         range .. 's/'
-        .. map(subpatterns, (_, v) => '\(' .. v .. '\)')
+        .. map(subpatterns, (_, v: string): string => '\(' .. v .. '\)')
             ->join(pat =~ '_' ? '_' : '')
         .. '//g'
 

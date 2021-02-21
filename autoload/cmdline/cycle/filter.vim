@@ -96,7 +96,9 @@ def Filter(arg_cmd: string, bang: bool) #{{{2
     var output: list<string> = cmd == 'args'
         ?     argv()
         :     execute(cmd)->split('\n')
-    echo filter(output, (_, v) => bang ? v !~ pat : v =~ pat)->join("\n")
+    echo output
+        ->filter((_, v: string): bool => bang ? v !~ pat : v =~ pat)
+        ->join("\n")
 enddef
 # }}}1
 # Utilities {{{1

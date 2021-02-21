@@ -120,11 +120,11 @@ def Vimgrep(args: string, loclist = false) #{{{2
     #}}}
     var getqfl: list<string> =<< trim END
         getqflist()
-           ->mapnew((_, v) => printf('%s:%d:%d:%s',
+           ->mapnew((_, v: dict<any>): string => printf('%s:%d:%d:%s',
                bufname(v.bufnr)->fnamemodify(':p'),
                v.lnum,
                v.col,
-               substitute(v.text, '[^[:print:]]', (m) => strtrans(m[0]), 'g')
+               v.text->substitute('[^[:print:]]', (m: list<string>): string => strtrans(m[0]), 'g')
                ))
            ->writefile(tempqfl, 's')
         qa!
@@ -192,8 +192,9 @@ def GetExtension(): string #{{{2
     elseif &ft == 'dirvish' && expand('%:p') =~? '/.vim/'
         ext = 'vim'
     elseif ext == '' && bufname() != ''
-        var _ext: list<string> = execute('au')->split('\n')
-        filter(_ext, (_, v) => v =~ 'setf\s\+' .. &ft)
+        var _ext: list<string> = execute('au')
+            ->split('\n')
+            ->filter((_, v: string): bool => v =~ 'setf\s\+' .. &ft)
         ext = get(_ext, 0, '')->matchstr('\*\.\zs\S\+')
     endif
     return ext
@@ -220,7 +221,7 @@ def Expandargs(args: string): string #{{{2
         # expand `##` into `files_in_arglist`
         ->substitute('\s\+\zs##\s*$',
             argv()
-                ->map((_, v) => fnamemodify(v, ':p')->fnameescape())
+                ->map((_, v: string): string => fnamemodify(v, ':p')->fnameescape())
                 ->join(),
             '')
 enddef

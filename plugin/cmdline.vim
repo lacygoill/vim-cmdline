@@ -69,7 +69,7 @@ augroup HitEnterPrompt | au!
     # is installed even after executing a command with a long output.
     #}}}
     au CmdlineLeave : if getcmdline() !~ '^\s*fu\%[nction]$'
-        |    timer_start(0, () => mode() == 'r' && cmdline#hitEnterPromptNoRecording())
+        |    timer_start(0, () => mode() == 'r' && !!cmdline#hitEnterPromptNoRecording())
         | endif
 augroup END
 
