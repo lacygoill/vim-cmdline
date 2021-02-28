@@ -32,11 +32,13 @@ def cmdline#transform#main(): string #{{{2
         cmdline#util#undo#emitAddToUndolistC()
         return "\<c-e>\<c-u>"
             .. (transformed % 2 ? ReplaceWithEquivClass() : SearchOutsideComments(cmdtype))
+
     elseif cmdtype =~ ':'
         cmdline#util#undo#emitAddToUndolistC()
         cmdline = getcmdline()
         var cmd: string = GuessWhatTheCmdlineIs(cmdline)
         return Transform(cmd, cmdline)
+
     else
         return ''
     endif
@@ -50,8 +52,12 @@ def GuessWhatTheCmdlineIs(cmdline: string): string #{{{3
         return ':s'
     elseif cmdline =~ '\C^\s*echo'
         return ':echo'
+    elseif cmdline =~ '\C^\s*vim9\s\+echo'
+        return ':vim9 echo'
     elseif cmdline =~ '\C^\s*eval'
         return ':eval'
+    elseif cmdline =~ '\C^\s*vim9\s\+eval'
+        return ':vim9 eval'
     endif
     return ''
 enddef
@@ -59,13 +65,13 @@ enddef
 def Transform(cmd: string, cmdline: string): string #{{{3
     if cmd == ':s'
         return CaptureSubpatterns(cmdline)
-    elseif cmd =~ '^:\%(echo\|eval\)$'
-        return MapFilter(cmdline)
+    elseif cmd =~ '\%(echo\|eval\)'
+        return MapFilter(cmdline, cmd =~ 'vim9')
     endif
     return ''
 enddef
 
-def MapFilter(cmdline: string): string #{{{3
+def MapFilter(cmdline: string, is_vim9: bool): string #{{{3
     # Purpose:{{{
     #
     #     :echo [1, 2, 3]
@@ -83,11 +89,21 @@ def MapFilter(cmdline: string): string #{{{3
             '\C^\s*\%(echo\|eval\)\s\+.*->\zs\%(map\|filter\)\ze({[i,_],\s*v\s*->\s*})$',
             '\={"map": "filter", "filter": "map"}[submatch(0)]',
             '')
+
+    elseif cmdline =~ '\C^\s*vim9\s\+\%(echo\|eval\)\s\+.*->\%(map\|filter\)(([i,_],\s\+v)\s\+=>\s*)$'
+        new_cmdline = substitute(cmdline,
+            '\C^\s*vim9\s\+\%(echo\|eval\)\s\+.*->\zs\%(map\|filter\)\ze(([i,_],\s\+v)\s\+=>\s*)$',
+            '\={"map": "filter", "filter": "map"}[submatch(0)]',
+            '')
+
     else
-        new_cmdline = substitute(cmdline, '$', '->map({_, v -> })', '')
+        new_cmdline = substitute(cmdline,
+            '$',
+            is_vim9 ? '->map((_, v) => )' : '->map({_, v -> })',
+            '')
     endif
 
-    return "\<c-e>\<c-u>" .. new_cmdline .. "\<left>\<left>"
+    return "\<c-e>\<c-u>" .. new_cmdline .. "\<left>" .. (is_vim9 ? '' : "\<left>")
 enddef
 
 def CaptureSubpatterns(cmdline: string): string #{{{3

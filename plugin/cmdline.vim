@@ -25,11 +25,11 @@ import MapMeta from 'lg/map.vim'
 # fix some typos
 cnorea <expr>  \` getcmdtype() =~ '[/?]' ? '\t' : '\`'
 
-cnorea <expr> soù getcmdtype() =~ ':' && getcmdpos() == 4 ? 'so%' : 'soù'
-cnorea <expr> sl getcmdtype() == ':' && getcmdpos() == 3 ? 'ls' : 'sl'
-cnorea <expr> hg getcmdtype() == ':' && getcmdpos() == 3 ? 'helpgrep' : 'hg'
 cnorea <expr> dig getcmdtype() == ':' && getcmdpos() == 4 ? 'verb Digraphs!' : 'dig'
 cnorea <expr> ecoh getcmdtype() == ':' && getcmdpos() == 5 ? 'echo' : 'ecoh'
+cnorea <expr> hg getcmdtype() == ':' && getcmdpos() == 3 ? 'helpgrep' : 'hg'
+cnorea <expr> sl getcmdtype() == ':' && getcmdpos() == 3 ? 'ls' : 'sl'
+cnorea <expr> soù getcmdtype() =~ ':' && getcmdpos() == 4 ? 'so%' : 'soù'
 
 #         :fbl
 #         :FzBLines~
@@ -48,6 +48,7 @@ cnorea <expr> fs getcmdtype() == ':' && getcmdpos() == 3 ? 'FzLocate' : 'fs'
 #               besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
 
 cnorea <expr> ucs getcmdtype() == ':' && getcmdpos() == 4 ? 'UnicodeSearch' : 'ucs'
+cnorea <expr> v getcmdtype() == ':' && getcmdpos() == 2 ? 'vim9' : 'v'
 
 # Autocmds {{{1
 
@@ -61,12 +62,13 @@ augroup HitEnterPrompt | au!
     # Problem: Pressing `q` at the hit-enter prompt quits the latter (✔) and starts a recording (✘).
     # Solution: Install a temporary `q` mapping which presses Escape to quit the prompt.
     # the guard suppresses `E454`; https://github.com/vim/vim/issues/6209
-    # Don't use `mode(1)`!{{{
+    # Don't use `mode(true)`!{{{
     #
     # When you've run  a command with an output longer  than the current visible
-    # screen, and `-- more --` is printed at the bottom, `mode(1)` is `rm`, *not* `r`.
-    # By using `mode()` instead of `mode(1)`,  we make sure that our `q` mapping
-    # is installed even after executing a command with a long output.
+    # screen, and `--  more --` is printed at the  bottom, `mode(true)` is `rm`,
+    # *not* `r`.
+    # By  using `mode()`  instead of  `mode(true)`, we  make sure  that our  `q`
+    # mapping is installed even after executing a command with a long output.
     #}}}
     au CmdlineLeave : if getcmdline() !~ '^\s*fu\%[nction]$'
         |    timer_start(0, () => mode() == 'r' && !!cmdline#hitEnterPromptNoRecording())
@@ -173,7 +175,7 @@ cno <expr><unique> <c-s> cmdline#transform#main()
 
 # Cycle through a set of arbitrary commands.
 cno <unique> <c-g> <c-\>e cmdline#cycle#main#move()<cr>
-sil! MapMeta('g', '<c-\>e cmdline#cycle#main#move(v:false)<cr>', 'c', 'u')
+MapMeta('g', '<c-\>e cmdline#cycle#main#move(v:false)<cr>', 'c', 'u')
 
 xno <unique> <c-g>s :s///g<left><left><left>
 

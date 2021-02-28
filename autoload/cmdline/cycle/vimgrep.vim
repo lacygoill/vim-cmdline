@@ -107,8 +107,8 @@ def Vimgrep(args: string, loclist = false) #{{{2
     #
     # Same thing for `%` and `##`.
     #}}}
-    var _args: string = Expandargs(args)
-    var vimgrepcmd: string = 'noa vim ' .. _args
+    var expanded_args: string = Expandargs(args)
+    var vimgrepcmd: string = 'noa vim ' .. expanded_args
     # Why `strtrans()`?{{{
     #
     # If the text contains NULs, it could mess up the parsing of `:cgetfile`.
@@ -142,7 +142,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
         tempvimrc, 's')
 
     var vimcmd: string = printf('vim -es -Nu NONE -U NONE -i NONE -S %s %s', tempvimrc, tempqfl)
-    var title: string = (loclist ? ':Lvim ' : ':Vim ') .. _args
+    var title: string = (loclist ? ':Lvim ' : ':Vim ') .. expanded_args
     var arglist: list<any> = [loclist, tempqfl, title]
     var opts: dict<func> = {exit_cb: function(Callback, arglist)}
     split(vimcmd)->job_start(opts)
@@ -192,10 +192,10 @@ def GetExtension(): string #{{{2
     elseif &ft == 'dirvish' && expand('%:p') =~? '/.vim/'
         ext = 'vim'
     elseif ext == '' && bufname() != ''
-        var _ext: list<string> = execute('au')
+        var setf_autocmds: list<string> = execute('au')
             ->split('\n')
             ->filter((_, v: string): bool => v =~ 'setf\s\+' .. &ft)
-        ext = get(_ext, 0, '')->matchstr('\*\.\zs\S\+')
+        ext = get(setf_autocmds, 0, '')->matchstr('\*\.\zs\S\+')
     endif
     return ext
 enddef

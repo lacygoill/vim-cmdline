@@ -38,22 +38,22 @@ var loaded = true
 # while the increased complexity would make the code harder to maintain.
 #}}}
 
-var cycles: dict<list<any>> = {}
+var cycles: dict<list<any>>
 var seq: string
 
 # the installation of cycles takes a few ms (too long)
-var seq_and_cmds: list<any> = []
+var seq_and_cmds: list<any>
 au CmdlineEnter : ++once DelayCycleInstall()
 
 # Interface {{{1
-def cmdline#cycle#main#set(seq: string, ...cmds: list<string>) #{{{2
+def cmdline#cycle#main#set(arg_seq: string, ...cmds: list<string>) #{{{2
     var first_cmd: string = cmds[0]
     var pos: number = FindTabstop(first_cmd)
-    exe 'nno <unique> <c-g>' .. seq
-        .. ' <cmd>call cmdline#cycle#main#setSeq(' .. string(seq) .. ')<cr>'
+    exe 'nno <unique> <c-g>' .. arg_seq
+        .. ' <cmd>call cmdline#cycle#main#setSeq(' .. string(arg_seq) .. ')<cr>'
         .. ':' .. substitute(first_cmd, '§', '', '')
         .. '<c-r>=setcmdpos(' .. pos .. ')[-1]<cr>'
-    seq_and_cmds += [[seq, cmds]]
+    seq_and_cmds += [[arg_seq, cmds]]
 enddef
 
 def cmdline#cycle#main#move(is_fwd = true): string #{{{2
@@ -70,8 +70,8 @@ def cmdline#cycle#main#move(is_fwd = true): string #{{{2
     # get the new index position
     idx = (idx + (is_fwd ? 1 : -1)) % len(cmds)
     # get the new command, and our initial position on the latter
-    var new_cmd: string = cmds[idx].cmd
-    var pos: number = cmds[idx].pos
+    var new_cmd: string = cmds[idx]['cmd']
+    var pos: number = cmds[idx]['pos']
     # update the new index position
     cycles[seq][0] = idx
 
@@ -90,7 +90,7 @@ def cmdline#cycle#main#move(is_fwd = true): string #{{{2
 enddef
 # }}}1
 # Core {{{1
-def Install(seq: string, arg_cmds: list<string>) #{{{2
+def Install(arg_seq: string, arg_cmds: list<string>) #{{{2
 # cmds = ['cmd1', 'cmd2']
     var positions: list<number> = arg_cmds
         ->mapnew((_, v: string): number => FindTabstop(v))
@@ -102,7 +102,7 @@ def Install(seq: string, arg_cmds: list<string>) #{{{2
             }))
     # cmds = [{cmd: 'cmd1', pos: 12}, {cmd: 'cmd2', pos: 34}]
 
-    extend(cycles, {[seq]: [0, cmds]})
+    cycles[arg_seq] = [0, cmds]
 enddef
 
 def DelayCycleInstall() #{{{2
