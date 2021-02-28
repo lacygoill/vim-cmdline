@@ -110,7 +110,7 @@ def cmdline#chain() #{{{1
 enddef
 var more_save: bool
 
-def cmdline#fix_typo(label: string) #{{{1
+def cmdline#fixTypo(label: string) #{{{1
     var cmdline: string = getcmdline()
     var keys: string = {
           cr: "\<bs>\<cr>",

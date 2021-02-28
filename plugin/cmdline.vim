@@ -94,14 +94,14 @@ augroup MyCmdlineChain | au!
 
     # sometimes, we type `:h functionz)` instead of `:h function()`
     au CmdlineLeave : if getcmdline() =~ '\C^h\%[elp]\s\+\S\+z)\s*$'
-        |     cmdline#fix_typo('z')
+        |     cmdline#fixTypo('z')
         | endif
 
     # when we copy a line of vimscript and paste it on the command-line,
     # sometimes the newline gets copied and translated into a literal CR,
     # which raises an error; remove it.
     au CmdlineLeave : if getcmdline() =~ '\r$'
-        |     cmdline#fix_typo('cr')
+        |     cmdline#fixTypo('cr')
         | endif
 augroup END
 
@@ -145,7 +145,7 @@ cno       <unique> <c-q>   <c-\>e cmdline#tab#restoreCmdlineAfterExpansion()<cr>
 # - extend `:h c^l` to `:vimgrep` and `:s`
 # - capture all paths (files or urls) displayed on the screen in an interactive popup window
 #}}}
-cno <expr> <c-l> cmdline#c_l#main()
+cno <expr> <c-l> cmdline#cL#main()
 
 # In vim-readline, we remap `i_C-a` to a readline motion.
 # Here, we restore the default `C-a` command (`:h i^a`) by mapping it to `C-x C-a`.

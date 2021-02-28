@@ -12,7 +12,7 @@ var loaded = true
 const URL: string = '\%(https\=\|ftps\=\|www\)://\S\+'
 
 # Interface {{{1
-def cmdline#c_l#main(): string #{{{2
+def cmdline#cL#main(): string #{{{2
     if getcmdtype() != ':'
         return "\<c-l>"
     endif
