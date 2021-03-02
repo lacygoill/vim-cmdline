@@ -124,8 +124,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
                bufname(v.bufnr)->fnamemodify(':p'),
                v.lnum,
                v.col,
-               v.text->substitute('[^[:print:]]', (m: list<string>): string => strtrans(m[0]), 'g')
-               ))
+               v.text->substitute('[^[:print:]]', (m: list<string>): string => strtrans(m[0]), 'g')))
            ->writefile(tempqfl, 's')
         qa!
     END
@@ -215,11 +214,13 @@ def Expandargs(args: string): string #{{{2
     #}}}
 
     # expand `//` into `/last search/`
-    return substitute(args, pat, rep, '')
+    return args
+        ->substitute(pat, rep, '')
         # expand `%` into `current_file`
         ->substitute('\s\+\zs%\s*$', expand('%:p')->fnameescape(), '')
         # expand `##` into `files_in_arglist`
-        ->substitute('\s\+\zs##\s*$',
+        ->substitute(
+            '\s\+\zs##\s*$',
             argv()
                 ->map((_, v: string): string => fnamemodify(v, ':p')->fnameescape())
                 ->join(),

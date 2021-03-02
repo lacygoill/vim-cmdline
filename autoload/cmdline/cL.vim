@@ -21,7 +21,7 @@ def cmdline#cL#main(): string #{{{2
     endif
     var col: number = getcmdpos()
     # `:123lvimgrepadd!`
-    var pat: string = '^\m\C[: \t]*\d*l\=vim\%[grepadd]!\=\s\+'
+    var pat: string = '^\C[: \t]*\d*l\=vim\%[grepadd]!\=\s\+'
         # opening delimiter
         .. '\(\i\@!.\)'
         # the pattern; stopping at the cursor because it doesn't make sense
@@ -53,7 +53,7 @@ def cmdline#cL#main(): string #{{{2
         return ''
     endif
     var match: string = getline(lnum)->matchstr('.*\%' .. col .. 'c\zs.*')
-    var suffix: string = substitute(match, '^' .. pat, '', '')
+    var suffix: string = match->substitute('^' .. pat, '', '')
     if suffix == ''
         return ''
     # escape the same characters as the default `C-l` in an `:s` command
@@ -100,9 +100,9 @@ def InteractivePaths(): string #{{{2
     var paths_without_lnum: list<string> = copy(paths)
         ->filter((_, v: string): bool => v !~ URL && v =~ '\%\(\s\+line\s\+\d\+\)\@<!$')
     AlignFields(paths_with_lnum)
-    var maxwidth: number = mapnew(urls + paths_with_lnum + paths_without_lnum,
-            (_, v: string): number => strchars(v, true)
-        )->max()
+    var maxwidth: number = (urls + paths_with_lnum + paths_without_lnum)
+        ->mapnew((_, v: string): number => strchars(v, true))
+        ->max()
     var what: list<string> = urls
         + (!empty(urls) && !empty(paths_with_lnum) ? [repeat('─', maxwidth)] : [])
         + paths_with_lnum
@@ -157,28 +157,29 @@ def ExtractPaths(lines: string): list<string> #{{{2
     var Rep: func = (m: list<string>): string =>
         add(paths, m[0])->string()
     # a side-effect of this substitution is to invoke `add()` to populate `paths`
-    substitute(lines, pat, Rep, 'g')
-    filter(paths, (_, v: string): bool =>
-            v =~ '^' .. URL .. '$'
-        ||
-            v =~ '/'
-        &&
-            substitute(v, '\s\+line\s\+\d\+$', '', '')
-            ->expand()
-            ->filereadable()
-        )
+    lines->substitute(pat, Rep, 'g')
+    paths
+        ->filter((_, v: string): bool =>
+                v =~ '^' .. URL .. '$'
+            ||
+                v =~ '/'
+            &&
+                v->substitute('\s\+line\s\+\d\+$', '', '')
+                 ->expand()
+                 ->filereadable())
         ->uniq()
     return paths
 enddef
 
 def AlignFields(paths: list<string>) #{{{2
-    var path_width: number = mapnew(paths,
-            (_, v: string): number => strchars(v, true)
+    var path_width: number = paths
+        ->mapnew((_, v: string): number => strchars(v, true))
+        ->max()
+    var lnum_width: number = paths
+        ->mapnew((_, v: string): number =>
+            matchstr(v, '\s\+line\s\+\zs\d\+$')->strchars(true)
         )->max()
-    var lnum_width: number = mapnew(paths,
-            (_, v: string): number => matchstr(v, '\s\+line\s\+\zs\d\+$')->strchars(true)
-        )->max()
-    map(paths, (_, v): string => Aligned(v, path_width, lnum_width))
+    paths->map((_, v: string): string => Aligned(v, path_width, lnum_width))
 enddef
 
 def Aligned(path: string, path_width: number, lnum_width: number): string #{{{2

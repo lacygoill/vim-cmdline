@@ -85,22 +85,25 @@ def MapFilter(cmdline: string, is_vim9: bool): string #{{{3
     #}}}
     var new_cmdline: string
     if cmdline =~ '\C^\s*\%(echo\|eval\)\s\+.*->\%(map\|filter\)({[i,_],\s*v\s*->\s*})$'
-        new_cmdline = substitute(cmdline,
-            '\C^\s*\%(echo\|eval\)\s\+.*->\zs\%(map\|filter\)\ze({[i,_],\s*v\s*->\s*})$',
-            '\={"map": "filter", "filter": "map"}[submatch(0)]',
-            '')
+        new_cmdline = cmdline
+            ->substitute(
+                '\C^\s*\%(echo\|eval\)\s\+.*->\zs\%(map\|filter\)\ze({[i,_],\s*v\s*->\s*})$',
+                '\={"map": "filter", "filter": "map"}[submatch(0)]',
+                '')
 
     elseif cmdline =~ '\C^\s*vim9\s\+\%(echo\|eval\)\s\+.*->\%(map\|filter\)(([i,_],\s\+v)\s\+=>\s*)$'
-        new_cmdline = substitute(cmdline,
-            '\C^\s*vim9\s\+\%(echo\|eval\)\s\+.*->\zs\%(map\|filter\)\ze(([i,_],\s\+v)\s\+=>\s*)$',
-            '\={"map": "filter", "filter": "map"}[submatch(0)]',
-            '')
+        new_cmdline = cmdline
+            ->substitute(
+                '\C^\s*vim9\s\+\%(echo\|eval\)\s\+.*->\zs\%(map\|filter\)\ze(([i,_],\s\+v)\s\+=>\s*)$',
+                '\={"map": "filter", "filter": "map"}[submatch(0)]',
+                '')
 
     else
-        new_cmdline = substitute(cmdline,
-            '$',
-            is_vim9 ? '->map((_, v) => )' : '->map({_, v -> })',
-            '')
+        new_cmdline = cmdline
+            ->substitute(
+                '$',
+                is_vim9 ? '->map((_, v) => )' : '->map({_, v -> })',
+                '')
     endif
 
     return "\<c-e>\<c-u>" .. new_cmdline .. "\<left>" .. (is_vim9 ? '' : "\<left>")
@@ -133,9 +136,9 @@ def CaptureSubpatterns(cmdline: string): string #{{{3
     #                              │    or    (one)_(two)_(three)
     #                              │
     #                              ├────────────────────────────────────────────────────────────────────┐}}}
-    var new_cmdline: string =
-        range .. 's/'
-        .. map(subpatterns, (_, v: string): string => '\(' .. v .. '\)')
+    var new_cmdline: string = range .. 's/'
+        .. subpatterns
+            ->map((_, v: string): string => '\(' .. v .. '\)')
             ->join(pat =~ '_' ? '_' : '')
         .. '//g'
 
@@ -159,9 +162,9 @@ def SearchOutsideComments(cmdtype: string): string #{{{3
     else
         cml = '\V' .. matchstr(&l:cms, '\S*\ze\s*%s')->escape('\' .. cmdtype) .. '\m'
     endif
-    return '\%(^\%(\s*' .. cml .. '\)\@!.*\)\@<=\m\%(' .. orig_cmdline .. '\)'
-    #                                             ├─┘
-    #                                             └ Why?{{{
+    return '\%(^\%(\s*' .. cml .. '\)\@!.*\)\@<=\%(' .. orig_cmdline .. '\)'
+    #                                           ├─┘
+    #                                           └ Why?{{{
     # The original pattern may contain several branches.
     # In that  case, we want the  lookbehind to be  applied to all of  them, not
     # just the first one.

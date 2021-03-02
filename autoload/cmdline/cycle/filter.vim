@@ -86,7 +86,7 @@ def Filter(arg_cmd: string, bang: bool) #{{{2
     if IsFilterable(first_word)
         if pat == ''
             exe 'filter' .. (bang ? '!' : '') .. ' '
-                .. substitute(arg_cmd, '/\zs.\{-}\ze/', @/, '')
+                .. arg_cmd->substitute('/\zs.\{-}\ze/', @/, '')
         else
             exe 'filter' .. (bang ? '!' : '') .. ' ' .. arg_cmd
         endif

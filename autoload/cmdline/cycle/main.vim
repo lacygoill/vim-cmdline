@@ -51,7 +51,7 @@ def cmdline#cycle#main#set(arg_seq: string, ...cmds: list<string>) #{{{2
     var pos: number = FindTabstop(first_cmd)
     exe 'nno <unique> <c-g>' .. arg_seq
         .. ' <cmd>call cmdline#cycle#main#setSeq(' .. string(arg_seq) .. ')<cr>'
-        .. ':' .. substitute(first_cmd, '§', '', '')
+        .. ':' .. first_cmd->substitute('§', '', '')
         .. '<c-r>=setcmdpos(' .. pos .. ')[-1]<cr>'
     seq_and_cmds += [[arg_seq, cmds]]
 enddef
@@ -97,7 +97,7 @@ def Install(arg_seq: string, arg_cmds: list<string>) #{{{2
 
     var cmds: list<dict<any>> = arg_cmds
         ->mapnew((i: number, v: string) => ({
-            cmd: substitute(v, '§', '', ''),
+            cmd: v->substitute('§', '', ''),
             pos: positions[i],
             }))
     # cmds = [{cmd: 'cmd1', pos: 12}, {cmd: 'cmd2', pos: 34}]

@@ -32,8 +32,7 @@ def cmdline#autoUppercase() #{{{1
         var lcmd: string = tolower(cmd)
         exe printf('cnorea <expr> %s getcmdtype() == '':'' && getcmdline() =~ '
                     .. string(pat) .. ' ? %s : %s',
-            lcmd, lcmd, lcmd, string(cmd), tolower(cmd)->string()
-            )
+            lcmd, lcmd, lcmd, string(cmd), tolower(cmd)->string())
     endfor
 enddef
 
@@ -154,11 +153,13 @@ def cmdline#remember(list: list<dict<any>>) #{{{1
                 exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
             endif
         END
-        mapnew(list, (_, v: dict<any>): string => printf(join(code, '|'),
-                v.regex ? '=~' : '==',
-                string(v.regex ? '^' .. v.old .. '$' : v.old),
-                string('[' .. v.new .. '] was equivalent')
-            )->execute())
+        list->mapnew((_, v: dict<any>): string =>
+                    printf(
+                        join(code, '|'),
+                        v.regex ? '=~' : '==',
+                        string(v.regex ? '^' .. v.old .. '$' : v.old),
+                        string('[' .. v.new .. '] was equivalent')
+                    )->execute())
     augroup END
 enddef
 
