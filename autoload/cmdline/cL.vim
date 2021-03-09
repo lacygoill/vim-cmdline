@@ -52,7 +52,7 @@ def cmdline#cL#main(): string #{{{2
     if [lnum, col] == [0, 0]
         return ''
     endif
-    var match: string = getline(lnum)->matchstr('.*\%' .. col .. 'c\zs.*')
+    var match: string = getline(lnum)->matchstr('\%' .. col .. 'c\zs.*')
     var suffix: string = match->substitute('^' .. pat, '', '')
     if suffix == ''
         return ''

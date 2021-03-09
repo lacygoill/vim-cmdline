@@ -79,9 +79,10 @@ enddef
 # }}}1
 # Core {{{1
 def Filter(arg_cmd: string, bang: bool) #{{{2
-    var pat: string = matchstr(arg_cmd, '/\zs.\{-}\ze/')
+    var pat: string
+    var cmd: string
+    [pat, cmd] = matchlist(arg_cmd, '/\(.\{-}\)/\s*\(.*\)')[1 : 2]
 
-    var cmd: string = matchstr(arg_cmd, '/.\{-}/\s*\zs.*')
     var first_word: string = matchstr(cmd, '\a*\|#')
     if IsFilterable(first_word)
         if pat == ''

@@ -117,8 +117,9 @@ def CaptureSubpatterns(cmdline: string): string #{{{3
 #}}}
 
     # extract the range, separator and the pattern
-    var range: string = matchstr(cmdline, PAT_RANGE)
-    var separator: string = matchstr(cmdline, '^' .. PAT_RANGE .. 's\zs.')
+    var range: string
+    var separator: string
+    [range, separator] = matchlist(cmdline, '^\(' .. PAT_RANGE .. '\)s\(.\)')[1 : 2]
     var pat: string = split(cmdline, separator)[1]
 
     # from the pattern, extract words between underscores or uppercase letters:{{{

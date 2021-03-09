@@ -9,8 +9,9 @@ import MapMeta from 'lg/map.vim'
 # Unused_code:{{{
 #
 #         def StrictAbbr(args: string, search_cmdline = false)
-#             var lhs: string = matchstr(a:args, '^\s*\zs\S\+')
-#             var rhs: string = matchstr(a:args, '^\s*\S\+\s\+\zs.*')
+#             var lhs: string
+#             var rhs: string
+#             [lhs, rhs] = matchlist(a:args, '^\s*\(\S\+\)\s\+\(.*\)')[1 : 2]
 #             if search_cmdline
 #                 exe printf("cnorea <expr> %s getcmdtype() =~ '[/?]' ? '%s' : '%s'", lhs, rhs, lhs)
 #             else
