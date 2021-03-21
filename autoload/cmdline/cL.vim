@@ -52,7 +52,7 @@ def cmdline#cL#main(): string #{{{2
     if [lnum, col] == [0, 0]
         return ''
     endif
-    var match: string = getline(lnum)->matchstr('\%' .. col .. 'c\zs.*')
+    var match: string = getline(lnum)->strpart(col - 1)
     var suffix: string = match->substitute('^' .. pat, '', '')
     if suffix == ''
         return ''
@@ -101,7 +101,7 @@ def InteractivePaths(): string #{{{2
         ->filter((_, v: string): bool => v !~ URL && v =~ '\%\(\s\+line\s\+\d\+\)\@<!$')
     AlignFields(paths_with_lnum)
     var maxwidth: number = (urls + paths_with_lnum + paths_without_lnum)
-        ->mapnew((_, v: string): number => strchars(v, true))
+        ->mapnew((_, v: string): number => strcharlen(v))
         ->max()
     var what: list<string> = urls
         + (!empty(urls) && !empty(paths_with_lnum) ? [repeat('─', maxwidth)] : [])
@@ -173,11 +173,11 @@ enddef
 
 def AlignFields(paths: list<string>) #{{{2
     var path_width: number = paths
-        ->mapnew((_, v: string): number => strchars(v, true))
+        ->mapnew((_, v: string): number => strcharlen(v))
         ->max()
     var lnum_width: number = paths
         ->mapnew((_, v: string): number =>
-            matchstr(v, '\s\+line\s\+\zs\d\+$')->strchars(true)
+            matchstr(v, '\s\+line\s\+\zs\d\+$')->strcharlen()
         )->max()
     paths->map((_, v: string): string => Aligned(v, path_width, lnum_width))
 enddef

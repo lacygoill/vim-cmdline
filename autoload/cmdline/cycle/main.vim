@@ -15,7 +15,7 @@ var loaded = true
 # the removal of a word by pressing `C-w`).
 #
 # See here for inspiration:
-# https://gist.github.com/nicsig/289deda5f7ae03ccd32bc5efd6afbf9c
+# https://gist.github.com/lacygoill/c8ccf30dfac6393f737e3fa4efccdf9d
 #
 # ---
 #
@@ -140,7 +140,7 @@ def FindTabstop(rhs: string): number #{{{2
 enddef
 
 def IsValidCycle(): bool #{{{2
-    return has_key(cycles, seq)
+    return cycles->has_key(seq)
         && typename(cycles[seq]) =~ '^list'
         && len(cycles[seq]) == 2
 enddef
