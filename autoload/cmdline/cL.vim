@@ -118,7 +118,7 @@ def InteractivePaths(): string #{{{2
         maxheight: &lines / 2,
         filter: Filter,
         callback: function(Callback, [what]),
-        })
+    })
     if !empty(paths)
         if mode() =~ 'c'
             redraw
@@ -146,9 +146,9 @@ def Getlines(): string #{{{2
         for col in range(1, &columns)
             line += [screenstring(row, col)]
         endfor
-        lines += [join(line, '')]
+        lines += [line->join('')]
     endfor
-    return join(lines, "\n")
+    return lines->join("\n")
 enddef
 
 def ExtractPaths(lines: string): list<string> #{{{2
@@ -182,7 +182,12 @@ def AlignFields(paths: list<string>) #{{{2
     paths->map((_, v: string): string => Aligned(v, path_width, lnum_width))
 enddef
 
-def Aligned(path: string, path_width: number, lnum_width: number): string #{{{2
+def Aligned( #{{{2
+    path: string,
+    path_width: number,
+    lnum_width: number
+): string
+
     var matchlist: list<string> = matchlist(path, '\(.*\)\s\+line\s\+\(\d\+\)$')
     var actualpath: string = matchlist[1]
     var lnum: number = matchlist[2]->str2nr()
@@ -197,7 +202,11 @@ def Filter(winid: number, key: string): bool #{{{2
     return popup_filter_menu(winid, key)
 enddef
 
-def Callback(paths: list<string>, _w: any, choice: number) #{{{2
+def Callback( #{{{2
+    paths: list<string>,
+    _,
+    choice: number
+)
     if choice == -1 || paths[choice - 1] =~ '^[-─]\+$'
         return
     endif

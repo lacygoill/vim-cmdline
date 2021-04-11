@@ -47,7 +47,7 @@ def cmdline#cycle#vimgrep#install()
         'Vim /§/gj ##',
         'Vim /§/gj `find . -type f -cmin -60`',
         'Lvim /§/gj %',
-        )
+    )
 enddef
 # }}}1
 # Core {{{1
@@ -147,14 +147,15 @@ def Vimgrep(args: string, loclist = false) #{{{2
     split(vimcmd)->job_start(opts)
 enddef
 
-def Callback(loclist: bool, tempqfl: string, title: string, _j: any, _e: any) #{{{2
-#                                                           ├──────────────┘
-#                                                           └ the callback receives 2 arguments{{{
-#
-# From `:h job-exit_cb`:
-#
-#    > The arguments are the job and the exit status.
-#}}}
+def Callback( #{{{2
+    loclist: bool,
+    tempqfl: string,
+    title: string,
+    # The callback receives 2 arguments.  From `:h job-exit_cb`:
+    #
+    #    > The arguments are the job and the exit status.
+    _, _
+)
 
     var efm_save: string = &l:efm
     var bufnr: number = bufnr('%')

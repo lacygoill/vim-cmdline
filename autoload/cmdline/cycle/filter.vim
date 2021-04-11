@@ -59,7 +59,7 @@ def cmdline#cycle#filter#install() #{{{2
     com -bang -nargs=+ -complete=custom,FilterCompletion Filter Filter(<q-args>, <bang>0)
 enddef
 
-def FilterCompletion(...l: any): string #{{{2
+def FilterCompletion(_, _, _): string #{{{2
     var matches: list<string> =<< trim END
         %#
         ab
@@ -74,7 +74,7 @@ def FilterCompletion(...l: any): string #{{{2
         scr
         set
     END
-    return join(matches, "\n")
+    return matches->join("\n")
 enddef
 # }}}1
 # Core {{{1

@@ -71,8 +71,14 @@ augroup HitEnterPrompt | au!
     # By  using `mode()`  instead of  `mode(true)`, we  make sure  that our  `q`
     # mapping is installed even after executing a command with a long output.
     #}}}
-    au CmdlineLeave : if getcmdline() !~ '^\s*fu\%[nction]$'
-        |    timer_start(0, () => mode() == 'r' && !!cmdline#hitEnterPromptNoRecording())
+    # The `sleep` pattern is necessary for the cursor to be correctly hidden when `:sleep!` is executed.
+    var Callback: func = (_) => {
+        if mode() == 'r'
+            cmdline#hitEnterPromptNoRecording()
+        endif
+    }
+    au CmdlineLeave : if getcmdline() !~ '^\s*fu\%[nction]$\|^\s*\d*\s*sleep!\s\+\d*m\=\s*$'
+        |    timer_start(0, Callback)
         | endif
 augroup END
 
@@ -266,7 +272,7 @@ def CyclesSet()
     cmdline#cycle#main#set('g',
         'cgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',
         'lgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',
-        )
+    )
 
     # we want a different pattern depending on the filetype
     # we want `:vimgrep` to be run asynchronously
@@ -323,7 +329,7 @@ def CyclesSet()
         '%s/§//g',
         '%s/`\(.\{-}\)''/`\1`/gce <bar> %s/‘\(.\{-}\)’/`\1`/gce',
         'let list = split(@", "\n") <bar> *s/§\zs/\=remove(list, 0)/'
-        )
+    )
 enddef
 
 CyclesSet()

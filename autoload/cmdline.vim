@@ -7,7 +7,7 @@ import Catch from 'lg.vim'
 import {
     MapSave,
     MapRestore,
-    } from 'lg/map.vim'
+} from 'lg/map.vim'
 
 def cmdline#autoUppercase() #{{{1
     # We define  abbreviations in command-line  mode to automatically  replace a
@@ -50,7 +50,7 @@ def cmdline#chain() #{{{1
         'undol\%[ist]': ['u ', true],
         'changes':      ["norm! g;\<s-left>", true],
         'ju\%[mps]':    ["norm! \<c-o>\<s-left>", true],
-        }
+    }
 
     for [pat, cmd] in items(pat2cmd)
         var keys: string
@@ -155,7 +155,7 @@ def cmdline#remember(list: list<dict<any>>) #{{{1
         END
         list->mapnew((_, v: dict<any>): string =>
                     printf(
-                        join(code, '|'),
+                        code->join('|'),
                         v.regex ? '=~' : '==',
                         string(v.regex ? '^' .. v.old .. '$' : v.old),
                         string('[' .. v.new .. '] was equivalent')

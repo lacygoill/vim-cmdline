@@ -99,7 +99,7 @@ def Install(arg_seq: string, arg_cmds: list<string>) #{{{2
         ->mapnew((i: number, v: string) => ({
             cmd: v->substitute('§', '', ''),
             pos: positions[i],
-            }))
+        }))
     # cmds = [{cmd: 'cmd1', pos: 12}, {cmd: 'cmd2', pos: 34}]
 
     cycles[arg_seq] = [0, cmds]

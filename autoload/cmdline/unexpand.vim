@@ -10,7 +10,11 @@ augroup ClearCmdlineBeforeExpansion | au!
 augroup END
 
 # Interface {{{1
-def cmdline#unexpand#saveOldcmdline(cmdline: string, key: string): string #{{{2
+def cmdline#unexpand#saveOldcmdline( #{{{2
+    cmdline: string,
+    key: string
+): string
+
     SaveRef = function(Save, [key, cmdline])
     au CmdlineChanged : ++once SaveRef()
     return key
