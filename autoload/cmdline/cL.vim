@@ -177,8 +177,8 @@ def AlignFields(paths: list<string>) #{{{2
         ->max()
     var lnum_width: number = paths
         ->mapnew((_, v: string): number =>
-            matchstr(v, '\s\+line\s\+\zs\d\+$')->strcharlen()
-        )->max()
+            matchstr(v, '\s\+line\s\+\zs\d\+$')->strcharlen())
+        ->max()
     paths->map((_, v: string): string => Aligned(v, path_width, lnum_width))
 enddef
 

@@ -187,9 +187,9 @@ enddef
 # Utilities {{{1
 def GetExtension(): string #{{{2
     var ext: string = expand('%:e')
-    if &ft == 'dirvish' && expand('%:p') =~? '/wiki/'
+    if &ft == 'dirvish' && expand('%:p') =~ '\c/wiki/'
         ext = 'md'
-    elseif &ft == 'dirvish' && expand('%:p') =~? '/.vim/'
+    elseif &ft == 'dirvish' && expand('%:p') =~ '\c/.vim/'
         ext = 'vim'
     elseif ext == '' && bufname() != ''
         var setf_autocmds: list<string> = execute('au')
