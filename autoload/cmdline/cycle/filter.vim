@@ -83,7 +83,7 @@ def Filter(arg_cmd: string, bang: bool) #{{{2
     var cmd: string
     [pat, cmd] = matchlist(arg_cmd, '/\(.\{-}\)/\s*\(.*\)')[1 : 2]
 
-    var first_word: string = matchstr(cmd, '\a*\|#')
+    var first_word: string = cmd->matchstr('\a*\|#')
     if IsFilterable(first_word)
         if pat == ''
             exe 'filter' .. (bang ? '!' : '') .. ' '

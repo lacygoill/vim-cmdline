@@ -52,15 +52,15 @@ enddef
 # }}}1
 # Core {{{1
 def FiletypeSpecificVimgrep(): string #{{{2
-    if &ft == 'dirvish'
+    if &filetype == 'dirvish'
         return expand('%:p') .. '**'
-    elseif &ft == 'zsh'
+    elseif &filetype == 'zsh'
         return '/usr/local/share/zsh/**'
-    elseif &ft =~ '^\%(bash\|sh\)$'
+    elseif &filetype =~ '^\%(bash\|sh\)$'
         # TODO: Remove `~/.shrc` once we've integrated it into `~/.zshrc`.
         return  '~/bin/**/*'
             .. ' ~/.{shrc,bashrc,zshrc,zshenv}'
-            .. ' ~/.vim/plugged/vim-snippets/UltiSnips/sh.snippets'
+            .. ' ~/.vim/pack/mine/opt/snippets/UltiSnips/sh.snippets'
     else
         # TODO: Once you start writing unit tests, add them.
         # For example, if you use the vader plugin, add `\ .. ' ~/.vim/**/*.vader'`.
@@ -178,7 +178,7 @@ def Callback( #{{{2
     redraw!
     if loclist && getloclist(0, {size: 0}).size == 0 || getqflist({size: 0}).size == 0
         echohl ErrorMsg
-        var pat: string = matchstr(title[1 :], '\(\i\@!\S\)\zs.\{-}\ze\1')
+        var pat: string = title[1 :]->matchstr('\(\i\@!\S\)\zs.\{-}\ze\1')
         echom 'E480: No match: ' .. pat
         echohl NONE
     endif
@@ -187,14 +187,14 @@ enddef
 # Utilities {{{1
 def GetExtension(): string #{{{2
     var ext: string = expand('%:e')
-    if &ft == 'dirvish' && expand('%:p') =~ '\c/wiki/'
+    if &filetype == 'dirvish' && expand('%:p') =~ '\c/wiki/'
         ext = 'md'
-    elseif &ft == 'dirvish' && expand('%:p') =~ '\c/.vim/'
+    elseif &filetype == 'dirvish' && expand('%:p') =~ '\c/.vim/'
         ext = 'vim'
     elseif ext == '' && bufname() != ''
         var setf_autocmds: list<string> = execute('au')
             ->split('\n')
-            ->filter((_, v: string): bool => v =~ 'setf\s\+' .. &ft)
+            ->filter((_, v: string): bool => v =~ 'setf\s\+' .. &filetype)
         ext = get(setf_autocmds, 0, '')->matchstr('\*\.\zs\S\+')
     endif
     return ext
@@ -223,7 +223,7 @@ def Expandargs(args: string): string #{{{2
         ->substitute(
             '\s\+\zs##\s*$',
             argv()
-                ->map((_, v: string): string => fnamemodify(v, ':p')->fnameescape())
+                ->map((_, v: string): string => v->fnamemodify(':p')->fnameescape())
                 ->join(),
             '')
 enddef

@@ -25,14 +25,14 @@ def cmdline#autoUppercase() #{{{1
     var commands: list<string> = execute('com')
         ->split('\n')[1 :]
         ->filter((_, v: string): bool => v =~ '^[^bA-Z]*\u\S')
-        ->map((_, v: string): string => matchstr(v, '\u\S*'))
+        ->map((_, v: string): string => v->matchstr('\u\S*'))
 
     var pat: string = '^\%%(\%%(tab\<bar>vert\%%[ical]\)\s\+\)\=%s$\<bar>^\%%(''<,''>\<bar>\*\)%s$'
     for cmd in commands
-        var lcmd: string = tolower(cmd)
+        var lcmd: string = cmd->tolower()
         exe printf('cnorea <expr> %s getcmdtype() == '':'' && getcmdline() =~ '
                     .. string(pat) .. ' ? %s : %s',
-            lcmd, lcmd, lcmd, string(cmd), tolower(cmd)->string())
+            lcmd, lcmd, lcmd, cmd->string(), cmd->tolower()->string())
     endfor
 enddef
 
@@ -93,7 +93,7 @@ def cmdline#chain() #{{{1
                 # even if it takes more than one screen; don't stop after the first
                 # screen to display the message:    -- More --
                 set nomore
-                au CmdlineLeave * ++once exe 'set ' .. (more_save ? '' : 'no') .. 'more'
+                au CmdlineLeave * ++once if more_save | set more | else | set nomore | endif
             endif
             feedkeys(':' .. keys, 'in')
             return
@@ -101,10 +101,11 @@ def cmdline#chain() #{{{1
     endfor
 
     if cmdline =~ '\C^\s*\%(dli\|il\)\%[ist]\s\+'
-        feedkeys(':' .. matchstr(cmdline, '\S') .. 'j  '
-            .. split(cmdline, ' ')[1] .. "\<s-left>\<left>", 'in')
+        feedkeys(':'
+            .. cmdline->matchstr('\S') .. 'j  '
+            .. cmdline->split(' ')[1] .. "\<s-left>\<left>", 'in')
     elseif cmdline =~ '\C^\s*\%(cli\|lli\)'
-        feedkeys(':sil ' .. matchstr(cmdline, '\S')->repeat(2) .. ' ', 'in')
+        feedkeys(':sil ' .. cmdline->matchstr('\S')->repeat(2) .. ' ', 'in')
     endif
 enddef
 var more_save: bool
@@ -168,12 +169,13 @@ def cmdline#toggleEditingCommands(enable: bool) #{{{1
         if enable
             MapRestore(my_editing_commands)
         else
-            var lhs_list: list<string> = execute('cno')
+            var lhs_list: list<string> = 'cmap'
+                ->execute()
                 ->split('\n')
                 # ignore buffer-local mappings
                 ->filter((_, v: string): bool => v !~ '^[c!]\s\+\S\+\s\+\S*@')
                 # extract lhs
-                ->map((_, v: string): string => matchstr(v, '^[c!]\s\+\zs\S\+'))
+                ->map((_, v: string): string => v->matchstr('^[c!]\s\+\zs\S\+'))
             my_editing_commands = MapSave(lhs_list, 'c')
             cmapclear
         endif

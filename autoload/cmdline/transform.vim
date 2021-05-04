@@ -11,7 +11,7 @@ var orig_cmdline: string
 
 # Interface {{{1
 def cmdline#transform#main(): string #{{{2
-    transformed += 1
+    ++transformed
     au CmdlineLeave /,\?,: ++once transformed = -1 | orig_cmdline = ''
 
     var cmdtype: string = getcmdtype()
@@ -154,14 +154,14 @@ enddef
 def SearchOutsideComments(cmdtype: string): string #{{{3
     # we should probably save `cmdline` in  a script-local variable if we want
     # to cycle between several transformations
-    if empty(&l:cms)
+    if empty(&cms)
         return orig_cmdline
     endif
     var cml: string
-    if &ft == 'vim'
+    if &filetype == 'vim'
         cml = '["#]'
     else
-        cml = '\V' .. matchstr(&l:cms, '\S*\ze\s*%s')->escape('\' .. cmdtype) .. '\m'
+        cml = '\V' .. &cms->matchstr('\S*\ze\s*%s')->escape('\' .. cmdtype) .. '\m'
     endif
     return '\%(^\%(\s*' .. cml .. '\)\@!.*\)\@<=\%(' .. orig_cmdline .. '\)'
     #                                           ├─┘
