@@ -82,10 +82,10 @@ enddef
 #     $ vim -Nu NONE -S /tmp/vim.vim /tmp/vim.vim
 #     :vim /c/
 #     " press C-l while the cursor is right before `c`
-#     [0, 1, 1, 0]~
+#     [0, 1, 1, 0]˜
 #     " the cursor didn't move
 #     :vim c C-l
-#     [0, 2, 6, 0]~
+#     [0, 2, 6, 0]˜
 #     " the cursor *did* move
 #}}}
 #}}}1

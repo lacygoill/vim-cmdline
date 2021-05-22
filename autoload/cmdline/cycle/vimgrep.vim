@@ -94,7 +94,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     #     :let $ENVVAR = 'some environment variable'
     #     :let job = job_start(['/bin/bash', '-c', 'vim -Nu NONE +''call writefile([$ENVVAR], "/tmp/somefile")'' +qa!'])
     #     :echo readfile('/tmp/somefile')
-    #     ['some environment variable']~
+    #     ['some environment variable']˜
     #}}}
     var setcmd: string = printf('set wildignore=%s suffixes=%s %signorecase %ssmartcase',
         &wildignore, &suffixes, &ignorecase ? '' : 'no', &smartcase ? '' : 'no')

@@ -33,13 +33,13 @@ cnorea <expr> sl getcmdtype() == ':' && getcmdpos() == 3 ? 'ls' : 'sl'
 cnorea <expr> soù getcmdtype() =~ ':' && getcmdpos() == 4 ? 'so%' : 'soù'
 
 #         :fbl
-#         :FzBLines~
+#         :FzBLines˜
 #         :fc
-#         :FzCommands~
+#         :FzCommands˜
 #         :fl
-#         :FzLines~
+#         :FzLines˜
 #         :fs
-#         :FzLocate~
+#         :FzLocate˜
 cnorea <expr> fbl getcmdtype() == ':' && getcmdpos() == 4 ? 'FzBLines' : 'fbl'
 cnorea <expr> fc getcmdtype() == ':' && getcmdpos() == 3 ? 'FzCommands' : 'fc'
 cnorea <expr> fl getcmdtype() == ':' && getcmdpos() == 3 ? 'FzLines' : 'fl'
@@ -267,7 +267,7 @@ def CyclesSet()
     # It could trigger a bug:
     #
     #     \rg -LS foobar /etc
-    #     error: The argument '--follow' was provided more than once, but cannot be used multiple times~
+    #     error: The argument '--follow' was provided more than once, but cannot be used multiple times˜
     #}}}
     cmdline#cycle#main#set('g',
         'cgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',

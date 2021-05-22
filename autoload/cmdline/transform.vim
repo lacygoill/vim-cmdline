@@ -75,13 +75,13 @@ def MapFilter(cmdline: string, is_vim9: bool): string #{{{3
     # Purpose:{{{
     #
     #     :echo [1, 2, 3]
-    #     :echo [1, 2, 3]->map({_, v -> })~
+    #     :echo [1, 2, 3]->map({_, v -> })˜
     #
     #     :echo [1, 2, 3]->map({_, v -> })
-    #     :echo [1, 2, 3]->filter({_, v -> })~
+    #     :echo [1, 2, 3]->filter({_, v -> })˜
     #
     #     :echo [1, 2, 3]->filter({_, v -> v != 2})
-    #     :echo [1, 2, 3]->filter({_, v -> v != 2})->map({_, v -> })~
+    #     :echo [1, 2, 3]->filter({_, v -> v != 2})->map({_, v -> })˜
     #}}}
     var new_cmdline: string
     if cmdline =~ '\C^\s*\%(echo\|eval\)\s\+.*->\%(map\|filter\)({[i,_],\s*v\s*->\s*})$'
@@ -113,7 +113,7 @@ def CaptureSubpatterns(cmdline: string): string #{{{3
 # Purpose:{{{
 #
 #     :%s/foo_bar_baz//g
-#     :%s/\(foo\)_\(bar\)_\(baz\)//g~
+#     :%s/\(foo\)_\(bar\)_\(baz\)//g˜
 #}}}
 
     # extract the range, separator and the pattern
