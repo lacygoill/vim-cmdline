@@ -151,11 +151,17 @@ def Callback( #{{{2
     loclist: bool,
     tempqfl: string,
     title: string,
-    # The callback receives 2 arguments.  From `:h job-exit_cb`:
-    #
-    #    > The arguments are the job and the exit status.
-    _, _
+    _: job,
+    exit: number
 )
+
+    if exit != 0
+        var pat: string = title[1 :]->matchstr('\(\i\@!\S\)\zs.\{-}\ze\1')
+        echohl ErrorMsg
+        echom 'E480: No match: ' .. pat
+        echohl NONE
+        return
+    endif
 
     var efm_save: string = &l:efm
     var bufnr: number = bufnr('%')
@@ -176,12 +182,6 @@ def Callback( #{{{2
     # If you were moving in a buffer  while the callback is invoked and open the
     # qf window, some stray characters might be printed in the status line.
     redraw!
-    if loclist && getloclist(0, {size: 0}).size == 0 || getqflist({size: 0}).size == 0
-        echohl ErrorMsg
-        var pat: string = title[1 :]->matchstr('\(\i\@!\S\)\zs.\{-}\ze\1')
-        echom 'E480: No match: ' .. pat
-        echohl NONE
-    endif
 enddef
 # }}}1
 # Utilities {{{1
