@@ -155,7 +155,7 @@ def ExtractPaths(lines: string): list<string> #{{{2
     var paths: list<string>
     var pat: string = URL .. '\|\f\+\%(\s\+line\s\+\d\+\)\='
     var Rep: func = (m: list<string>): string =>
-        add(paths, m[0])->string()
+        paths->add(m[0])->string()
     # a side-effect of this substitution is to invoke `add()` to populate `paths`
     lines->substitute(pat, Rep, 'g')
     paths
