@@ -71,7 +71,7 @@ enddef
 # MWE:
 #
 #     $ cat <<'EOF' >/tmp/vim.vim
-#         set is
+#         set incsearch
 #         cno <expr> <c-l> C_l()
 #         fu C_l()
 #             echom getpos('.')

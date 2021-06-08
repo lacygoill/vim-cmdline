@@ -92,8 +92,8 @@ def cmdline#chain() #{{{1
                 # allow Vim's pager to display the full contents of any command,
                 # even if it takes more than one screen; don't stop after the first
                 # screen to display the message:    -- More --
-                set nomore
-                au CmdlineLeave * ++once if more_save | set more | else | set nomore | endif
+                &more = false
+                au CmdlineLeave * ++once if more_save | &more = true | else | &more = false | endif
             endif
             feedkeys(':' .. keys, 'in')
             return

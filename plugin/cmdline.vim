@@ -328,7 +328,7 @@ def CyclesSet()
     cmdline#cycle#main#set('s',
         '%s/§//g',
         '%s/`\(.\{-}\)''/`\1`/gce <bar> %s/‘\(.\{-}\)’/`\1`/gce',
-        'let list = split(@", "\n") <bar> *s/§\zs/\=remove(list, 0)/'
+        'let list = split(@", "\n") <bar> *s/§\zs/\=list->remove(0)/'
     )
 enddef
 

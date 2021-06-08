@@ -154,14 +154,14 @@ enddef
 def SearchOutsideComments(cmdtype: string): string #{{{3
     # we should probably save `cmdline` in  a script-local variable if we want
     # to cycle between several transformations
-    if empty(&cms)
+    if empty(&commentstring)
         return orig_cmdline
     endif
     var cml: string
     if &filetype == 'vim'
         cml = '["#]'
     else
-        cml = '\V' .. &cms->matchstr('\S*\ze\s*%s')->escape('\' .. cmdtype) .. '\m'
+        cml = '\V' .. &commentstring->matchstr('\S*\ze\s*%s')->escape('\' .. cmdtype) .. '\m'
     endif
     return '\%(^\%(\s*' .. cml .. '\)\@!.*\)\@<=\%(' .. orig_cmdline .. '\)'
     #                                           ├─┘

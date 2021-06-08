@@ -22,7 +22,7 @@ enddef
 var SaveRef: func(string, string)
 
 def Save(key: string, cmdline: string)
-    if key == "\<c-a>" || key == nr2char(&wcm != 0 ? &wcm : &wc)
+    if key == "\<c-a>" || key == nr2char(&wildcharm != 0 ? &wildcharm : &wildchar)
         oldcmdline = cmdline
     endif
 enddef

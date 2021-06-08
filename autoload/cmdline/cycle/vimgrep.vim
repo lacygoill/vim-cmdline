@@ -163,10 +163,10 @@ def Callback( #{{{2
         return
     endif
 
-    var efm_save: string = &l:efm
+    var errorformat_save: string = &l:errorformat
     var bufnr: number = bufnr('%')
     try
-        setl efm=%f:%l:%c:%m
+        &l:errorformat = '%f:%l:%c:%m'
         if loclist
             exe 'lgetfile ' .. tempqfl
             lw
@@ -177,7 +177,7 @@ def Callback( #{{{2
             setqflist([], 'a', {title: title})
         endif
     finally
-        setbufvar(bufnr, '&efm', efm_save)
+        setbufvar(bufnr, '&errorformat', errorformat_save)
     endtry
     # If you were moving in a buffer  while the callback is invoked and open the
     # qf window, some stray characters might be printed in the status line.

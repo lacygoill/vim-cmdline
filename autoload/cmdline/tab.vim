@@ -12,8 +12,8 @@ def cmdline#tab#custom(is_fwd = true): string #{{{1
     if is_fwd
         # The returned key will be pressed from a mapping while in command-line mode.
         # We want Vim to start a wildcard expansion.
-        # So, we need to return whatever key is stored in 'wcm'.
-        var key: string = nr2char(&wcm != 0 ? &wcm : &wc)
+        # So, we need to return whatever key is stored in 'wildcharm'.
+        var key: string = nr2char(&wildcharm != 0 ? &wildcharm : &wildchar)
         return wildmenumode() ? key : getcmdline()->cmdline#unexpand#saveOldcmdline(key)
     else
         # Why `feedkeys()`?{{{

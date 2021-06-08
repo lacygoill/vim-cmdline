@@ -81,7 +81,7 @@ enddef
 def Filter(arg_cmd: string, bang: bool) #{{{2
     var pat: string
     var cmd: string
-    [pat, cmd] = matchlist(arg_cmd, '/\(.\{-}\)/\s*\(.*\)')[1 : 2]
+    [pat, cmd] = arg_cmd->matchlist('/\(.\{-}\)/\s*\(.*\)')[1 : 2]
 
     var first_word: string = cmd->matchstr('\a*\|#')
     if IsFilterable(first_word)
