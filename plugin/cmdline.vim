@@ -49,7 +49,7 @@ cnorea <expr> fs getcmdtype() == ':' && getcmdpos() == 3 ? 'FzLocate' : 'fs'
 #               besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
 
 cnorea <expr> ucs getcmdtype() == ':' && getcmdpos() == 4 ? 'UnicodeSearch' : 'ucs'
-cnorea <expr> v getcmdtype() == ':' && getcmdpos() == 2 ? 'vim9' : 'v'
+cnorea <expr> v cmdline#vim9Abbrev()
 
 # Autocmds {{{1
 

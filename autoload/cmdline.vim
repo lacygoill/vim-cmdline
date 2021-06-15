@@ -93,7 +93,11 @@ def cmdline#chain() #{{{1
                 # even if it takes more than one screen; don't stop after the first
                 # screen to display the message:    -- More --
                 &more = false
-                au CmdlineLeave * ++once if more_save | &more = true | else | &more = false | endif
+                au CmdlineLeave * ++once if more_save
+                    |     &more = true
+                    | else
+                    |     &more = false
+                    | endif
             endif
             feedkeys(':' .. keys, 'in')
             return
@@ -185,4 +189,22 @@ def cmdline#toggleEditingCommands(enable: bool) #{{{1
     endtry
 enddef
 var my_editing_commands: list<dict<any>>
+
+def cmdline#vim9Abbrev(): string #{{{1
+    if getcmdtype() != ':'
+        return 'v'
+    endif
+
+    var cmdline: string = getcmdline()
+    var pos: number = getcmdpos()
+    var before_cursor: string = cmdline->matchstr('.*\%' .. pos .. 'c')
+    # expand `v` into `vim9` at the start of a line
+    if before_cursor == 'v'
+    # and after a bar
+    || before_cursor =~ '|\s*v$'
+        return 'vim9'
+    else
+        return 'v'
+    endif
+enddef
 

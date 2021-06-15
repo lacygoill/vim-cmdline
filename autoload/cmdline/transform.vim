@@ -112,8 +112,8 @@ enddef
 def CaptureSubpatterns(cmdline: string): string #{{{3
 # Purpose:{{{
 #
-#     :%s/foo_bar_baz//g
-#     :%s/\(foo\)_\(bar\)_\(baz\)//g˜
+#     :% s/foo_bar_baz//g
+#     :% s/\(foo\)_\(bar\)_\(baz\)//g˜
 #}}}
 
     # extract the range, separator and the pattern
@@ -158,8 +158,10 @@ def SearchOutsideComments(cmdtype: string): string #{{{3
         return orig_cmdline
     endif
     var cml: string
-    if &filetype == 'vim'
-        cml = '["#]'
+    if b:current_syntax == 'vim9'
+        cml = '#'
+    elseif b:current_syntax == 'vim'
+        cml = '"'
     else
         cml = '\V' .. &commentstring->matchstr('\S*\ze\s*%s')->escape('\' .. cmdtype) .. '\m'
     endif
