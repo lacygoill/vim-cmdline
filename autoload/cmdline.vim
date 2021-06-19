@@ -168,28 +168,6 @@ def cmdline#remember(list: list<dict<any>>) #{{{1
     augroup END
 enddef
 
-def cmdline#toggleEditingCommands(enable: bool) #{{{1
-    try
-        if enable
-            MapRestore(my_editing_commands)
-        else
-            var lhs_list: list<string> = 'cmap'
-                ->execute()
-                ->split('\n')
-                # ignore buffer-local mappings
-                ->filter((_, v: string): bool => v !~ '^[c!]\s\+\S\+\s\+\S*@')
-                # extract lhs
-                ->map((_, v: string): string => v->matchstr('^[c!]\s\+\zs\S\+'))
-            my_editing_commands = MapSave(lhs_list, 'c')
-            cmapclear
-        endif
-    catch
-        Catch()
-        return
-    endtry
-enddef
-var my_editing_commands: list<dict<any>>
-
 def cmdline#vim9Abbrev(): string #{{{1
     if getcmdtype() != ':'
         return 'v'

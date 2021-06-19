@@ -49,7 +49,7 @@ cnorea <expr> fs getcmdtype() == ':' && getcmdpos() == 3 ? 'FzLocate' : 'fs'
 #               besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
 
 cnorea <expr> ucs getcmdtype() == ':' && getcmdpos() == 4 ? 'UnicodeSearch' : 'ucs'
-cnorea <expr> v cmdline#vim9Abbrev()
+cnorea <expr> v !get(g:, 'debugging') ? cmdline#vim9Abbrev() : 'v'
 
 # Autocmds {{{1
 
@@ -77,7 +77,8 @@ augroup HitEnterPrompt | au!
             cmdline#hitEnterPromptNoRecording()
         endif
     }
-    au CmdlineLeave : if getcmdline() !~ '^\s*fu\%[nction]$\|^\s*\d*\s*sleep!\s\+\d*m\=\s*$'
+    au CmdlineLeave : if !get(g:, 'debugging')
+    \ && getcmdline() !~ '^\s*fu\%[nction]$\|^\s*\d*\s*sleep!\s\+\d*m\=\s*$\|^\s*Debug\>'
         |    timer_start(0, Callback)
         | endif
 augroup END
@@ -112,23 +113,6 @@ augroup MyCmdlineChain | au!
         | endif
 augroup END
 
-# Command {{{1
-
-# Purpose:{{{
-#
-# We have several custom mappings in command-line mode.
-# Some of them are bound to custom functions.
-# They interfere / add noise / bug (`CR`) when we're in debug mode.
-# We install this command so that it can  be used to toggle them when needed, in
-# other plugins or in our vimrc.
-#}}}
-# Usage:{{{
-#
-#     ToggleEditingCommands 0  →  disable
-#     ToggleEditingCommands 1  →  enable
-#}}}
-com -bar -nargs=1 ToggleEditingCommands cmdline#toggleEditingCommands(<args>)
-
 # Mappings {{{1
 
 # Purpose:{{{
@@ -143,9 +127,11 @@ com -bar -nargs=1 ToggleEditingCommands cmdline#toggleEditingCommands(<args>)
 # We use  our Tab mapping  to save the command-line  prior to an  expansion, and
 # install a C-q mapping to restore it.
 #}}}
-cno <expr><unique> <tab>   cmdline#tab#custom()
-cno <expr><unique> <s-tab> cmdline#tab#custom(v:false)
-cno       <unique> <c-q>   <c-\>e cmdline#tab#restoreCmdlineAfterExpansion()<cr>
+cno <expr><unique> <tab>   !get(g:, 'debugging') ? cmdline#tab#custom() : '<tab>'
+cno <expr><unique> <s-tab> !get(g:, 'debugging') ? cmdline#tab#custom(v:false) : '<s-tab>'
+cno       <unique> <c-q>   <c-\>e !get(g:, 'debugging')
+    \ ? cmdline#tab#restoreCmdlineAfterExpansion()
+    \ : getcmdline()<cr>
 
 # Purpose:{{{
 #
