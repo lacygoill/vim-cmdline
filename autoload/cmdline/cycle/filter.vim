@@ -86,10 +86,14 @@ def Filter(arg_cmd: string, bang: bool) #{{{2
     var first_word: string = cmd->matchstr('\a*\|#')
     if IsFilterable(first_word)
         if pat == ''
-            exe 'filter' .. (bang ? '!' : '') .. ' '
+            # Need to be run in the legacy context, to suppress `E1126`:{{{
+            #
+            # E1126: Cannot use :let in Vim9 script
+            #}}}
+            exe 'legacy filter' .. (bang ? '!' : '') .. ' '
                 .. arg_cmd->substitute('/\zs.\{-}\ze/', @/, '')
         else
-            exe 'filter' .. (bang ? '!' : '') .. ' ' .. arg_cmd
+            exe 'legacy filter' .. (bang ? '!' : '') .. ' ' .. arg_cmd
         endif
         return
     endif
