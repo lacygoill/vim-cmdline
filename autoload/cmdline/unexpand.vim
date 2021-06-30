@@ -5,8 +5,8 @@ var loaded = true
 
 var oldcmdline: string
 
-augroup ClearCmdlineBeforeExpansion | au!
-    au CmdlineLeave : oldcmdline = ''
+augroup ClearCmdlineBeforeExpansion | autocmd!
+    autocmd CmdlineLeave : oldcmdline = ''
 augroup END
 
 # Interface {{{1
@@ -16,13 +16,13 @@ def cmdline#unexpand#saveOldcmdline( #{{{2
 ): string
 
     SaveRef = function(Save, [key, cmdline])
-    au CmdlineChanged : ++once SaveRef()
+    autocmd CmdlineChanged : ++once SaveRef()
     return key
 enddef
 var SaveRef: func(string, string)
 
 def Save(key: string, cmdline: string)
-    if key == "\<c-a>" || key == nr2char(&wildcharm != 0 ? &wildcharm : &wildchar)
+    if key == "\<C-A>" || key == nr2char(&wildcharm != 0 ? &wildcharm : &wildchar)
         oldcmdline = cmdline
     endif
 enddef

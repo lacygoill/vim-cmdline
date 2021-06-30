@@ -12,7 +12,7 @@ var orig_cmdline: string
 # Interface {{{1
 def cmdline#transform#main(): string #{{{2
     ++transformed
-    au CmdlineLeave /,\?,: ++once transformed = -1 | orig_cmdline = ''
+    autocmd CmdlineLeave /,\?,: ++once transformed = -1 | orig_cmdline = ''
 
     var cmdtype: string = getcmdtype()
     var cmdline: string = getcmdline()
@@ -30,7 +30,7 @@ def cmdline#transform#main(): string #{{{2
             orig_cmdline = cmdline
         endif
         cmdline#util#undo#emitAddToUndolistC()
-        return "\<c-e>\<c-u>"
+        return "\<C-E>\<C-U>"
             .. (transformed % 2 ? ReplaceWithEquivClass() : SearchOutsideComments(cmdtype))
 
     elseif cmdtype =~ ':'
@@ -106,14 +106,14 @@ def MapFilter(cmdline: string, is_vim9: bool): string #{{{3
                 '')
     endif
 
-    return "\<c-e>\<c-u>" .. new_cmdline .. "\<left>" .. (is_vim9 ? '' : "\<left>")
+    return "\<C-E>\<C-U>" .. new_cmdline .. "\<Left>" .. (is_vim9 ? '' : "\<Left>")
 enddef
 
 def CaptureSubpatterns(cmdline: string): string #{{{3
 # Purpose:{{{
 #
-#     :% s/foo_bar_baz//g
-#     :% s/\(foo\)_\(bar\)_\(baz\)//g˜
+#     :%s/foo_bar_baz//g
+#     :%s/\(foo\)_\(bar\)_\(baz\)//g˜
 #}}}
 
     # extract the range, separator and the pattern
@@ -143,7 +143,7 @@ def CaptureSubpatterns(cmdline: string): string #{{{3
             ->join(pat =~ '_' ? '_' : '')
         .. '//g'
 
-    return "\<c-e>\<c-u>" .. new_cmdline .. "\<left>\<left>"
+    return "\<C-E>\<C-U>" .. new_cmdline .. "\<Left>\<Left>"
 enddef
 #}}}2
 # Search {{{2

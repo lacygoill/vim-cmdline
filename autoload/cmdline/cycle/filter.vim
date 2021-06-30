@@ -56,7 +56,7 @@ cmdline#cycle#main#set('f', 'Verb Filter /\c§/ ')
 # }}}1
 # Interface {{{1
 def cmdline#cycle#filter#install() #{{{2
-    com -bang -nargs=+ -complete=custom,FilterCompletion Filter Filter(<q-args>, <bang>0)
+    command -bang -nargs=+ -complete=custom,FilterCompletion Filter Filter(<q-args>, <bang>0)
 enddef
 
 def FilterCompletion(_, _, _): string #{{{2
@@ -90,10 +90,10 @@ def Filter(arg_cmd: string, bang: bool) #{{{2
             #
             # E1126: Cannot use :let in Vim9 script
             #}}}
-            exe 'legacy filter' .. (bang ? '!' : '') .. ' '
+            execute 'legacy filter' .. (bang ? '!' : '') .. ' '
                 .. arg_cmd->substitute('/\zs.\{-}\ze/', @/, '')
         else
-            exe 'legacy filter' .. (bang ? '!' : '') .. ' ' .. arg_cmd
+            execute 'legacy filter' .. (bang ? '!' : '') .. ' ' .. arg_cmd
         endif
         return
     endif

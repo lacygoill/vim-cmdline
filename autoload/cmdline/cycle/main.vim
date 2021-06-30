@@ -7,9 +7,9 @@ var loaded = true
 #
 # Useful for a command like:
 #
-#     noa vim //gj `find . -type f -cmin -60` | cw
-#             ^                           ^
-#             tabstop 1                   tabstop 2
+#     noautocmd vimgrep //gj `find . -type f -cmin -60` | cwindow
+#                       ^                           ^
+#                       tabstop 1                   tabstop 2
 #
 # The difficulty is how to track  the changes operated on the command-line (like
 # the removal of a word by pressing `C-w`).
@@ -19,8 +19,9 @@ var loaded = true
 #
 # ---
 #
-# In the previous  example, we could reliably find the  first tabstop by looking
-# for `^noa\s*vim\s*/`, and the second tabstop by looking for `-\d*.\s*|\s*cw$`.
+# In  the  previous  example,  we  could reliably  find  the  first  tabstop  by
+# looking for `^noautocmd\s*vimgrep\s*/`, and the  second tabstop by looking for
+# `-\d*.\s*|\s*cwindow$`.
 #
 # ---
 #
@@ -43,16 +44,16 @@ var seq: string
 
 # the installation of cycles takes a few ms (too long)
 var seq_and_cmds: list<any>
-au CmdlineEnter : ++once DelayCycleInstall()
+autocmd CmdlineEnter : ++once DelayCycleInstall()
 
 # Interface {{{1
 def cmdline#cycle#main#set(arg_seq: string, ...cmds: list<string>) #{{{2
     var first_cmd: string = cmds[0]
     var pos: number = FindTabstop(first_cmd)
-    exe 'nno <unique> <c-g>' .. arg_seq
-        .. ' <cmd>call cmdline#cycle#main#setSeq(' .. string(arg_seq) .. ')<cr>'
+    execute 'nnoremap <unique> <C-G>' .. arg_seq
+        .. ' <Cmd>call cmdline#cycle#main#setSeq(' .. string(arg_seq) .. ')<CR>'
         .. ':' .. first_cmd->substitute('§', '', '')
-        .. '<c-r>=setcmdpos(' .. pos .. ')[-1]<cr>'
+        .. '<C-R>=setcmdpos(' .. pos .. ')[-1]<CR>'
     seq_and_cmds += [[arg_seq, cmds]]
 enddef
 
@@ -75,17 +76,17 @@ def cmdline#cycle#main#move(is_fwd = true): string #{{{2
     # update the new index position
     cycles[seq][0] = idx
 
-    augroup ResetCycleIndex | au!
-        au CmdlineLeave : cycles[seq][0] = 0
+    augroup ResetCycleIndex | autocmd!
+        autocmd CmdlineLeave : cycles[seq][0] = 0
     augroup END
 
-    exe 'cno <plug>(cycle-new-cmd) ' .. new_cmd .. '<c-r>=setcmdpos(' .. pos .. ')[-1]<cr>'
+    execute 'cnoremap <Plug>(cycle-new-cmd) ' .. new_cmd .. '<C-R>=setcmdpos(' .. pos .. ')[-1]<CR>'
 
     # If we press `C-g` by accident on  the command-line, and we move forward in
     # the cycle, we should be able to undo and recover the previous command with
     # `C-_`.
     cmdline#util#undo#emitAddToUndolistC()
-    feedkeys("\<plug>(cycle-new-cmd)", 'i')
+    feedkeys("\<Plug>(cycle-new-cmd)", 'i')
     return ''
 enddef
 # }}}1
@@ -115,13 +116,13 @@ enddef
 def FindTabstop(rhs: string): number #{{{2
     # Why not simply `return stridx(a:rhs, '§')`?{{{
     #
-    # The rhs may contain special sequences such as `<bar>` or `<c-r>`.
+    # The rhs may contain special sequences such as `<Bar>` or `<C-R>`.
     # They need to be translated first.
     #}}}
-    exe 'nno <plug>(cycle-find-tabstop) :' .. rhs
+    execute 'nnoremap <Plug>(cycle-find-tabstop) :' .. rhs
     # In reality, we should add `1`, but  we don't need to{{{
     #
-    # because we've defined the previous  `<plug>` mapping with a leading colon,
+    # because we've defined the previous  `<Plug>` mapping with a leading colon,
     # which is taken into account by `maparg()`.
     #
     # IOW, the output is right because of 2 errors which cancel one another:
@@ -132,11 +133,11 @@ def FindTabstop(rhs: string): number #{{{2
     #
     #     It's useless, because we never see it when we're cycling.
     #
-    #     The `<plug>`  mapping would  *not* be wrong  without `:`,  because its
+    #     The `<Plug>`  mapping would  *not* be wrong  without `:`,  because its
     #     purpose is not  to be pressed, but to get  the translation of possible
     #     special characters in the rhs.
     #}}}
-    return maparg('<plug>(cycle-find-tabstop)')->stridx('§')
+    return maparg('<Plug>(cycle-find-tabstop)')->stridx('§')
 enddef
 
 def IsValidCycle(): bool #{{{2

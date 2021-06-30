@@ -6,8 +6,8 @@ var loaded = true
 def cmdline#tab#custom(is_fwd = true): string #{{{1
     if getcmdtype() =~ '[?/]'
         return getcmdline() == ''
-            ?     "\<up>"
-            :     is_fwd ? "\<c-g>" : "\<c-t>"
+            ?     "\<Up>"
+            :     is_fwd ? "\<C-G>" : "\<C-T>"
     endif
     if is_fwd
         # The returned key will be pressed from a mapping while in command-line mode.
@@ -41,10 +41,10 @@ def cmdline#tab#custom(is_fwd = true): string #{{{1
         # I don't know how to fix this, and I don't really care; it's a corner case.
         #}}}
         if !wildmenumode() && reg_recording()->empty()
-            feedkeys("\<s-tab>", 'int')
+            feedkeys("\<S-Tab>", 'int')
             return ''
         endif
-        return "\<s-tab>"
+        return "\<S-Tab>"
     endif
 enddef
 
@@ -55,7 +55,7 @@ def cmdline#tab#restoreCmdlineAfterExpansion(): string #{{{1
     endif
     # clear wildmenu
     redraw
-    au CmdlineChanged : ++once cmdline#unexpand#clearOldcmdline()
+    autocmd CmdlineChanged : ++once cmdline#unexpand#clearOldcmdline()
     return cmdline_before_expansion
 enddef
 # }}}1

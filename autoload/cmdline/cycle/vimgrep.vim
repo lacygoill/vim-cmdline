@@ -21,28 +21,28 @@ var loaded = true
 # interpreted as meaning: "take the following special character as a literal one").
 #
 #     $ vim -Nu NONE -S <(cat <<'EOF'
-#         com -nargs=* -complete=file Cmd echom <q-args>
+#         command -nargs=* -complete=file Cmd echomsg <q-args>
 #         Cmd a\%b
 #     EOF
 #     )
 #
 #     a%b
 #}}}
-com -nargs=* Vim Vimgrep(<q-args>)
-com -nargs=* Lvim Vimgrep(<q-args>, true)
+command -nargs=* Vim Vimgrep(<q-args>)
+command -nargs=* Lvim Vimgrep(<q-args>, true)
 
 def cmdline#cycle#vimgrep#install()
-    # Why don't you add `<bar> cw` in your mappings?{{{
+    # Why don't you add `<Bar> cwindow` in your mappings?{{{
     #
     # `:Vim` is a custom command, which isn't defined with `-bar`.
-    # So, if it sees  `| cw`, it will wrongly interpret it as  being part of its
-    # argument.
+    # So, if it sees `| cwindow`, it  will wrongly interpret it as being part of
+    # its argument.
     # We don't  define `:Vim` with  `-bar` because we might  need to look  for a
     # pattern which contains a bar.
     #}}}
     cmdline#cycle#main#set('v',
-        'Vim /§/gj ./**/*.<c-r>=' .. expand('<SID>') .. 'GetExtension()<cr>',
-        'Vim /§/gj <c-r>=' .. expand('<SID>') .. 'FiletypeSpecificVimgrep()<cr>',
+        'Vim /§/gj ./**/*.<C-R>=' .. expand('<SID>') .. 'GetExtension()<CR>',
+        'Vim /§/gj <C-R>=' .. expand('<SID>') .. 'FiletypeSpecificVimgrep()<CR>',
         'Vim /§/gj $VIMRUNTIME/**/*.vim',
         'Vim /§/gj ##',
         'Vim /§/gj `find . -type f -cmin -60`',
@@ -92,7 +92,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     # No.  Apparently, a Vim job inherits the environment of the current Vim instance.
     #
     #     :let $ENVVAR = 'some environment variable'
-    #     :let job = job_start(['/bin/bash', '-c', 'vim -Nu NONE +''call writefile([$ENVVAR], "/tmp/somefile")'' +qa!'])
+    #     :let job = job_start(['/bin/bash', '-c', 'vim -Nu NONE +''call writefile([$ENVVAR], "/tmp/somefile")'' +quitall!'])
     #     :echo readfile('/tmp/somefile')
     #     ['some environment variable']˜
     #}}}
@@ -108,7 +108,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
     # Same thing for `%` and `##`.
     #}}}
     var expanded_args: string = Expandargs(args)
-    var vimgrepcmd: string = 'noa vim ' .. expanded_args
+    var vimgrepcmd: string = 'noautocmd vimgrep ' .. expanded_args
     # Why `strtrans()`?{{{
     #
     # If the text contains NULs, it could mess up the parsing of `:cgetfile`.
@@ -126,7 +126,7 @@ def Vimgrep(args: string, loclist = false) #{{{2
                v.col,
                v.text->substitute('[^[:print:]]', (m: list<string>): string => strtrans(m[0]), 'g')))
            ->writefile(tempqfl, 's')
-        qa!
+        quitall!
     END
     # Make sure that the code contained in `get_tempfile` is run before `vimgrepcmd`{{{
     #
@@ -158,7 +158,7 @@ def Callback( #{{{2
     if exit != 0
         var pat: string = title[1 :]->matchstr('\(\i\@!\S\)\zs.\{-}\ze\1')
         echohl ErrorMsg
-        echom 'E480: No match: ' .. pat
+        echomsg 'E480: No match: ' .. pat
         echohl NONE
         return
     endif
@@ -168,12 +168,12 @@ def Callback( #{{{2
     try
         &l:errorformat = '%f:%l:%c:%m'
         if loclist
-            exe 'lgetfile ' .. tempqfl
-            lw
+            execute 'lgetfile ' .. tempqfl
+            lwindow
             setloclist(0, [], 'a', {title: title})
         else
-            exe 'cgetfile ' .. tempqfl
-            cw
+            execute 'cgetfile ' .. tempqfl
+            cwindow
             setqflist([], 'a', {title: title})
         endif
     finally
@@ -192,9 +192,9 @@ def GetExtension(): string #{{{2
     elseif &filetype == 'dirvish' && expand('%:p') =~ '\c/.vim/'
         ext = 'vim'
     elseif ext == '' && bufname() != ''
-        var setf_autocmds: list<string> = execute('au')
+        var setf_autocmds: list<string> = execute('autocmd')
             ->split('\n')
-            ->filter((_, v: string): bool => v =~ 'setf\s\+' .. &filetype)
+            ->filter((_, v: string): bool => v =~ 'setf\%[iletype]\s\+' .. &filetype)
         ext = get(setf_autocmds, 0, '')->matchstr('\*\.\zs\S\+')
     endif
     return ext
@@ -208,7 +208,7 @@ def Expandargs(args: string): string #{{{2
     #                                    │{{{
     #                                    └ `substitute()` will remove any backslash, because
     #                                       some sequences are special (like `\1` or `\u`);
-    #                                       See: :h sub-replace-special
+    #                                       See: :help sub-replace-special
     #
     #                                       If our pattern contains a backslash (like in `\s`),
     #                                       we need it to be preserved.

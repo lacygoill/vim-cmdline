@@ -14,7 +14,7 @@ const URL: string = '\%(https\=\|ftps\=\|www\)://\S\+'
 # Interface {{{1
 def cmdline#cL#main(): string #{{{2
     if getcmdtype() != ':'
-        return "\<c-l>"
+        return "\<C-L>"
     endif
     if getcmdline()->empty()
         return InteractivePaths()
@@ -33,15 +33,15 @@ def cmdline#cL#main(): string #{{{2
         .. '\1'
         # flags
         .. '[gj]\{,2}\s'
-        # `:%s/pat/rep/g`
+        # `:%substitute/pat/rep/g`
         .. '\|s\(\i\@!.\)\zs.\{-}\%' .. col .. 'c\ze.\{-}\2.\{-}\2'
-        # `:h :s_flags`
+        # `:helpgrep :s_flags`
         .. '[cegn]\{,4}\%($\|\s\||\)'
-        # `:helpg pat`
+        # `:helpgrep pat`
         .. '\|\%(helpg\%[rep]\|l\%[helpgrep]\)\s\+\zs.*'
     var list: list<string> = getcmdline()->matchlist(pat)
     if list == []
-        return "\<c-l>"
+        return "\<C-L>"
     endif
     pat = list[0]
     var delim: string = list[1]
@@ -63,7 +63,7 @@ def cmdline#cL#main(): string #{{{2
         return suffix[0]
     endif
 enddef
-# Why don't you support `:vim pat` (without delimiters)?{{{
+# Why don't you support `:vimgrep pat` (without delimiters)?{{{
 #
 # It  would be  tricky because  in that case,  Vim updates  the position  of the
 # cursor after every inserted character.
@@ -72,11 +72,11 @@ enddef
 #
 #     $ cat <<'EOF' >/tmp/vim.vim
 #         set incsearch
-#         cno <expr> <c-l> C_l()
-#         fu C_l()
-#             echom getpos('.')
+#         cnoremap <expr> <C-L> C_l()
+#         function C_l()
+#             echomsg getpos('.')
 #             return ''
-#         endfu
+#         endfunction
 #     EOF
 #
 #     $ vim -Nu NONE -S /tmp/vim.vim /tmp/vim.vim
@@ -128,12 +128,12 @@ def InteractivePaths(): string #{{{2
             # should be ignored, but are not.
             # https://github.com/vim/vim/issues/7011#issuecomment-700981791
             #}}}
-            au SafeState * ++once Popup()
+            autocmd SafeState * ++once Popup()
         else
             Popup()
         endif
     endif
-    return "\<c-\>\<c-n>"
+    return "\<C-\>\<C-N>"
 enddef
 
 var Popup: func
@@ -220,11 +220,11 @@ def Callback( #{{{2
     else
         # Alternative:{{{
         #
-        #     exe 'sp ' .. fpath
-        #     exe printf('au SafeState * ++once keepj norm! %szvzz',
+        #     execute 'split ' .. fpath
+        #     execute printf('autocmd SafeState * ++once keepjumps normal! %szvzz',
         #         empty(lnum) ? '' : lnum .. 'G')
         #}}}
-        exe printf('sp +exe\ "keepj\ norm!\ %szvzz" %s',
+        execute printf('split +execute\ "keepjumps\ normal!\ %szvzz" %s',
             !empty(lnum) ? lnum .. 'G' : '', fpath)
     endif
 enddef

@@ -22,15 +22,15 @@ def cmdline#autoUppercase() #{{{1
     # Installing  a *global* abbreviation  for a *buffer-local*  command doesn't
     # make sense.
     #}}}
-    var commands: list<string> = execute('com')
+    var commands: list<string> = execute('command')
         ->split('\n')[1 :]
         ->filter((_, v: string): bool => v =~ '^[^bA-Z]*\u\S')
         ->map((_, v: string): string => v->matchstr('\u\S*'))
 
-    var pat: string = '^\%%(\%%(tab\<bar>vert\%%[ical]\)\s\+\)\=%s$\<bar>^\%%(''<,''>\<bar>\*\)%s$'
+    var pat: string = '^\%%(\%%(tab\<Bar>vert\%%[ical]\)\s\+\)\=%s$\<Bar>^\%%(''<,''>\<Bar>\*\)%s$'
     for cmd in commands
         var lcmd: string = cmd->tolower()
-        exe printf('cnorea <expr> %s getcmdtype() == '':'' && getcmdline() =~ '
+        execute printf('cnoreabbrev <expr> %s getcmdtype() == '':'' && getcmdline() =~ '
                     .. string(pat) .. ' ? %s : %s',
             lcmd, lcmd, lcmd, cmd->string(), cmd->tolower()->string())
     endfor
@@ -45,11 +45,11 @@ def cmdline#chain() #{{{1
         '\%(ls\|files\|buffers\)!\=': ['b ', false],
         'chi\%[story]': ['CC ', true],
         'lhi\%[story]': ['LL ', true],
-        'marks':        ['norm! `', true],
-        'old\%[files]': ['e #<', true],
-        'undol\%[ist]': ['u ', true],
-        'changes':      ["norm! g;\<s-left>", true],
-        'ju\%[mps]':    ["norm! \<c-o>\<s-left>", true],
+        'marks':        ['normal! `', true],
+        'old\%[files]': ['edit #<', true],
+        'undol\%[ist]': ['undo ', true],
+        'changes':      ["normal! g;\<S-Left>", true],
+        'ju\%[mps]':    ["normal! \<C-O>\<S-Left>", true],
     }
 
     for [pat, cmd] in items(pat2cmd)
@@ -57,8 +57,8 @@ def cmdline#chain() #{{{1
         var nomore: bool
         [keys, nomore] = cmd
         if cmdline =~ '\C^' .. pat .. '$'
-            # when I  execute `:[cl]chi`,  don't populate the  command-line with
-            # `:sil [cl]ol` if the qf stack doesn't have at least two qf lists
+            # when I  execute `:[cl]chistory`,  don't populate the  command-line with
+            # `:silent [cl]older` if the qf stack doesn't have at least two qf lists
             if pat == 'lhi\%[story]' && getloclist(0, {nr: '$'})->get('nr', 0) <= 1
             || pat == 'chi\%[story]' && getqflist({nr: '$'})->get('nr', 0) <= 1
                 return
@@ -93,7 +93,7 @@ def cmdline#chain() #{{{1
                 # even if it takes more than one screen; don't stop after the first
                 # screen to display the message:    -- More --
                 &more = false
-                au CmdlineLeave * ++once if more_save
+                autocmd CmdlineLeave * ++once if more_save
                     |     &more = true
                     | else
                     |     &more = false
@@ -107,9 +107,9 @@ def cmdline#chain() #{{{1
     if cmdline =~ '\C^\s*\%(dli\|il\)\%[ist]\s\+'
         feedkeys(':'
             .. cmdline->matchstr('\S') .. 'j  '
-            .. cmdline->split(' ')[1] .. "\<s-left>\<left>", 'in')
+            .. cmdline->split(' ')[1] .. "\<S-Left>\<Left>", 'in')
     elseif cmdline =~ '\C^\s*\%(cli\|lli\)'
-        feedkeys(':sil ' .. cmdline->matchstr('\S')->repeat(2) .. ' ', 'in')
+        feedkeys(':silent ' .. cmdline->matchstr('\S')->repeat(2) .. ' ', 'in')
     endif
 enddef
 var more_save: bool
@@ -117,12 +117,12 @@ var more_save: bool
 def cmdline#fixTypo(label: string) #{{{1
     var cmdline: string = getcmdline()
     var keys: string = {
-          cr: "\<bs>\<cr>",
-          z: "\<bs>\<bs>()\<cr>",
+          cr: "\<BS>\<CR>",
+          z: "\<BS>\<BS>()\<CR>",
         }[label]
     # We can't send the keys right now, because the command hasn't been executed yet.{{{
     #
-    # From `:h CmdlineLeave`:
+    # From `:help CmdlineLeave`:
     #
     #    > Before leaving the command-line.
     #
@@ -135,7 +135,7 @@ def cmdline#fixTypo(label: string) #{{{1
     #                                       when the callback will be processed,
     #                                       the old command-line will be lost
     #}}}
-    au SafeState * ++once RerunFixedCmd()
+    autocmd SafeState * ++once RerunFixedCmd()
 enddef
 var RerunFixedCmd: func
 
@@ -146,16 +146,16 @@ def cmdline#hitEnterPromptNoRecording() #{{{1
     # hit-enter prompt  has already been  closed automatically.  It's  closed no
     # matter which key you press.
     #}}}
-    nno q <cmd>sil! nunmap q<cr>
+    nnoremap q <Cmd>silent! nunmap q<CR>
     # if we escape the prompt without pressing `q`, make sure the mapping is still removed
-    au SafeState * ++once sil! nunmap q
+    autocmd SafeState * ++once silent! nunmap q
 enddef
 
 def cmdline#remember(list: list<dict<any>>) #{{{1
-    augroup RememberOverlookedCommands | au!
+    augroup RememberOverlookedCommands | autocmd!
         var code: list<string> =<< trim END
-            au CmdlineLeave : if getcmdline() %s %s
-                exe "au SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
+            autocmd CmdlineLeave : if getcmdline() %s %s
+                execute "autocmd SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
             endif
         END
         list->mapnew((_, v: dict<any>): string =>

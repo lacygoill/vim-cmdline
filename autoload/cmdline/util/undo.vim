@@ -5,7 +5,7 @@ def cmdline#util#undo#emitAddToUndolistC() #{{{1
     # We emit  a custom event, so  that we can  add the current line  to our
     # undo list in `vim-readline`.
     if exists('#User#AddToUndolistC')
-        do <nomodeline> User AddToUndolistC
+        doautocmd <nomodeline> User AddToUndolistC
     endif
 enddef
 

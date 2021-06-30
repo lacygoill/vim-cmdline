@@ -13,24 +13,24 @@ import MapMeta from 'lg/map.vim'
 #             var rhs: string
 #             [lhs, rhs] = matchlist(a:args, '^\s*\(\S\+\)\s\+\(.*\)')[1 : 2]
 #             if search_cmdline
-#                 exe printf("cnorea <expr> %s getcmdtype() =~ '[/?]' ? '%s' : '%s'", lhs, rhs, lhs)
+#                 execute printf("cnoreabbrev <expr> %s getcmdtype() =~ '[/?]' ? '%s' : '%s'", lhs, rhs, lhs)
 #             else
-#                 exe printf("cnorea <expr> %s getcmdtype() == ':' ? '%s' : '%s'", lhs, rhs, lhs)
+#                 execute printf("cnoreabbrev <expr> %s getcmdtype() == ':' ? '%s' : '%s'", lhs, rhs, lhs)
 #             endif
 #         enddef
 #
-#         com -nargs=+ Cab StrictAbbr(<q-args>)
-#         com -nargs=+ Sab StrictAbbr(<q-args>, true)
+#         command -nargs=+ Cab StrictAbbr(<q-args>)
+#         command -nargs=+ Sab StrictAbbr(<q-args>, true)
 #}}}
 
 # fix some typos
-cnorea <expr>  \` getcmdtype() =~ '[/?]' ? '\t' : '\`'
+cnoreabbrev <expr>  \` getcmdtype() =~ '[/?]' ? '\t' : '\`'
 
-cnorea <expr> dig getcmdtype() == ':' && getcmdpos() == 4 ? 'verb Digraphs!' : 'dig'
-cnorea <expr> ecoh getcmdtype() == ':' && getcmdpos() == 5 ? 'echo' : 'ecoh'
-cnorea <expr> hg getcmdtype() == ':' && getcmdpos() == 3 ? 'helpgrep' : 'hg'
-cnorea <expr> sl getcmdtype() == ':' && getcmdpos() == 3 ? 'ls' : 'sl'
-cnorea <expr> soù getcmdtype() =~ ':' && getcmdpos() == 4 ? 'so%' : 'soù'
+cnoreabbrev <expr> dig getcmdtype() == ':' && getcmdpos() == 4 ? 'verbose Digraphs!' : 'dig'
+cnoreabbrev <expr> ecoh getcmdtype() == ':' && getcmdpos() == 5 ? 'echo' : 'ecoh'
+cnoreabbrev <expr> hg getcmdtype() == ':' && getcmdpos() == 3 ? 'helpgrep' : 'hg'
+cnoreabbrev <expr> sl getcmdtype() == ':' && getcmdpos() == 3 ? 'ls' : 'sl'
+cnoreabbrev <expr> soù getcmdtype() =~ ':' && getcmdpos() == 4 ? 'source %' : 'soù'
 
 #         :fbl
 #         :FzBLines˜
@@ -40,26 +40,26 @@ cnorea <expr> soù getcmdtype() =~ ':' && getcmdpos() == 4 ? 'so%' : 'soù'
 #         :FzLines˜
 #         :fs
 #         :FzLocate˜
-cnorea <expr> fbl getcmdtype() == ':' && getcmdpos() == 4 ? 'FzBLines' : 'fbl'
-cnorea <expr> fc getcmdtype() == ':' && getcmdpos() == 3 ? 'FzCommands' : 'fc'
-cnorea <expr> fl getcmdtype() == ':' && getcmdpos() == 3 ? 'FzLines' : 'fl'
-cnorea <expr> fs getcmdtype() == ':' && getcmdpos() == 3 ? 'FzLocate' : 'fs'
-#             │
-#             └ `fl` is already taken for `:FzLines`
-#               besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
+cnoreabbrev <expr> fbl getcmdtype() == ':' && getcmdpos() == 4 ? 'FzBLines' : 'fbl'
+cnoreabbrev <expr> fc getcmdtype() == ':' && getcmdpos() == 3 ? 'FzCommands' : 'fc'
+cnoreabbrev <expr> fl getcmdtype() == ':' && getcmdpos() == 3 ? 'FzLines' : 'fl'
+cnoreabbrev <expr> fs getcmdtype() == ':' && getcmdpos() == 3 ? 'FzLocate' : 'fs'
+#                  │
+#                  └ `fl` is already taken for `:FzLines`
+#                    besides, we can use this mnemonic: in `fs`, `s` is for ’_s_earch’.
 
-cnorea <expr> ucs getcmdtype() == ':' && getcmdpos() == 4 ? 'UnicodeSearch' : 'ucs'
-cnorea <expr> v !get(g:, 'debugging') ? cmdline#vim9Abbrev() : 'v'
+cnoreabbrev <expr> ucs getcmdtype() == ':' && getcmdpos() == 4 ? 'UnicodeSearch' : 'ucs'
+cnoreabbrev <expr> v !get(g:, 'debugging') ? cmdline#vim9Abbrev() : 'v'
 
 # Autocmds {{{1
 
 # Do *not* write  a bar after a backslash  on an empty line: it  would result in
 # two consecutive bars (empty command).  This would  print a line of a buffer on
 # the command-line, when we change the focused window for the first time.
-au CmdlineEnter : ++once cmdline#autoUppercase()
+autocmd CmdlineEnter : ++once cmdline#autoUppercase()
     | cmdline#remember(OVERLOOKED_COMMANDS)
 
-augroup HitEnterPrompt | au!
+augroup HitEnterPrompt | autocmd!
     # Problem: Pressing `q` at the hit-enter prompt quits the latter (✔) and starts a recording (✘).
     # Solution: Install a temporary `q` mapping which presses Escape to quit the prompt.
     # the guard suppresses `E454`; https://github.com/vim/vim/issues/6209
@@ -77,17 +77,17 @@ augroup HitEnterPrompt | au!
             cmdline#hitEnterPromptNoRecording()
         endif
     }
-    au CmdlineLeave : if !get(g:, 'debugging')
+    autocmd CmdlineLeave : if !get(g:, 'debugging')
     \ && getcmdline() !~ '^\s*fu\%[nction]$\|^\s*\d*\s*sleep!\s\+\d*m\=\s*$\|^\s*Debug\>'
         |    timer_start(0, Callback)
         | endif
 augroup END
 
-augroup MyCmdlineChain | au!
+augroup MyCmdlineChain | autocmd!
     # Automatically execute  command B when A  has just been executed  (chain of
     # commands).  Inspiration:
     # https://gist.github.com/romainl/047aca21e338df7ccf771f96858edb86
-    au CmdlineLeave : cmdline#chain()
+    autocmd CmdlineLeave : cmdline#chain()
 
     # TODO:
     # The following autocmds are not  handled by `cmdline#chain()`, because they
@@ -100,15 +100,15 @@ augroup MyCmdlineChain | au!
     # Refactor it, so that when it handles complex commands, the code is readable.
     # No long: `if ... | then ... | elseif ... | ... | elseif ... | ...`.
 
-    # sometimes, we type `:h functionz)` instead of `:h function()`
-    au CmdlineLeave : if getcmdline() =~ '\C^h\%[elp]\s\+\S\+z)\s*$'
+    # sometimes, we type `:help functionz)` instead of `:help function()`
+    autocmd CmdlineLeave : if getcmdline() =~ '\C^h\%[elp]\s\+\S\+z)\s*$'
         |     cmdline#fixTypo('z')
         | endif
 
     # when we copy a line of vimscript and paste it on the command-line,
     # sometimes the newline gets copied and translated into a literal CR,
     # which raises an error; remove it.
-    au CmdlineLeave : if getcmdline() =~ '\r$'
+    autocmd CmdlineLeave : if getcmdline() =~ '\r$'
         |     cmdline#fixTypo('cr')
         | endif
 augroup END
@@ -127,27 +127,27 @@ augroup END
 # We use  our Tab mapping  to save the command-line  prior to an  expansion, and
 # install a C-q mapping to restore it.
 #}}}
-cno <expr><unique> <tab>   !get(g:, 'debugging') ? cmdline#tab#custom() : '<tab>'
-cno <expr><unique> <s-tab> !get(g:, 'debugging') ? cmdline#tab#custom(v:false) : '<s-tab>'
-cno       <unique> <c-q>   <c-\>e !get(g:, 'debugging')
+cnoremap <expr><unique> <Tab>   !get(g:, 'debugging') ? cmdline#tab#custom() : '<Tab>'
+cnoremap <expr><unique> <S-Tab> !get(g:, 'debugging') ? cmdline#tab#custom(v:false) : '<S-Tab>'
+cnoremap       <unique> <C-Q>   <C-\>e !get(g:, 'debugging')
     \ ? cmdline#tab#restoreCmdlineAfterExpansion()
-    \ : getcmdline()<cr>
+    \ : getcmdline()<CR>
 
 # Purpose:{{{
 #
-# - extend `:h c^l` to `:vimgrep` and `:s`
+# - extend `:help c^l` to `:vimgrep` and `:s`
 # - capture all paths (files or urls) displayed on the screen in an interactive popup window
 #}}}
-cno <expr> <c-l> cmdline#cL#main()
+cnoremap <expr> <C-L> cmdline#cL#main()
 
 # In vim-readline, we remap `i_C-a` to a readline motion.
-# Here, we restore the default `C-a` command (`:h i^a`) by mapping it to `C-x C-a`.
-# Same thing with the default `c_C-a` (`:h c^a`).
-noremap! <expr><unique> <c-x><c-a> getcmdline()->cmdline#unexpand#saveOldcmdline('<c-a>')
+# Here, we restore the default `C-a` command (`:help i^a`) by mapping it to `C-x C-a`.
+# Same thing with the default `c_C-a` (`:help c^a`).
+noremap! <expr><unique> <C-X><C-A> getcmdline()->cmdline#unexpand#saveOldcmdline('<C-A>')
 
 # `c_C-a` dumps all the matches on the command-line; let's define a custom `C-x C-d`
 # to capture all of them in the unnamed register.
-cno <unique> <c-x><c-d> <c-a><cmd>call setreg('"', [getcmdline()], 'l')<cr><c-c>
+cnoremap <unique> <C-X><C-D> <C-A><Cmd>call setreg('"', [getcmdline()], 'l')<CR><C-C>
 
 # Prevent the function from returning anything if we are not in the pattern field of `:vim`.
 # The following mapping transforms the command-line in 2 ways, depending on where we press it:{{{
@@ -164,13 +164,13 @@ cno <unique> <c-x><c-d> <c-a><cmd>call setreg('"', [getcmdline()], 'l')<cr><c-c>
 #      camel case inside parentheses, so that we can refer to them easily
 #      with backref in the replacement.
 #}}}
-cno <expr><unique> <c-s> cmdline#transform#main()
+cnoremap <expr><unique> <C-S> cmdline#transform#main()
 
 # Cycle through a set of arbitrary commands.
-cno <unique> <c-g> <c-\>e cmdline#cycle#main#move()<cr>
-MapMeta('g', '<c-\>e cmdline#cycle#main#move(v:false)<cr>', 'c', 'u')
+cnoremap <unique> <C-G> <C-\>e cmdline#cycle#main#move()<CR>
+MapMeta('g', '<C-\>e cmdline#cycle#main#move(v:false)<CR>', 'c', 'u')
 
-xno <unique> <c-g>s :s///g<left><left><left>
+xnoremap <unique> <C-G>s :s///g<Left><Left><Left>
 
 def CyclesSet()
     # populate the arglist with:
@@ -178,8 +178,8 @@ def CyclesSet()
     #    - all the files in a directory
     #    - all the files in the output of a shell command
     cmdline#cycle#main#set('a',
-        'sp <bar> args `=glob(''§./**/*'', 0, 1)->filter({_, v -> filereadable(v)})`',
-        'sp <bar> sil args `=systemlist(''§'')`')
+        'sp <Bar> args `=glob(''§./**/*'', 0, 1)->filter({_, v -> filereadable(v)})`',
+        'sp <Bar> silent args `=systemlist(''§'')`')
 
     #                       ┌ definition
     #                       │
@@ -256,15 +256,15 @@ def CyclesSet()
     #     error: The argument '--follow' was provided more than once, but cannot be used multiple times˜
     #}}}
     cmdline#cycle#main#set('g',
-        'cgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',
-        'lgete system("rg 2>/dev/null -L -S --vimgrep ''§''")',
+        'cgetexpr system("rg 2>/dev/null -L -S --vimgrep ''§''")',
+        'lgetexpr system("rg 2>/dev/null -L -S --vimgrep ''§''")',
     )
 
     # we want a different pattern depending on the filetype
     # we want `:vimgrep` to be run asynchronously
     cmdline#cycle#vimgrep#install()
 
-    cmdline#cycle#main#set('p', 'new<bar>0pu=execute(''§'')')
+    cmdline#cycle#main#set('p', 'new <Bar> :0 put =execute(''§'')')
 
     # When should I prefer this over `:WebPageRead`?{{{
     #
@@ -277,9 +277,8 @@ def CyclesSet()
     # Besides, the text  is formatted to not go beyond  100 characters per line,
     # which could break some long line of code.
     #}}}
-    cmdline#cycle#main#set('r', 'exe ''r !curl -s '' .. shellescape(''§'', v:true)')
-    #                                           │
-    #                                           └ don't show progress meter, nor error messages
+    # `-s`: don't show progress meter, nor error messages
+    cmdline#cycle#main#set('r', 'execute ''read !curl -s '' .. shellescape(''§'', v:true)')
 
     # What's this `let list = ...`?{{{
     #
@@ -313,8 +312,8 @@ def CyclesSet()
     #}}}
     cmdline#cycle#main#set('s',
         '%s/§//g',
-        '%s/`\(.\{-}\)''/`\1`/gce <bar> %s/‘\(.\{-}\)’/`\1`/gce',
-        'let list = split(@", "\n") <bar> *s/§\zs/\=list->remove(0)/'
+        '%s/`\(.\{-}\)''/`\1`/gce <Bar> %s/‘\(.\{-}\)’/`\1`/gce',
+        'let list = split(@", "\n") <Bar> *s/§\zs/\=list->remove(0)/'
     )
 enddef
 
