@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 var oldcmdline: string
 
 augroup ClearCmdlineBeforeExpansion | autocmd!
@@ -19,7 +16,7 @@ def cmdline#unexpand#saveOldcmdline( #{{{2
     autocmd CmdlineChanged : ++once SaveRef()
     return key
 enddef
-var SaveRef: func(string, string)
+var SaveRef: func
 
 def Save(key: string, cmdline: string)
     if key == "\<C-A>" || key == nr2char(&wildcharm != 0 ? &wildcharm : &wildchar)

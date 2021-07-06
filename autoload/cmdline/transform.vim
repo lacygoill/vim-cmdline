@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 const PAT_RANGE: string = '\s*\%([%*]\|[^,]*,[^,]*\)'
 
 # number of times we've transformed the command-line
@@ -74,14 +71,14 @@ enddef
 def MapFilter(cmdline: string, is_vim9: bool): string #{{{3
     # Purpose:{{{
     #
-    #     :echo [1, 2, 3]
-    #     :echo [1, 2, 3]->map({_, v -> })˜
+    #     :vim9 echo [1, 2, 3]
+    #     :vim9 echo [1, 2, 3]->map((_, v) => )˜
     #
-    #     :echo [1, 2, 3]->map({_, v -> })
-    #     :echo [1, 2, 3]->filter({_, v -> })˜
+    #     :vim9 echo [1, 2, 3]->map((_, v) => )
+    #     :vim9 echo [1, 2, 3]->filter((_, v) => )˜
     #
-    #     :echo [1, 2, 3]->filter({_, v -> v != 2})
-    #     :echo [1, 2, 3]->filter({_, v -> v != 2})->map({_, v -> })˜
+    #     :vim9 echo [1, 2, 3]->filter((_, v) => v != 2)
+    #     :vim9 echo [1, 2, 3]->filter((_, v) => v != 2)->map((_, v) => )˜
     #}}}
     var new_cmdline: string
     if cmdline =~ '\C^\s*\%(echo\|eval\)\s\+.*->\%(map\|filter\)({[i,_],\s*v\s*->\s*})$'
@@ -139,7 +136,7 @@ def CaptureSubpatterns(cmdline: string): string #{{{3
     #                              ├────────────────────────────────────────────────────────────────────┐}}}
     var new_cmdline: string = range .. 's/'
         .. subpatterns
-            ->map((_, v: string): string => '\(' .. v .. '\)')
+            ->map((_, v: string) => '\(' .. v .. '\)')
             ->join(pat =~ '_' ? '_' : '')
         .. '//g'
 

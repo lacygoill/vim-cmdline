@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 # TODO: Maybe we should support multiple tabstops (not just one).{{{
 #
 # Useful for a command like:

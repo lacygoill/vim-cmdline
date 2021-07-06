@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 def cmdline#tab#custom(is_fwd = true): string #{{{1
     if getcmdtype() =~ '[?/]'
         return getcmdline() == ''

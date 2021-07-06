@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 import Catch from 'lg.vim'
 import {
     MapSave,
@@ -25,7 +22,7 @@ def cmdline#autoUppercase() #{{{1
     var commands: list<string> = execute('command')
         ->split('\n')[1 :]
         ->filter((_, v: string): bool => v =~ '^[^bA-Z]*\u\S')
-        ->map((_, v: string): string => v->matchstr('\u\S*'))
+        ->map((_, v: string) => v->matchstr('\u\S*'))
 
     var pat: string = '^\%%(\%%(tab\<Bar>vert\%%[ical]\)\s\+\)\=%s$\<Bar>^\%%(''<,''>\<Bar>\*\)%s$'
     for cmd in commands
@@ -52,7 +49,7 @@ def cmdline#chain() #{{{1
         'ju\%[mps]':    ["normal! \<C-O>\<S-Left>", true],
     }
 
-    for [pat, cmd] in items(pat2cmd)
+    for [pat, cmd] in pat2cmd->items()
         var keys: string
         var nomore: bool
         [keys, nomore] = cmd
@@ -158,13 +155,15 @@ def cmdline#remember(list: list<dict<any>>) #{{{1
                 execute "autocmd SafeState * ++once echohl WarningMsg | echo %s | echohl NONE"
             endif
         END
-        list->mapnew((_, v: dict<any>): string =>
-                    printf(
-                        code->join('|'),
-                        v.regex ? '=~' : '==',
-                        string(v.regex ? '^' .. v.old .. '$' : v.old),
-                        string('[' .. v.new .. '] was equivalent')
-                    )->execute())
+        for d: dict<any> in list
+            var cmd: string = printf(
+                code->join('|'),
+                d.regex ? '=~' : '==',
+                string(d.regex ? '^' .. d.old .. '$' : d.old),
+                string('[' .. d.new .. '] was equivalent')
+            )
+            execute cmd
+        endfor
     augroup END
 enddef
 

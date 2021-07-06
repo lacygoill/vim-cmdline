@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 # TEST:
 #
 # https://unix.stackexchange.com/
@@ -20,8 +17,8 @@ def cmdline#cL#main(): string #{{{2
         return InteractivePaths()
     endif
     var col: number = getcmdpos()
-    # `:123lvimgrepadd!`
-    var pat: string = '^\C[: \t]*\d*l\=vim\%[grepadd]!\=\s\+'
+    # `:123 lvimgrepadd!`
+    var pat: string = '^\C[: \t]*\d*\s*l\=vim\%[grepadd]!\=\s\+'
         # opening delimiter
         .. '\(\i\@!.\)'
         # the pattern; stopping at the cursor because it doesn't make sense
@@ -33,7 +30,7 @@ def cmdline#cL#main(): string #{{{2
         .. '\1'
         # flags
         .. '[gj]\{,2}\s'
-        # `:%substitute/pat/rep/g`
+        # `:%s/pat/rep/g`
         .. '\|s\(\i\@!.\)\zs.\{-}\%' .. col .. 'c\ze.\{-}\2.\{-}\2'
         # `:helpgrep :s_flags`
         .. '[cegn]\{,4}\%($\|\s\||\)'
@@ -73,20 +70,20 @@ enddef
 #     $ cat <<'EOF' >/tmp/vim.vim
 #         set incsearch
 #         cnoremap <expr> <C-L> C_l()
-#         function C_l()
+#         def C_l(): string
 #             echomsg getpos('.')
 #             return ''
-#         endfunction
+#         enddef
 #     EOF
 #
 #     $ vim -Nu NONE -S /tmp/vim.vim /tmp/vim.vim
-#     :vim /c/
-#     " press C-l while the cursor is right before `c`
+#     :vimgrep /c/
+#     # press C-l while the cursor is right before `c`
 #     [0, 1, 1, 0]˜
-#     " the cursor didn't move
-#     :vim c C-l
-#     [0, 2, 6, 0]˜
-#     " the cursor *did* move
+#     # the cursor didn't move
+#     :vimgrep c C-l
+#     [0, 1, 12, 0]˜
+#     # the cursor *did* move
 #}}}
 #}}}1
 # Core {{{1
@@ -179,7 +176,7 @@ def AlignFields(paths: list<string>) #{{{2
         ->mapnew((_, v: string): number =>
             v->matchstr('\s\+line\s\+\zs\d\+$')->strcharlen())
         ->max()
-    paths->map((_, v: string): string => Aligned(v, path_width, lnum_width))
+    paths->map((_, v: string) => Aligned(v, path_width, lnum_width))
 enddef
 
 def Aligned( #{{{2

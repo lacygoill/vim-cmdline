@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 # Init {{{1
 
 # `:Filter /pat/ cmd` should just run the built-in `:filter` if it can filter `:cmd`.

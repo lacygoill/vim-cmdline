@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 # Interface {{{1
 
 # Why a wrapper command around `:[l]vim`?{{{
@@ -20,13 +17,9 @@ var loaded = true
 # used  in  regexes,  because  the  backslash would  be  removed  (it  would  be
 # interpreted as meaning: "take the following special character as a literal one").
 #
-#     $ vim -Nu NONE -S <(cat <<'EOF'
-#         command -nargs=* -complete=file Cmd echomsg <q-args>
-#         Cmd a\%b
-#     EOF
-#     )
-#
-#     a%b
+#     command -nargs=* -complete=file Cmd echomsg <q-args>
+#     Cmd a\%b
+#     a%b˜
 #}}}
 command -nargs=* Vim Vimgrep(<q-args>)
 command -nargs=* Lvim Vimgrep(<q-args>, true)
@@ -91,9 +84,13 @@ def Vimgrep(args: string, loclist = false) #{{{2
     #
     # No.  Apparently, a Vim job inherits the environment of the current Vim instance.
     #
-    #     :let $ENVVAR = 'some environment variable'
-    #     :let job = job_start(['/bin/bash', '-c', 'vim -Nu NONE +''call writefile([$ENVVAR], "/tmp/somefile")'' +quitall!'])
-    #     :echo readfile('/tmp/somefile')
+    #     $ENVVAR = 'some environment variable'
+    #     job_start([
+    #         '/bin/bash',
+    #         '-c',
+    #         'vim -Nu NONE +''call writefile([$ENVVAR], "/tmp/somefile")'' +quitall!'
+    #     ])
+    #     echo readfile('/tmp/somefile')
     #     ['some environment variable']˜
     #}}}
     var setcmd: string = printf('set wildignore=%s suffixes=%s %signorecase %ssmartcase',
@@ -223,7 +220,7 @@ def Expandargs(args: string): string #{{{2
         ->substitute(
             '\s\+\zs##\s*$',
             argv()
-                ->map((_, v: string): string => v->fnamemodify(':p')->fnameescape())
+                ->map((_, v: string) => v->fnamemodify(':p')->fnameescape())
                 ->join(),
             '')
 enddef
