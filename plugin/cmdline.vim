@@ -168,7 +168,7 @@ cnoremap <expr><unique> <C-S> cmdline#transform#main()
 
 # Cycle through a set of arbitrary commands.
 cnoremap <unique> <C-G> <C-\>e cmdline#cycle#main#move()<CR>
-MapMeta('g', '<C-\>e cmdline#cycle#main#move(v:false)<CR>', 'c', 'u')
+MapMeta('cnoremap <unique> <M-G> <C-\>e cmdline#cycle#main#move(v:false)<CR>')
 
 xnoremap <unique> <C-G>s :s///g<Left><Left><Left>
 
