@@ -25,7 +25,7 @@ def cmdline#autoUppercase() #{{{1
         ->map((_, v: string) => v->matchstr('\u\S*'))
 
     var pat: string = '^\%%(\%%(tab\<Bar>vert\%%[ical]\)\s\+\)\=%s$\<Bar>^\%%(''<,''>\<Bar>\*\)%s$'
-    for cmd in commands
+    for cmd: string in commands
         var lcmd: string = cmd->tolower()
         execute printf('cnoreabbrev <expr> %s getcmdtype() == '':'' && getcmdline() =~ '
                     .. string(pat) .. ' ? %s : %s',
@@ -49,7 +49,7 @@ def cmdline#chain() #{{{1
         'ju\%[mps]':    ["normal! \<C-O>\<S-Left>", true],
     }
 
-    for [pat, cmd] in pat2cmd->items()
+    for [pat: string, cmd: list<any>] in pat2cmd->items()
         var keys: string
         var nomore: bool
         [keys, nomore] = cmd

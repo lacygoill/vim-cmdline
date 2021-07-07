@@ -138,9 +138,9 @@ var Popup: func
 def Getlines(): string #{{{2
     var lines: list<string>
     var line: list<string>
-    for row in range(1, &lines)
+    for row: number in range(1, &lines)
         line = []
-        for col in range(1, &columns)
+        for col: number in range(1, &columns)
             line += [screenstring(row, col)]
         endfor
         lines += [line->join('')]

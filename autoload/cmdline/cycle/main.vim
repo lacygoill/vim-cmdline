@@ -104,7 +104,7 @@ def Install(arg_seq: string, arg_cmds: list<string>) #{{{2
 enddef
 
 def DelayCycleInstall() #{{{2
-    for [seq, cmds] in seq_and_cmds
+    for [seq: string, cmds: list<string>] in seq_and_cmds
         Install(seq, cmds)
     endfor
 enddef

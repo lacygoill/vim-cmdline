@@ -105,7 +105,7 @@ enddef
 # }}}1
 # Utilities {{{1
 def IsFilterable(first_word: string): bool #{{{2
-    for cmd in FILTERABLE_COMMANDS
+    for cmd: string in FILTERABLE_COMMANDS
         if first_word =~ '^\C' .. cmd .. '$'
             return true
         endif
